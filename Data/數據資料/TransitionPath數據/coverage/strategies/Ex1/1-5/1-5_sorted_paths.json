@@ -1,0 +1,619 @@
+{
+  "strategyName": "Ex1",
+  "projectName": "1-5",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 1,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-1",
+      "name": "User login → open draft → edit & save → back to list",
+      "semanticGoal": "驗證 User 登入後可進入文件列表、開啟 Draft 詳情、編輯保存成功並返回列表，且路徑全程連通。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_documents_user.s.feature_AuthLoginFeature_AuthenticatedUser.to.page_DocumentsUserPage_user_Init",
+        "t.page_documents_user.0001",
+        "c.page_documents_user.invokes.page_document_detail_user.s.page_DocumentsUserPage_user_Ready.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.feature_edit_draft.s.page_DocumentDetailUserPage_user_DraftReady.to.feature_EditDraftFeature_Init",
+        "t.feature_edit_draft.0001",
+        "t.feature_edit_draft.0002",
+        "t.feature_edit_draft.0003",
+        "c.feature_edit_draft.invokes.page_document_detail_user.s.feature_EditDraftFeature_Completed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.page_documents_user.s.page_DocumentDetailUserPage_user_DraftReady.to.page_DocumentsUserPage_user_Init",
+        "t.page_documents_user.0001"
+      ],
+      "pathLength": 17
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-12",
+      "name": "Admin login → go flow templates → edit & save template → back to list",
+      "semanticGoal": "驗證 Admin 可從文件列表進入流程模板頁，進入模板管理功能並保存成功後返回列表且可重新載入模板。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_documents_admin.s.feature_AuthLoginFeature_AuthenticatedAdmin.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0001",
+        "c.page_documents_admin.invokes.page_admin_flows.s.page_DocumentsAdminPage_admin_Ready.to.page_AdminFlowsPage_admin_Init",
+        "t.page_admin_flows.0001",
+        "c.page_admin_flows.invokes.feature_manage_flow_template.s.page_AdminFlowsPage_admin_Ready.to.feature_ManageFlowTemplateFeature_Init",
+        "t.feature_manage_flow_template.0001",
+        "t.feature_manage_flow_template.0002",
+        "t.feature_manage_flow_template.0004",
+        "c.feature_manage_flow_template.invokes.page_admin_flows.s.feature_ManageFlowTemplateFeature_Completed.to.page_AdminFlowsPage_admin_Init",
+        "t.page_admin_flows.0001"
+      ],
+      "pathLength": 15
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-9",
+      "name": "Reviewer login → open pending doc → final approve → doc becomes readonly",
+      "semanticGoal": "驗證 Reviewer 登入後可進入待辦、開啟待審文件並完成最後同意，返回詳情後不再顯示待處理 CTA。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_reviews.s.feature_AuthLoginFeature_AuthenticatedReviewer.to.page_ReviewsPage_reviewer_Init",
+        "t.page_reviews.0001",
+        "c.page_reviews.invokes.page_document_detail_reviewer.s.page_ReviewsPage_reviewer_Ready.to.page_DocumentDetailReviewerPage_reviewer_Init",
+        "t.page_document_detail_reviewer.0001",
+        "c.page_document_detail_reviewer.invokes.feature_approve_review_task.s.page_DocumentDetailReviewerPage_reviewer_PendingAction.to.feature_ApproveReviewTaskFeature_Init",
+        "t.feature_approve_review_task.0001",
+        "t.feature_approve_review_task.0003",
+        "c.feature_approve_review_task.invokes.page_document_detail_reviewer.s.feature_ApproveReviewTaskFeature_DocumentApproved.to.page_DocumentDetailReviewerPage_reviewer_Init",
+        "t.page_document_detail_reviewer.0002"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-3",
+      "name": "User empty list → create draft → submit validation failed → back to list",
+      "semanticGoal": "驗證 User 在空列表可建立 Draft，並在送審驗證失敗後回到詳情仍為 Draft，最後返回列表顯示有文件。",
+      "edgeIds": [
+        "t.page_documents_user.0002",
+        "c.page_documents_user.invokes.feature_create_document.s.page_DocumentsUserPage_user_Empty.to.feature_CreateDocumentFeature_Init",
+        "t.feature_create_document.0001",
+        "t.feature_create_document.0002",
+        "c.feature_create_document.invokes.page_document_detail_user.s.feature_CreateDocumentFeature_CreatedForUser.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.feature_submit_document.s.page_DocumentDetailUserPage_user_DraftReady.to.feature_SubmitDocumentFeature_Init",
+        "t.feature_submit_document.0001",
+        "t.feature_submit_document.0003",
+        "c.feature_submit_document.invokes.page_document_detail_user.s.feature_SubmitDocumentFeature_Failed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.page_documents_user.s.page_DocumentDetailUserPage_user_DraftReady.to.page_DocumentsUserPage_user_Init",
+        "t.page_documents_user.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-45",
+      "name": "Reviewer reject failed → retry → reject success → readonly",
+      "semanticGoal": "驗證 Reviewer 退回任務若第一次提交失敗可重試，最終退回成功後返回詳情進入只讀狀態。",
+      "edgeIds": [
+        "t.page_document_detail_reviewer.0001",
+        "c.page_document_detail_reviewer.invokes.feature_reject_review_task.s.page_DocumentDetailReviewerPage_reviewer_PendingAction.to.feature_RejectReviewTaskFeature_Init",
+        "t.feature_reject_review_task.0001",
+        "t.feature_reject_review_task.0002",
+        "t.feature_reject_review_task.0004",
+        "t.feature_reject_review_task.0005",
+        "t.feature_reject_review_task.0002",
+        "t.feature_reject_review_task.0003",
+        "c.feature_reject_review_task.invokes.page_document_detail_reviewer.s.feature_RejectReviewTaskFeature_Completed.to.page_DocumentDetailReviewerPage_reviewer_Init",
+        "t.page_document_detail_reviewer.0002"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 19,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-19",
+      "name": "Admin approved doc → archive failed → back → return to list",
+      "semanticGoal": "驗證 Approved 文件封存失敗時可回到詳情並仍維持 Approved 狀態，且可返回文件列表重新載入。",
+      "edgeIds": [
+        "t.page_document_detail_admin.0001",
+        "c.page_document_detail_admin.invokes.feature_archive_document.s.page_DocumentDetailAdminPage_admin_ApprovedReady.to.feature_ArchiveDocumentFeature_Init",
+        "t.feature_archive_document.0001",
+        "t.feature_archive_document.0003",
+        "c.feature_archive_document.invokes.page_document_detail_admin.s.feature_ArchiveDocumentFeature_Failed.to.page_DocumentDetailAdminPage_admin_Init",
+        "t.page_document_detail_admin.0001",
+        "c.page_document_detail_admin.invokes.page_documents_admin.s.page_DocumentDetailAdminPage_admin_ApprovedReady.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-28",
+      "name": "User rejected → reopen failed → return still rejected",
+      "semanticGoal": "驗證 Rejected 文件重開 Draft 失敗時回到詳情仍維持 Rejected 狀態，且路徑可連通。",
+      "edgeIds": [
+        "t.page_document_detail_user.0002",
+        "c.page_document_detail_user.invokes.feature_reopen_rejected_document.s.page_DocumentDetailUserPage_user_RejectedReady.to.feature_ReopenRejectedDocumentFeature_Init",
+        "t.feature_reopen_rejected_document.0001",
+        "t.feature_reopen_rejected_document.0003",
+        "c.feature_reopen_rejected_document.invokes.page_document_detail_user.s.feature_ReopenRejectedDocumentFeature_Failed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-13",
+      "name": "Admin empty docs → create draft → open detail readonly → back to docs hasDocs",
+      "semanticGoal": "驗證 Admin 在文件列表為空時仍可建立文件，並能開啟新文件詳情(非 Approved 只讀)後返回列表載入成功。",
+      "edgeIds": [
+        "t.page_documents_admin.0002",
+        "c.page_documents_admin.invokes.feature_create_document.s.page_DocumentsAdminPage_admin_Empty.to.feature_CreateDocumentFeature_Init",
+        "t.feature_create_document.0001",
+        "t.feature_create_document.0003",
+        "c.feature_create_document.invokes.page_document_detail_admin.s.feature_CreateDocumentFeature_CreatedForAdmin.to.page_DocumentDetailAdminPage_admin_Init",
+        "t.page_document_detail_admin.0002",
+        "c.page_document_detail_admin.invokes.page_documents_admin.s.page_DocumentDetailAdminPage_admin_Readonly.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 37,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-37",
+      "name": "Admin docs load failed → retry → open approved doc → go to flows → flows empty",
+      "semanticGoal": "驗證 Admin 文件列表載入失敗可重試成功，並可從列表開啟 Approved 詳情後導向 /admin/flows 並呈現 Empty 分支。",
+      "edgeIds": [
+        "t.page_documents_admin.0003",
+        "t.page_documents_admin.0004",
+        "t.page_documents_admin.0001",
+        "c.page_documents_admin.invokes.page_document_detail_admin.s.page_DocumentsAdminPage_admin_Ready.to.page_DocumentDetailAdminPage_admin_Init",
+        "t.page_document_detail_admin.0001",
+        "c.page_document_detail_admin.invokes.page_admin_flows.s.page_DocumentDetailAdminPage_admin_ApprovedReady.to.page_AdminFlowsPage_admin_Init",
+        "t.page_admin_flows.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-26",
+      "name": "User draft → upload attachment success → return to draft",
+      "semanticGoal": "驗證 Draft 附件上傳成功會回到詳情並仍處於可操作的 Draft 路徑，且路徑連通。",
+      "edgeIds": [
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.feature_upload_attachment.s.page_DocumentDetailUserPage_user_DraftReady.to.feature_UploadAttachmentFeature_Init",
+        "t.feature_upload_attachment.0001",
+        "t.feature_upload_attachment.0002",
+        "c.feature_upload_attachment.invokes.page_document_detail_user.s.feature_UploadAttachmentFeature_Completed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-8",
+      "name": "User draft → submit for review success → return as readonly",
+      "semanticGoal": "驗證送審成功會建立鎖定版本與任務、文件進入審核流程，返回詳情後變為只讀狀態路徑可連通。",
+      "edgeIds": [
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.feature_submit_document.s.page_DocumentDetailUserPage_user_DraftReady.to.feature_SubmitDocumentFeature_Init",
+        "t.feature_submit_document.0001",
+        "t.feature_submit_document.0002",
+        "t.feature_submit_document.0004",
+        "c.feature_submit_document.invokes.page_document_detail_user.s.feature_SubmitDocumentFeature_Completed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0003"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-43",
+      "name": "Reviewer detail not found → return to reviews empty → logout",
+      "semanticGoal": "驗證 Reviewer 開啟未關聯/不存在文件會 NotFound，返回 /reviews 後可呈現 Empty，並能登出回 /login。",
+      "edgeIds": [
+        "t.page_document_detail_reviewer.0003",
+        "c.page_document_detail_reviewer.invokes.page_reviews.s.page_DocumentDetailReviewerPage_reviewer_NotFound.to.page_ReviewsPage_reviewer_Init",
+        "t.page_reviews.0002",
+        "c.page_reviews.invokes.page_login.s.page_ReviewsPage_reviewer_Empty.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 36,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-36",
+      "name": "Admin docs ready → create failed → back to docs empty",
+      "semanticGoal": "驗證 Admin 從文件列表 Ready 進入建立文件流程後若建立失敗，會返回 Admin 文件列表且可走到 Empty 分支。",
+      "edgeIds": [
+        "c.page_documents_admin.invokes.feature_create_document.s.page_DocumentsAdminPage_admin_Ready.to.feature_CreateDocumentFeature_Init",
+        "t.feature_create_document.0001",
+        "t.feature_create_document.0004",
+        "c.feature_create_document.invokes.page_documents_admin.s.feature_CreateDocumentFeature_Failed.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-40",
+      "name": "User detail load failed → retry → readonly → logout",
+      "semanticGoal": "驗證 User 文件詳情載入失敗可 Retry，之後可進入只讀狀態並登出回 /login。",
+      "edgeIds": [
+        "t.page_document_detail_user.0005",
+        "t.page_document_detail_user.0006",
+        "t.page_document_detail_user.0003",
+        "c.page_document_detail_user.invokes.page_login.s.page_DocumentDetailUserPage_user_Readonly.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-39",
+      "name": "User docs load failed → retry → ready → logout",
+      "semanticGoal": "驗證 User 文件列表載入失敗可 Retry 回到 Init 並成功載入 Ready，且可登出回 /login 並顯示表單。",
+      "edgeIds": [
+        "t.page_documents_user.0003",
+        "t.page_documents_user.0004",
+        "t.page_documents_user.0001",
+        "c.page_documents_user.invokes.page_login.s.page_DocumentsUserPage_user_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-15",
+      "name": "Admin flows load failed → retry → empty → logout to login",
+      "semanticGoal": "驗證 /admin/flows 載入失敗可重試並在無模板時顯示 Empty，且可從 Empty 狀態登出返回 /login。",
+      "edgeIds": [
+        "t.page_admin_flows.0003",
+        "t.page_admin_flows.0004",
+        "t.page_admin_flows.0002",
+        "c.page_admin_flows.invokes.page_login.s.page_AdminFlowsPage_admin_Empty.to.page_LoginPage_Init"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-20",
+      "name": "Flows empty → open editor → deactivate → back to flows empty",
+      "semanticGoal": "驗證 Admin 在流程模板列表為空時仍可進入模板管理並完成停用流程，回到列表後仍可呈現空狀態。",
+      "edgeIds": [
+        "t.page_admin_flows.0002",
+        "c.page_admin_flows.invokes.feature_manage_flow_template.s.page_AdminFlowsPage_admin_Empty.to.feature_ManageFlowTemplateFeature_Init",
+        "t.feature_manage_flow_template.0001",
+        "t.feature_manage_flow_template.0003",
+        "t.feature_manage_flow_template.0006",
+        "c.feature_manage_flow_template.invokes.page_admin_flows.s.feature_ManageFlowTemplateFeature_Completed.to.page_AdminFlowsPage_admin_Init",
+        "t.page_admin_flows.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-18",
+      "name": "Admin docs ready → open missing doc → return → logout",
+      "semanticGoal": "驗證 Admin 從文件列表可開啟文件詳情並正確處理 NotFound，返回列表後仍可正常載入並能登出回登入頁。",
+      "edgeIds": [
+        "t.page_documents_admin.0001",
+        "c.page_documents_admin.invokes.page_document_detail_admin.s.page_DocumentsAdminPage_admin_Ready.to.page_DocumentDetailAdminPage_admin_Init",
+        "t.page_document_detail_admin.0003",
+        "c.page_document_detail_admin.invokes.page_documents_admin.s.page_DocumentDetailAdminPage_admin_NotFound.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0001",
+        "c.page_documents_admin.invokes.page_login.s.page_DocumentsAdminPage_admin_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-5",
+      "name": "User detail not found → return to documents (empty)",
+      "semanticGoal": "驗證 User 開啟不存在/未授權文件得到 NotFound，並可返回列表且列表可走到 Empty。",
+      "edgeIds": [
+        "t.page_document_detail_user.0004",
+        "c.page_document_detail_user.invokes.page_documents_user.s.page_DocumentDetailUserPage_user_NotFound.to.page_DocumentsUserPage_user_Init",
+        "t.page_documents_user.0002"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-11",
+      "name": "Reviews load failed → retry → empty",
+      "semanticGoal": "驗證 /reviews 待辦載入失敗後可 Retry，並能在無任務時走到 Empty。",
+      "edgeIds": [
+        "t.page_reviews.0003",
+        "t.page_reviews.0004",
+        "t.page_reviews.0002"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-14",
+      "name": "Admin approved detail → archive success → return as archived readonly",
+      "semanticGoal": "驗證 Approved 文件可進入封存流程並成功封存，返回詳情後顯示 Archived 且不可再封存。",
+      "edgeIds": [
+        "t.page_document_detail_admin.0001",
+        "c.page_document_detail_admin.invokes.feature_archive_document.s.page_DocumentDetailAdminPage_admin_ApprovedReady.to.feature_ArchiveDocumentFeature_Init",
+        "t.feature_archive_document.0001",
+        "t.feature_archive_document.0002",
+        "c.feature_archive_document.invokes.page_document_detail_admin.s.feature_ArchiveDocumentFeature_Completed.to.page_DocumentDetailAdminPage_admin_Init",
+        "t.page_document_detail_admin.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-31",
+      "name": "Reviewer approve (not final) → return to doc readonly",
+      "semanticGoal": "驗證 Reviewer 同意任務後若流程尚未結束，可返回詳情並進入不可操作的只讀視圖。",
+      "edgeIds": [
+        "t.page_document_detail_reviewer.0001",
+        "c.page_document_detail_reviewer.invokes.feature_approve_review_task.s.page_DocumentDetailReviewerPage_reviewer_PendingAction.to.feature_ApproveReviewTaskFeature_Init",
+        "t.feature_approve_review_task.0001",
+        "t.feature_approve_review_task.0002",
+        "c.feature_approve_review_task.invokes.page_document_detail_reviewer.s.feature_ApproveReviewTaskFeature_StepAdvanced.to.page_DocumentDetailReviewerPage_reviewer_Init",
+        "t.page_document_detail_reviewer.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-6",
+      "name": "User rejected detail → reopen as draft (success) → draft ready",
+      "semanticGoal": "驗證 Rejected 文件可透過 reopen 建立新 Draft 版本並回到詳情呈現 Draft。",
+      "edgeIds": [
+        "t.page_document_detail_user.0002",
+        "c.page_document_detail_user.invokes.feature_reopen_rejected_document.s.page_DocumentDetailUserPage_user_RejectedReady.to.feature_ReopenRejectedDocumentFeature_Init",
+        "t.feature_reopen_rejected_document.0001",
+        "t.feature_reopen_rejected_document.0002",
+        "c.feature_reopen_rejected_document.invokes.page_document_detail_user.s.feature_ReopenRejectedDocumentFeature_Completed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-44",
+      "name": "Reviewer approve failed → return to pending doc",
+      "semanticGoal": "驗證 Reviewer 同意任務若失敗（例如 409/403）可返回文件詳情並仍能回到 PendingAction 視角。",
+      "edgeIds": [
+        "t.page_document_detail_reviewer.0001",
+        "c.page_document_detail_reviewer.invokes.feature_approve_review_task.s.page_DocumentDetailReviewerPage_reviewer_PendingAction.to.feature_ApproveReviewTaskFeature_Init",
+        "t.feature_approve_review_task.0001",
+        "t.feature_approve_review_task.0004",
+        "c.feature_approve_review_task.invokes.page_document_detail_reviewer.s.feature_ApproveReviewTaskFeature_Failed.to.page_DocumentDetailReviewerPage_reviewer_Init",
+        "t.page_document_detail_reviewer.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-7",
+      "name": "User draft → upload attachment failed → return to draft",
+      "semanticGoal": "驗證 Draft 附件上傳失敗不新增附件，返回詳情後仍可維持 Draft 並可再次操作。",
+      "edgeIds": [
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.feature_upload_attachment.s.page_DocumentDetailUserPage_user_DraftReady.to.feature_UploadAttachmentFeature_Init",
+        "t.feature_upload_attachment.0001",
+        "t.feature_upload_attachment.0003",
+        "c.feature_upload_attachment.invokes.page_document_detail_user.s.feature_UploadAttachmentFeature_Failed.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_204744_fra99q.json",
+      "sourcePathId": "path-2",
+      "name": "Login failed → return to /login and show form again",
+      "semanticGoal": "驗證登入失敗不建立 session，會回到登入頁並能再次顯示登入表單。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0005",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Failed.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 42,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-42",
+      "name": "Reviewer readonly detail → back to reviews → open logout",
+      "semanticGoal": "驗證 Reviewer 在只讀詳情可返回待辦列表並成功載入 Ready，且可從 Ready 登出回 /login。",
+      "edgeIds": [
+        "t.page_document_detail_reviewer.0002",
+        "c.page_document_detail_reviewer.invokes.page_reviews.s.page_DocumentDetailReviewerPage_reviewer_Readonly.to.page_ReviewsPage_reviewer_Init",
+        "t.page_reviews.0001",
+        "c.page_reviews.invokes.page_login.s.page_ReviewsPage_reviewer_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 17,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-17",
+      "name": "Admin login → documents load failed → retry → empty → go flows → logout",
+      "semanticGoal": "驗證 Admin 登入後進入文件列表載入失敗可 Retry 並到 Empty，接著可從空列表前往流程模板頁並登出回登入頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_documents_admin.s.feature_AuthLoginFeature_AuthenticatedAdmin.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0003",
+        "t.page_documents_admin.0004",
+        "t.page_documents_admin.0002",
+        "c.page_documents_admin.invokes.page_admin_flows.s.page_DocumentsAdminPage_admin_Empty.to.page_AdminFlowsPage_admin_Init",
+        "t.page_admin_flows.0001",
+        "c.page_admin_flows.invokes.page_login.s.page_AdminFlowsPage_admin_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-48",
+      "name": "Manage template save failed",
+      "semanticGoal": "驗證 Admin 進入模板管理後送出保存若失敗，會進入 Failed 狀態且路徑連通。",
+      "edgeIds": [
+        "t.feature_manage_flow_template.0001",
+        "t.feature_manage_flow_template.0002",
+        "t.feature_manage_flow_template.0005"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 21,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-21",
+      "name": "User docs ready → create doc → open draft → back to list",
+      "semanticGoal": "驗證 User 在文件列表 Ready 狀態可進入建立文件流程並成功開啟新 Draft，返回列表後仍可正常載入文件。",
+      "edgeIds": [
+        "t.page_documents_user.0001",
+        "c.page_documents_user.invokes.feature_create_document.s.page_DocumentsUserPage_user_Ready.to.feature_CreateDocumentFeature_Init",
+        "t.feature_create_document.0001",
+        "t.feature_create_document.0002",
+        "c.feature_create_document.invokes.page_document_detail_user.s.feature_CreateDocumentFeature_CreatedForUser.to.page_DocumentDetailUserPage_user_Init",
+        "t.page_document_detail_user.0001",
+        "c.page_document_detail_user.invokes.page_documents_user.s.page_DocumentDetailUserPage_user_DraftReady.to.page_DocumentsUserPage_user_Init",
+        "t.page_documents_user.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205158_cvvei2.json",
+      "sourcePathId": "path-32",
+      "name": "Reviewer pending doc → back to reviews → empty → logout",
+      "semanticGoal": "驗證 Reviewer 可從待審詳情返回待辦列表，待辦為空時可登出回登入頁。",
+      "edgeIds": [
+        "t.page_document_detail_reviewer.0001",
+        "c.page_document_detail_reviewer.invokes.page_reviews.s.page_DocumentDetailReviewerPage_reviewer_PendingAction.to.page_ReviewsPage_reviewer_Init",
+        "t.page_reviews.0002",
+        "c.page_reviews.invokes.page_login.s.page_ReviewsPage_reviewer_Empty.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 38,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\1-5\\20260321_205845_ta1hpv.json",
+      "sourcePathId": "path-38",
+      "name": "Flows ready → go to documents → documents hasDocs",
+      "semanticGoal": "驗證 Admin 在流程模板頁 Ready 狀態可返回 /documents，且文件列表可成功載入 hasDocuments 分支。",
+      "edgeIds": [
+        "t.page_admin_flows.0001",
+        "c.page_admin_flows.invokes.page_documents_admin.s.page_AdminFlowsPage_admin_Ready.to.page_DocumentsAdminPage_admin_Init",
+        "t.page_documents_admin.0001"
+      ],
+      "pathLength": 3
+    }
+  ]
+}

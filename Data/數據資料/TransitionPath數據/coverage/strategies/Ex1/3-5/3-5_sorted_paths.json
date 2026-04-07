@@ -1,0 +1,639 @@
+{
+  "strategyName": "Ex1",
+  "projectName": "3-5",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-10",
+      "name": "Invitations accept → Open member board",
+      "semanticGoal": "Validate accepting an invitation returns to Project List and user can open a project as member and load the board.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.feature_invitation_response.s.page_ProjectListPage_Ready.to.feature_InvitationResponseFeature_Idle",
+        "t.feature_invitation_response.0001",
+        "t.feature_invitation_response.0002",
+        "t.feature_invitation_response.0004",
+        "c.feature_invitation_response.invokes.page_project_list.01",
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.page_project_board_member.s.page_ProjectListPage_Ready.to.page.ProjectBoardPage.member.Init",
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0003"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-13",
+      "name": "Owner/Admin task status change → Close panel",
+      "semanticGoal": "Validate opening an editable task detail panel, changing task status successfully, refreshing panel, then closing back to board.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.feature_task_status.01",
+        "t.feature_task_status.0001",
+        "t.feature_task_status.0002",
+        "c.feature_task_status.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.page_project_board_owner_admin.01"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-47",
+      "name": "Owner settings update rejected → Refresh settings page",
+      "semanticGoal": "Validate owner can reach settings, attempt update that is rejected, and settings page refreshes back to ready state.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_project_settings.01",
+        "t.page_project_settings.0001",
+        "t.page_project_settings.0002",
+        "c.page_project_settings.invokes.feature_project_settings.01",
+        "t.feature_project_settings.0001",
+        "t.feature_project_settings.0003",
+        "c.feature_project_settings.invokes.page_project_settings.02",
+        "t.page_project_settings.0001",
+        "t.page_project_settings.0002"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212453_t5f7nc.json",
+      "sourcePathId": "path-31",
+      "name": "Members (owner/admin) → Invite member → Back to members",
+      "semanticGoal": "Validate owner/admin can open membership management, submit an invitation successfully, and return to members page with a fresh load.",
+      "edgeIds": [
+        "t.page_members_owner_admin.0001",
+        "t.page_members_owner_admin.0002",
+        "c.page_members_owner_admin.invokes.feature_membership_management.01",
+        "t.feature_membership_management.0001",
+        "t.feature_membership_management.0004",
+        "c.feature_membership_management.invokes.page_members_owner_admin.01",
+        "t.page_members_owner_admin.0001",
+        "t.page_members_owner_admin.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-16",
+      "name": "Viewer open task detail → Close to board",
+      "semanticGoal": "Validate viewer can open read-only task detail panel and close back to viewer board with board loading ready.",
+      "edgeIds": [
+        "t.page_project_board_viewer.0001",
+        "t.page_project_board_viewer.0003",
+        "c.page_project_board_viewer.invokes.page_task_detail_viewer.01",
+        "t.page_task_detail_viewer.0001",
+        "t.page_task_detail_viewer.0002",
+        "c.page_task_detail_viewer.invokes.page_project_board_viewer.01",
+        "t.page_project_board_viewer.0001",
+        "t.page_project_board_viewer.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-6",
+      "name": "Register success → Projects empty",
+      "semanticGoal": "Validate successful registration routes to Project List and empty-state renders when no projects exist.",
+      "edgeIds": [
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Idle",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0002",
+        "c.feature_auth_register.invokes.page_project_list.01",
+        "t.page_project_list.0001",
+        "t.page_project_list.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-3",
+      "name": "Login rejected → back to login",
+      "semanticGoal": "Validate rejected login returns user to Login page without establishing a session.",
+      "edgeIds": [
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Idle",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_login.01",
+        "t.page_login.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212453_t5f7nc.json",
+      "sourcePathId": "path-32",
+      "name": "Owner/Admin empty board → Structure change rejected → Back to board",
+      "semanticGoal": "Validate owner/admin can enter board structure flow from empty board, handle a rejected update, and navigate back to board.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0002",
+        "c.page_project_board_owner_admin.invokes.feature_board_structure.01",
+        "t.feature_board_structure.0001",
+        "t.feature_board_structure.0003",
+        "c.feature_board_structure.invokes.page_project_board_owner_admin.02"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-33",
+      "name": "Owner/Admin → Activity log failed → Retry → Ready",
+      "semanticGoal": "Validate Activity Log shows error on failure, supports retry, and reaches ready state.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_activity_log.01",
+        "t.page_activity_log.0001",
+        "t.page_activity_log.0004",
+        "t.page_activity_log.0005",
+        "t.page_activity_log.0003"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 36,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-35",
+      "name": "Owner/Admin → Archived view failed → Retry → Ready",
+      "semanticGoal": "Validate Archived View handles load failure with retry and can reach ready state.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_archived_view.01",
+        "t.page_archived_view.0001",
+        "t.page_archived_view.0004",
+        "t.page_archived_view.0005",
+        "t.page_archived_view.0003"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-7",
+      "name": "Empty projects → Create project → Board ready",
+      "semanticGoal": "Validate creating a project from empty project list opens the created project board and board loads ready.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0002",
+        "c.page_project_list.invokes.feature_project_create.s.page_ProjectListPage_Empty.to.feature_ProjectCreateFeature_Idle",
+        "t.feature_project_create.0001",
+        "t.feature_project_create.0002",
+        "c.feature_project_create.invokes.page_project_board_owner_admin.01",
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-14",
+      "name": "Member create task blocked by WIP",
+      "semanticGoal": "Validate member task creation can be blocked by WIP limits and returns safely back to member board.",
+      "edgeIds": [
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0003",
+        "c.page_project_board_member.invokes.feature_task_create.01",
+        "t.feature_task_create.0001",
+        "t.feature_task_create.0004",
+        "c.feature_task_create.invokes.page_project_board_member.02",
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-15",
+      "name": "Member drag task → Conflict → Back to board",
+      "semanticGoal": "Validate member task move can hit a conflict and returns to board with authoritative state reload.",
+      "edgeIds": [
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0003",
+        "c.page_project_board_member.invokes.feature_task_move.01",
+        "t.feature_task_move.0001",
+        "t.feature_task_move.0005",
+        "c.feature_task_move.invokes.page_project_board_member.03",
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-46",
+      "name": "Task assignment rejected → Refresh panel",
+      "semanticGoal": "Validate rejected assignee change does not persist and panel refresh shows unchanged assignees.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.feature_task_assignment.01",
+        "t.feature_task_assignment.0001",
+        "t.feature_task_assignment.0003",
+        "c.feature_task_assignment.invokes.page_task_detail_editor.02",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-45",
+      "name": "Task edit conflict → Refresh panel",
+      "semanticGoal": "Validate task edit conflict returns latest authoritative payload via panel refresh.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.feature_task_edit.01",
+        "t.feature_task_edit.0001",
+        "t.feature_task_edit.0003",
+        "c.feature_task_edit.invokes.page_task_detail_editor.02",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-2",
+      "name": "Landing CTA → Login form",
+      "semanticGoal": "Validate Landing page loads, then Login CTA routes to Login page and shows the login form.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_landing.s.page_Entry_Init.to.page_LandingPage_Init",
+        "t.page_landing.0001",
+        "c.page_landing.invokes.page_login.s.page_LandingPage_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-9",
+      "name": "Invitations reject → Back to projects",
+      "semanticGoal": "Validate rejecting an invitation returns to Project List without changing project access.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.feature_invitation_response.s.page_ProjectListPage_Ready.to.feature_InvitationResponseFeature_Idle",
+        "t.feature_invitation_response.0001",
+        "t.feature_invitation_response.0003",
+        "t.feature_invitation_response.0005",
+        "c.feature_invitation_response.invokes.page_project_list.02",
+        "t.page_project_list.0001",
+        "t.page_project_list.0003"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 42,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-41",
+      "name": "Project list → Viewer board realtime disconnect → Resync",
+      "semanticGoal": "Validate viewer board reconnect flow returns to ready state after realtime disconnect.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.page_project_board_viewer.s.page_ProjectListPage_Ready.to.page.ProjectBoardPage.viewer.Init",
+        "t.page_project_board_viewer.0001",
+        "t.page_project_board_viewer.0003",
+        "t.page_project_board_viewer.0005",
+        "t.page_project_board_viewer.0006",
+        "t.page_project_board_viewer.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-8",
+      "name": "Create project failed → Back to projects",
+      "semanticGoal": "Validate failed project creation returns to Project List and list can load to ready again.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.feature_project_create.s.page_ProjectListPage_Ready.to.feature_ProjectCreateFeature_Idle",
+        "t.feature_project_create.0001",
+        "t.feature_project_create.0003",
+        "c.feature_project_create.invokes.page_project_list.01",
+        "t.page_project_list.0001",
+        "t.page_project_list.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 38,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-37",
+      "name": "Projects load failed → Logout → Landing ready",
+      "semanticGoal": "Validate logging out from Project List error state routes to Landing and Landing renders ready state.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0004",
+        "c.page_project_list.invokes.page_landing.s.page_ProjectListPage_Error.to.page.LandingPage.Init",
+        "t.page_landing.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212453_t5f7nc.json",
+      "sourcePathId": "path-27",
+      "name": "Owner/Admin board load fails → Retry → Ready",
+      "semanticGoal": "Validate owner/admin board shows error on snapshot failure and can retry to reach ready state.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0004",
+        "t.page_project_board_owner_admin.0007",
+        "t.page_project_board_owner_admin.0003"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-40",
+      "name": "Member board realtime disconnect → Resync → Ready",
+      "semanticGoal": "Validate member board enters reconnecting on realtime disconnect and resyncs back to ready.",
+      "edgeIds": [
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0003",
+        "t.page_project_board_member.0005",
+        "t.page_project_board_member.0006",
+        "t.page_project_board_member.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212453_t5f7nc.json",
+      "sourcePathId": "path-26",
+      "name": "Owner/Admin board → Realtime disconnect → Reconnect → Ready",
+      "semanticGoal": "Validate owner/admin board can enter reconnecting state after realtime disconnect and resync back to ready.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "t.page_project_board_owner_admin.0005",
+        "t.page_project_board_owner_admin.0006",
+        "t.page_project_board_owner_admin.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-4",
+      "name": "Login success → Projects ready",
+      "semanticGoal": "Validate successful login routes to Project List and projects load into ready state.",
+      "edgeIds": [
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Idle",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_project_list.01",
+        "t.page_project_list.0001",
+        "t.page_project_list.0003"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212230_h89fct.json",
+      "sourcePathId": "path-5",
+      "name": "Register rejected → back to register",
+      "semanticGoal": "Validate rejected registration returns user to Register page without authenticated access.",
+      "edgeIds": [
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Idle",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0003",
+        "c.feature_auth_register.invokes.page_register.01",
+        "t.page_register.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-42",
+      "name": "Owner/Admin open task panel → Load failed → Retry → Close",
+      "semanticGoal": "Validate task detail panel handles load failure with retry, reaches ready, and can close back to board.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0003",
+        "t.page_task_detail_editor.0004",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.page_project_board_owner_admin.01"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-38",
+      "name": "Project list → Member board empty → Back to projects",
+      "semanticGoal": "Validate member board can render empty state and supports returning to Project List and reloading projects.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.page_project_board_member.s.page_ProjectListPage_Ready.to.page.ProjectBoardPage.member.Init",
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0002",
+        "c.page_project_board_member.invokes.page_project_list.01",
+        "t.page_project_list.0001",
+        "t.page_project_list.0003"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212453_t5f7nc.json",
+      "sourcePathId": "path-30",
+      "name": "Owner/Admin board → Settings load fails → Retry → Ready",
+      "semanticGoal": "Validate owner-only settings route is reachable from board and supports retry after load failure.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_project_settings.01",
+        "t.page_project_settings.0001",
+        "t.page_project_settings.0003",
+        "t.page_project_settings.0004",
+        "t.page_project_settings.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-39",
+      "name": "Project list → Member board failed → Retry → Ready",
+      "semanticGoal": "Validate member board shows error on load failure and can retry to reach ready state.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.page_project_board_member.s.page_ProjectListPage_Ready.to.page.ProjectBoardPage.member.Init",
+        "t.page_project_board_member.0001",
+        "t.page_project_board_member.0004",
+        "t.page_project_board_member.0007",
+        "t.page_project_board_member.0003"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_212453_t5f7nc.json",
+      "sourcePathId": "path-25",
+      "name": "Projects ready → Open viewer board → Error → Retry → Ready",
+      "semanticGoal": "Validate viewer board shows retryable error on load failure and can retry to ready state.",
+      "edgeIds": [
+        "t.page_project_list.0001",
+        "t.page_project_list.0003",
+        "c.page_project_list.invokes.page_project_board_viewer.s.page_ProjectListPage_Ready.to.page.ProjectBoardPage.viewer.Init",
+        "t.page_project_board_viewer.0001",
+        "t.page_project_board_viewer.0004",
+        "t.page_project_board_viewer.0007",
+        "t.page_project_board_viewer.0003"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-43",
+      "name": "Task status illegal transition → Rejected → Panel refresh",
+      "semanticGoal": "Validate illegal task status change is rejected and task panel refresh preserves authoritative status.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.feature_task_status.01",
+        "t.feature_task_status.0001",
+        "t.feature_task_status.0003",
+        "c.feature_task_status.invokes.page_task_detail_editor.02",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-5\\20260321_213054_r0wasx.json",
+      "sourcePathId": "path-44",
+      "name": "Task status update failed → Panel refresh",
+      "semanticGoal": "Validate task status update can fail (non-legality) and panel refresh keeps authoritative unchanged status.",
+      "edgeIds": [
+        "t.page_project_board_owner_admin.0001",
+        "t.page_project_board_owner_admin.0003",
+        "c.page_project_board_owner_admin.invokes.page_task_detail_editor.01",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002",
+        "c.page_task_detail_editor.invokes.feature_task_status.01",
+        "t.feature_task_status.0001",
+        "t.feature_task_status.0004",
+        "c.feature_task_status.invokes.page_task_detail_editor.03",
+        "t.page_task_detail_editor.0001",
+        "t.page_task_detail_editor.0002"
+      ],
+      "pathLength": 11
+    }
+  ]
+}

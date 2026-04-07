@@ -1,0 +1,235 @@
+{
+  "strategyName": "Ex9",
+  "projectName": "2-5",
+  "maxPathsPerProject": 32,
+  "totals": {
+    "states": 124,
+    "transitions": 272
+  },
+  "points": [
+    {
+      "pathCount": 1,
+      "coveredStates": 14,
+      "stateCoverageRatio": 0.11290322580645161,
+      "coveredTransitions": 17,
+      "transitionCoverageRatio": 0.0625
+    },
+    {
+      "pathCount": 2,
+      "coveredStates": 26,
+      "stateCoverageRatio": 0.20967741935483872,
+      "coveredTransitions": 33,
+      "transitionCoverageRatio": 0.1213235294117647
+    },
+    {
+      "pathCount": 3,
+      "coveredStates": 38,
+      "stateCoverageRatio": 0.3064516129032258,
+      "coveredTransitions": 46,
+      "transitionCoverageRatio": 0.16911764705882354
+    },
+    {
+      "pathCount": 4,
+      "coveredStates": 48,
+      "stateCoverageRatio": 0.3870967741935484,
+      "coveredTransitions": 58,
+      "transitionCoverageRatio": 0.21323529411764705
+    },
+    {
+      "pathCount": 5,
+      "coveredStates": 53,
+      "stateCoverageRatio": 0.4274193548387097,
+      "coveredTransitions": 68,
+      "transitionCoverageRatio": 0.25
+    },
+    {
+      "pathCount": 6,
+      "coveredStates": 60,
+      "stateCoverageRatio": 0.4838709677419355,
+      "coveredTransitions": 77,
+      "transitionCoverageRatio": 0.28308823529411764
+    },
+    {
+      "pathCount": 7,
+      "coveredStates": 67,
+      "stateCoverageRatio": 0.5403225806451613,
+      "coveredTransitions": 87,
+      "transitionCoverageRatio": 0.31985294117647056
+    },
+    {
+      "pathCount": 8,
+      "coveredStates": 73,
+      "stateCoverageRatio": 0.5887096774193549,
+      "coveredTransitions": 97,
+      "transitionCoverageRatio": 0.35661764705882354
+    },
+    {
+      "pathCount": 9,
+      "coveredStates": 78,
+      "stateCoverageRatio": 0.6290322580645161,
+      "coveredTransitions": 104,
+      "transitionCoverageRatio": 0.38235294117647056
+    },
+    {
+      "pathCount": 10,
+      "coveredStates": 83,
+      "stateCoverageRatio": 0.6693548387096774,
+      "coveredTransitions": 113,
+      "transitionCoverageRatio": 0.41544117647058826
+    },
+    {
+      "pathCount": 11,
+      "coveredStates": 85,
+      "stateCoverageRatio": 0.6854838709677419,
+      "coveredTransitions": 121,
+      "transitionCoverageRatio": 0.44485294117647056
+    },
+    {
+      "pathCount": 12,
+      "coveredStates": 88,
+      "stateCoverageRatio": 0.7096774193548387,
+      "coveredTransitions": 128,
+      "transitionCoverageRatio": 0.47058823529411764
+    },
+    {
+      "pathCount": 13,
+      "coveredStates": 90,
+      "stateCoverageRatio": 0.7258064516129032,
+      "coveredTransitions": 135,
+      "transitionCoverageRatio": 0.4963235294117647
+    },
+    {
+      "pathCount": 14,
+      "coveredStates": 94,
+      "stateCoverageRatio": 0.7580645161290323,
+      "coveredTransitions": 141,
+      "transitionCoverageRatio": 0.5183823529411765
+    },
+    {
+      "pathCount": 15,
+      "coveredStates": 96,
+      "stateCoverageRatio": 0.7741935483870968,
+      "coveredTransitions": 147,
+      "transitionCoverageRatio": 0.5404411764705882
+    },
+    {
+      "pathCount": 16,
+      "coveredStates": 98,
+      "stateCoverageRatio": 0.7903225806451613,
+      "coveredTransitions": 153,
+      "transitionCoverageRatio": 0.5625
+    },
+    {
+      "pathCount": 17,
+      "coveredStates": 98,
+      "stateCoverageRatio": 0.7903225806451613,
+      "coveredTransitions": 158,
+      "transitionCoverageRatio": 0.5808823529411765
+    },
+    {
+      "pathCount": 18,
+      "coveredStates": 98,
+      "stateCoverageRatio": 0.7903225806451613,
+      "coveredTransitions": 163,
+      "transitionCoverageRatio": 0.5992647058823529
+    },
+    {
+      "pathCount": 19,
+      "coveredStates": 100,
+      "stateCoverageRatio": 0.8064516129032258,
+      "coveredTransitions": 168,
+      "transitionCoverageRatio": 0.6176470588235294
+    },
+    {
+      "pathCount": 20,
+      "coveredStates": 102,
+      "stateCoverageRatio": 0.8225806451612904,
+      "coveredTransitions": 173,
+      "transitionCoverageRatio": 0.6360294117647058
+    },
+    {
+      "pathCount": 21,
+      "coveredStates": 104,
+      "stateCoverageRatio": 0.8387096774193549,
+      "coveredTransitions": 178,
+      "transitionCoverageRatio": 0.6544117647058824
+    },
+    {
+      "pathCount": 22,
+      "coveredStates": 105,
+      "stateCoverageRatio": 0.8467741935483871,
+      "coveredTransitions": 183,
+      "transitionCoverageRatio": 0.6727941176470589
+    },
+    {
+      "pathCount": 23,
+      "coveredStates": 106,
+      "stateCoverageRatio": 0.8548387096774194,
+      "coveredTransitions": 188,
+      "transitionCoverageRatio": 0.6911764705882353
+    },
+    {
+      "pathCount": 24,
+      "coveredStates": 109,
+      "stateCoverageRatio": 0.8790322580645161,
+      "coveredTransitions": 192,
+      "transitionCoverageRatio": 0.7058823529411765
+    },
+    {
+      "pathCount": 25,
+      "coveredStates": 110,
+      "stateCoverageRatio": 0.8870967741935484,
+      "coveredTransitions": 196,
+      "transitionCoverageRatio": 0.7205882352941176
+    },
+    {
+      "pathCount": 26,
+      "coveredStates": 112,
+      "stateCoverageRatio": 0.9032258064516129,
+      "coveredTransitions": 199,
+      "transitionCoverageRatio": 0.7316176470588235
+    },
+    {
+      "pathCount": 27,
+      "coveredStates": 113,
+      "stateCoverageRatio": 0.9112903225806451,
+      "coveredTransitions": 202,
+      "transitionCoverageRatio": 0.7426470588235294
+    },
+    {
+      "pathCount": 28,
+      "coveredStates": 114,
+      "stateCoverageRatio": 0.9193548387096774,
+      "coveredTransitions": 205,
+      "transitionCoverageRatio": 0.7536764705882353
+    },
+    {
+      "pathCount": 29,
+      "coveredStates": 114,
+      "stateCoverageRatio": 0.9193548387096774,
+      "coveredTransitions": 208,
+      "transitionCoverageRatio": 0.7647058823529411
+    },
+    {
+      "pathCount": 30,
+      "coveredStates": 114,
+      "stateCoverageRatio": 0.9193548387096774,
+      "coveredTransitions": 211,
+      "transitionCoverageRatio": 0.7757352941176471
+    },
+    {
+      "pathCount": 31,
+      "coveredStates": 115,
+      "stateCoverageRatio": 0.9274193548387096,
+      "coveredTransitions": 213,
+      "transitionCoverageRatio": 0.7830882352941176
+    },
+    {
+      "pathCount": 32,
+      "coveredStates": 116,
+      "stateCoverageRatio": 0.9354838709677419,
+      "coveredTransitions": 215,
+      "transitionCoverageRatio": 0.7904411764705882
+    }
+  ]
+}

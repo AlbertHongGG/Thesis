@@ -1,0 +1,647 @@
+{
+  "strategyName": "EX2",
+  "projectName": "1-2",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-12",
+      "name": "Manager approve persisted -> deduct sync success",
+      "semanticGoal": "驗證主管核准 submitted 請假後觸發額度扣抵同步，扣抵成功返回詳情並維持帳務一致。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_ManagerAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001",
+        "c.page_my_leave_manager.invokes.page_pending_approvals.s.page_MyLeavePage_manager_Browsing.to.page_PendingApprovalsPage_Init",
+        "t.page_pending_approvals.0001",
+        "c.page_pending_approvals.invokes.page_leave_request_detail.s.page_PendingApprovalsPage_Ready.to.page_LeaveRequestDetailPage_Init",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_manager.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_manager_Init",
+        "t.page_leave_request_detail_manager.0001",
+        "c.page_leave_request_detail_manager.invokes.feature_leave_request_status.s.page_LeaveRequestDetailPage_manager_Reviewing.to.feature_LeaveRequestStatusFeature_Init_approve",
+        "t.feature_leave_request_status.0003",
+        "c.feature_leave_request_status.invokes.feature_leave_balance_sync.s.feature_LeaveRequestStatusFeature_Approving.to.feature_LeaveBalanceSyncFeature_Init_approve",
+        "t.feature_leave_balance_sync.0003",
+        "c.feature_leave_balance_sync.invokes.page_leave_request_detail.s.feature_LeaveBalanceSyncFeature_Deducting.to.page_LeaveRequestDetailPage_Init_success",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 21
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-6",
+      "name": "Create request -> edit -> attachment -> save draft -> view detail",
+      "semanticGoal": "驗證建立新請假申請進入表單與編輯功能，更新附件並儲存草稿成功後回到詳情且可進入員工詳情操作。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_EmployeeAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_employee.s.page_MyLeavePage_Ready.to.page_MyLeavePage_employee_Init",
+        "t.page_my_leave_employee.0001",
+        "c.page_my_leave_employee.invokes.page_leave_request_form.s.page_MyLeavePage_employee_Browsing.to.page_LeaveRequestFormPage_Init",
+        "t.page_leave_request_form.0001",
+        "c.page_leave_request_form.invokes.feature_leave_request_edit.s.page_LeaveRequestFormPage_Ready.to.feature_LeaveRequestEditFeature_Init",
+        "t.feature_leave_request_edit.0001",
+        "t.feature_leave_request_edit.0002",
+        "t.feature_leave_request_edit.0003",
+        "t.feature_leave_request_edit.0004",
+        "c.feature_leave_request_edit.invokes.page_leave_request_detail.s.feature_LeaveRequestEditFeature_SavingDraft.to.page_LeaveRequestDetailPage_Init",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_employee.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_employee_Init",
+        "t.page_leave_request_detail_employee.0001"
+      ],
+      "pathLength": 20
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-14",
+      "name": "Manager approvals -> calendar fail/retry -> open event denied -> safe back",
+      "semanticGoal": "驗證主管從待審核切到部門日曆，日曆載入失敗可重試成功；開啟超出範圍事件時詳情進入安全失敗並返回安全頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_ManagerAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001",
+        "c.page_my_leave_manager.invokes.page_pending_approvals.s.page_MyLeavePage_manager_Browsing.to.page_PendingApprovalsPage_Init",
+        "t.page_pending_approvals.0001",
+        "c.page_pending_approvals.invokes.page_department_calendar.s.page_PendingApprovalsPage_Ready.to.page_DepartmentCalendarPage_Init",
+        "t.page_department_calendar.0002",
+        "t.page_department_calendar.0003",
+        "t.page_department_calendar.0001",
+        "c.page_department_calendar.invokes.page_leave_request_detail.s.page_DepartmentCalendarPage_Ready.to.page_LeaveRequestDetailPage_Init",
+        "t.page_leave_request_detail.0002",
+        "c.page_leave_request_detail.invokes.page_my_leave.s.page_LeaveRequestDetailPage_Failed.to.page_MyLeavePage_Init"
+      ],
+      "pathLength": 18
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-15",
+      "name": "Manager leave balance fail/retry/refresh then back",
+      "semanticGoal": "驗證主管在剩餘假期頁的載入失敗可重試成功，並可刷新資料後安全返回我的請假。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_ManagerAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001",
+        "c.page_my_leave_manager.invokes.page_leave_balance.s.page_MyLeavePage_manager_Browsing.to.page_LeaveBalancePage_Init",
+        "t.page_leave_balance.0002",
+        "t.page_leave_balance.0004",
+        "t.page_leave_balance.0001",
+        "t.page_leave_balance.0003",
+        "t.page_leave_balance.0001",
+        "c.page_leave_balance.invokes.page_my_leave.s.page_LeaveBalancePage_Ready.to.page_MyLeavePage_Init"
+      ],
+      "pathLength": 16
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-9",
+      "name": "Employee submit persisted -> reserve sync success",
+      "semanticGoal": "驗證送出請假成功後啟動額度預扣同步，預扣成功返回詳情並可呈現已送出狀態。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_EmployeeAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_employee.s.page_MyLeavePage_Ready.to.page_MyLeavePage_employee_Init",
+        "t.page_my_leave_employee.0001",
+        "c.page_my_leave_employee.invokes.page_leave_request_detail.s.page_MyLeavePage_employee_Browsing.to.page_LeaveRequestDetailPage_Init",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_employee.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_employee_Init",
+        "t.page_leave_request_detail_employee.0001",
+        "c.page_leave_request_detail_employee.invokes.feature_leave_request_status.s.page_LeaveRequestDetailPage_employee_Viewing.to.feature_LeaveRequestStatusFeature_Init",
+        "t.feature_leave_request_status.0001",
+        "c.feature_leave_request_status.invokes.feature_leave_balance_sync.s.feature_LeaveRequestStatusFeature_Submitting.to.feature_LeaveBalanceSyncFeature_Init_submit",
+        "t.feature_leave_balance_sync.0001",
+        "c.feature_leave_balance_sync.invokes.page_leave_request_detail.s.feature_LeaveBalanceSyncFeature_Reserving.to.page_LeaveRequestDetailPage_Init_success",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_employee.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_employee_Init",
+        "t.page_leave_request_detail_employee.0001"
+      ],
+      "pathLength": 21
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-10",
+      "name": "Employee cancel persisted -> release sync failed",
+      "semanticGoal": "驗證撤回成功後觸發額度釋放同步，但同步失敗需回到詳情且避免顯示不一致的額度效果。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_EmployeeAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_employee.s.page_MyLeavePage_Ready.to.page_MyLeavePage_employee_Init",
+        "t.page_my_leave_employee.0001",
+        "c.page_my_leave_employee.invokes.page_leave_request_detail.s.page_MyLeavePage_employee_Browsing.to.page_LeaveRequestDetailPage_Init",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_employee.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_employee_Init",
+        "t.page_leave_request_detail_employee.0001",
+        "c.page_leave_request_detail_employee.invokes.feature_leave_request_status.s.page_LeaveRequestDetailPage_employee_Viewing.to.feature_LeaveRequestStatusFeature_Init_cancel",
+        "t.feature_leave_request_status.0002",
+        "c.feature_leave_request_status.invokes.feature_leave_balance_sync.s.feature_LeaveRequestStatusFeature_Cancelling.to.feature_LeaveBalanceSyncFeature_Init_cancel",
+        "t.feature_leave_balance_sync.0002",
+        "c.feature_leave_balance_sync.invokes.page_leave_request_detail.s.feature_LeaveBalanceSyncFeature_Releasing.to.page_LeaveRequestDetailPage_Init_failed",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 19
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-43",
+      "name": "Reject persisted -> release sync success",
+      "semanticGoal": "覆蓋主管駁回成功後進入額度同步（release）且釋放成功返回詳情並可載入內容。",
+      "edgeIds": [
+        "t.feature_leave_request_status.0004",
+        "c.feature_leave_request_status.invokes.feature_leave_balance_sync.s.feature_LeaveRequestStatusFeature_Rejecting.to.feature_LeaveBalanceSyncFeature_Init_reject",
+        "t.feature_leave_balance_sync.0002",
+        "c.feature_leave_balance_sync.invokes.page_leave_request_detail.s.feature_LeaveBalanceSyncFeature_Releasing.to.page_LeaveRequestDetailPage_Init_success",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-47",
+      "name": "Manager back to approvals then fail/retry",
+      "semanticGoal": "覆蓋主管從詳情返回待審核後，待審核載入失敗並可重試成功恢復 Ready。",
+      "edgeIds": [
+        "t.page_leave_request_detail_manager.0001",
+        "c.page_leave_request_detail_manager.invokes.page_pending_approvals.s.page_LeaveRequestDetailPage_manager_Reviewing.to.page_PendingApprovalsPage_Init",
+        "t.page_pending_approvals.0002",
+        "t.page_pending_approvals.0003",
+        "t.page_pending_approvals.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-3",
+      "name": "Login failed then return to login",
+      "semanticGoal": "驗證登入失敗會回到登入頁，且可再次呈現登入表單狀態。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Failed.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-4",
+      "name": "My Leave load failed then retry success",
+      "semanticGoal": "驗證我的請假清單載入失敗顯示可恢復錯誤，重試後可成功載入。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_EmployeeAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0002",
+        "t.page_my_leave.0003",
+        "t.page_my_leave.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-16",
+      "name": "Create request form load failed then back",
+      "semanticGoal": "驗證從我的請假建立新申請進入表單時，若表單上下文載入失敗，能安全返回我的請假且不提交任何變更。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_EmployeeAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_employee.s.page_MyLeavePage_Ready.to.page_MyLeavePage_employee_Init",
+        "t.page_my_leave_employee.0001",
+        "c.page_my_leave_employee.invokes.page_leave_request_form.s.page_MyLeavePage_employee_Browsing.to.page_LeaveRequestFormPage_Init",
+        "t.page_leave_request_form.0002",
+        "c.page_leave_request_form.invokes.page_my_leave.s.page_LeaveRequestFormPage_Failed.to.page_MyLeavePage_Init"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-11",
+      "name": "Department Calendar forbid non-manager then require login",
+      "semanticGoal": "覆蓋非主管存取部門日曆時導回我的請假，且在未登入情境下再導回登入頁。",
+      "edgeIds": [
+        "c.page_department_calendar.invokes.page_my_leave.s.page_DepartmentCalendarPage_Init.to.page_MyLeavePage_Init_forbid",
+        "c.page_my_leave.invokes.page_login.s.page_MyLeavePage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-46",
+      "name": "Edit draft then cancel edit back to form",
+      "semanticGoal": "覆蓋員工從詳情 edit_draft 進表單與編輯功能後 cancel_edit 回到表單入口並再次載入表單上下文。",
+      "edgeIds": [
+        "t.page_leave_request_detail_employee.0001",
+        "c.page_leave_request_detail_employee.invokes.page_leave_request_form.s.page_LeaveRequestDetailPage_employee_Viewing.to.page_LeaveRequestFormPage_Init",
+        "t.page_leave_request_form.0001",
+        "c.page_leave_request_form.invokes.feature_leave_request_edit.s.page_LeaveRequestFormPage_Ready.to.feature_LeaveRequestEditFeature_Init",
+        "t.feature_leave_request_edit.0001",
+        "c.feature_leave_request_edit.invokes.page_leave_request_form.s.feature_LeaveRequestEditFeature_Editing.to.page_LeaveRequestFormPage_Init",
+        "t.page_leave_request_form.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 37,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-37",
+      "name": "Edit feature submit_request (via status)",
+      "semanticGoal": "覆蓋從表單編輯功能直接送出（submit_request）串到狀態功能的 submit 流，並回到詳情可重新載入。",
+      "edgeIds": [
+        "t.feature_leave_request_edit.0001",
+        "c.feature_leave_request_edit.invokes.feature_leave_request_status.s.feature_LeaveRequestEditFeature_Editing.to.feature_LeaveRequestStatusFeature_Init",
+        "t.feature_leave_request_status.0001",
+        "c.feature_leave_request_status.invokes.page_leave_request_detail.s.feature_LeaveRequestStatusFeature_Submitting.to.page_LeaveRequestDetailPage_Init_denied",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-13",
+      "name": "Manager My Leave -> calendar -> back to approvals",
+      "semanticGoal": "覆蓋主管從我的請假進入部門日曆，再返回待審核並載入清單的跨頁串接。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_ManagerAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001",
+        "c.page_my_leave_manager.invokes.page_department_calendar.s.page_MyLeavePage_manager_Browsing.to.page_DepartmentCalendarPage_Init",
+        "t.page_department_calendar.0001",
+        "c.page_department_calendar.invokes.page_pending_approvals.s.page_DepartmentCalendarPage_Ready.to.page_PendingApprovalsPage_Init",
+        "t.page_pending_approvals.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-15",
+      "name": "Manager create request then cancel back to My Leave",
+      "semanticGoal": "覆蓋主管從我的請假建立新申請進入表單，載入成功後取消返回我的請假並可再次載入清單。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_ManagerAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001",
+        "c.page_my_leave_manager.invokes.page_leave_request_form.s.page_MyLeavePage_manager_Browsing.to.page_LeaveRequestFormPage_Init",
+        "t.page_leave_request_form.0001",
+        "c.page_leave_request_form.invokes.page_my_leave.s.page_LeaveRequestFormPage_Ready.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223317_rjje4q.json",
+      "sourcePathId": "path-13",
+      "name": "Manager reject denied then detail reload",
+      "semanticGoal": "驗證主管駁回請假若被拒絕（權限/驗證不符）會回到詳情並可重新載入，且不會留下部分決策資料。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_my_leave.s.feature_AuthLoginFeature_ManagerAuthenticated.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001",
+        "c.page_my_leave_manager.invokes.page_pending_approvals.s.page_MyLeavePage_manager_Browsing.to.page_PendingApprovalsPage_Init",
+        "t.page_pending_approvals.0001",
+        "c.page_pending_approvals.invokes.page_leave_request_detail.s.page_PendingApprovalsPage_Ready.to.page_LeaveRequestDetailPage_Init",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_manager.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_manager_Init",
+        "t.page_leave_request_detail_manager.0001",
+        "c.page_leave_request_detail_manager.invokes.feature_leave_request_status.s.page_LeaveRequestDetailPage_manager_Reviewing.to.feature_LeaveRequestStatusFeature_Init_reject",
+        "t.feature_leave_request_status.0004",
+        "c.feature_leave_request_status.invokes.page_leave_request_detail.s.feature_LeaveRequestStatusFeature_Rejecting.to.page_LeaveRequestDetailPage_Init_denied",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 19
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 33,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-33",
+      "name": "Employee refresh My Leave list",
+      "semanticGoal": "覆蓋員工在我的請假（employee browsing）執行 refresh 回到清單入口並重新載入，再次切回員工視圖。",
+      "edgeIds": [
+        "c.page_my_leave_employee.invokes.page_my_leave.s.page_MyLeavePage_employee_Browsing.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_employee.s.page_MyLeavePage_Ready.to.page_MyLeavePage_employee_Init",
+        "t.page_my_leave_employee.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-34",
+      "name": "Manager refresh My Leave list",
+      "semanticGoal": "覆蓋主管在我的請假（manager browsing）執行 refresh 回到清單入口並重新載入，再次切回主管視圖。",
+      "edgeIds": [
+        "c.page_my_leave_manager.invokes.page_my_leave.s.page_MyLeavePage_manager_Browsing.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001",
+        "c.page_my_leave.invokes.page_my_leave_manager.s.page_MyLeavePage_Ready.to.page_MyLeavePage_manager_Init",
+        "t.page_my_leave_manager.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-10",
+      "name": "Pending Approvals forbid non-manager then require login",
+      "semanticGoal": "覆蓋非主管存取待審核頁時導回我的請假，且在未登入情境下再導回登入頁。",
+      "edgeIds": [
+        "c.page_pending_approvals.invokes.page_my_leave.s.page_PendingApprovalsPage_Init.to.page_MyLeavePage_Init_forbid",
+        "c.page_my_leave.invokes.page_login.s.page_MyLeavePage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-12",
+      "name": "Department Calendar unauthenticated redirects to Login",
+      "semanticGoal": "覆蓋未登入存取部門日曆頁時的 require_login 導回登入頁行為。",
+      "edgeIds": [
+        "c.page_department_calendar.invokes.page_login.s.page_DepartmentCalendarPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-02",
+      "name": "Leave Balance unauthenticated redirects to Login",
+      "semanticGoal": "覆蓋未登入存取剩餘假期頁時的 require_login 導回登入頁行為。",
+      "edgeIds": [
+        "c.page_leave_balance.invokes.page_login.s.page_LeaveBalancePage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 19,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-03",
+      "name": "Leave Detail unauthenticated redirects to Login",
+      "semanticGoal": "覆蓋未登入存取請假詳情頁時的 require_login 導回登入頁行為。",
+      "edgeIds": [
+        "c.page_leave_request_detail.invokes.page_login.s.page_LeaveRequestDetailPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-04",
+      "name": "Leave Form unauthenticated redirects to Login",
+      "semanticGoal": "覆蓋未登入存取請假表單頁時的 require_login 導回登入頁行為。",
+      "edgeIds": [
+        "c.page_leave_request_form.invokes.page_login.s.page_LeaveRequestFormPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-09",
+      "name": "Pending Approvals unauthenticated redirects to Login",
+      "semanticGoal": "覆蓋未登入存取待審核頁時的 require_login 導回登入頁行為。",
+      "edgeIds": [
+        "c.page_pending_approvals.invokes.page_login.s.page_PendingApprovalsPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-48",
+      "name": "Approve denied then enter manager review view",
+      "semanticGoal": "覆蓋核准被拒絕後仍可回到詳情並切入主管詳情視角（manager reviewing）以檢視可用操作。",
+      "edgeIds": [
+        "t.feature_leave_request_status.0003",
+        "c.feature_leave_request_status.invokes.page_leave_request_detail.s.feature_LeaveRequestStatusFeature_Approving.to.page_LeaveRequestDetailPage_Init_denied",
+        "t.page_leave_request_detail.0001",
+        "c.page_leave_request_detail.invokes.page_leave_request_detail_manager.s.page_LeaveRequestDetailPage_Ready.to.page_LeaveRequestDetailPage_manager_Init",
+        "t.page_leave_request_detail_manager.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-44",
+      "name": "Reserve sync failed -> detail reload",
+      "semanticGoal": "覆蓋 submitted 預扣同步失敗（reserve_failed）回到詳情並可重新載入內容。",
+      "edgeIds": [
+        "t.feature_leave_balance_sync.0001",
+        "c.feature_leave_balance_sync.invokes.page_leave_request_detail.s.feature_LeaveBalanceSyncFeature_Reserving.to.page_LeaveRequestDetailPage_Init_failed",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-45",
+      "name": "Deduct sync failed -> detail reload",
+      "semanticGoal": "覆蓋 approved 扣抵同步失敗（deduct_failed）回到詳情並可重新載入內容。",
+      "edgeIds": [
+        "t.feature_leave_balance_sync.0003",
+        "c.feature_leave_balance_sync.invokes.page_leave_request_detail.s.feature_LeaveBalanceSyncFeature_Deducting.to.page_LeaveRequestDetailPage_Init_failed",
+        "t.page_leave_request_detail.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-41",
+      "name": "Department calendar back to My Leave",
+      "semanticGoal": "覆蓋主管在部門日曆 Ready 狀態返回我的請假並載入自己的清單。",
+      "edgeIds": [
+        "t.page_department_calendar.0001",
+        "c.page_department_calendar.invokes.page_my_leave.s.page_DepartmentCalendarPage_Ready.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 35,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-35",
+      "name": "Employee detail back to My Leave",
+      "semanticGoal": "覆蓋員工在請假詳情（employee viewing）返回我的請假並重新進入清單 Ready 狀態。",
+      "edgeIds": [
+        "t.page_leave_request_detail_employee.0001",
+        "c.page_leave_request_detail_employee.invokes.page_my_leave.s.page_LeaveRequestDetailPage_employee_Viewing.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_224453_bvi2w2.json",
+      "sourcePathId": "path-40",
+      "name": "Pending approvals back to My Leave",
+      "semanticGoal": "覆蓋主管在待審核清單 Ready 狀態返回我的請假並載入自己的清單。",
+      "edgeIds": [
+        "t.page_pending_approvals.0001",
+        "c.page_pending_approvals.invokes.page_my_leave.s.page_PendingApprovalsPage_Ready.to.page_MyLeavePage_Init",
+        "t.page_my_leave.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\1-2\\20260321_223753_etmsza.json",
+      "sourcePathId": "path-16",
+      "name": "Edit feature draft save failed returns to editing",
+      "semanticGoal": "覆蓋請假編輯功能在儲存草稿失敗時回到 Editing 並保留可修正狀態。",
+      "edgeIds": [
+        "t.feature_leave_request_edit.0001",
+        "t.feature_leave_request_edit.0004",
+        "t.feature_leave_request_edit.0005"
+      ],
+      "pathLength": 3
+    }
+  ]
+}

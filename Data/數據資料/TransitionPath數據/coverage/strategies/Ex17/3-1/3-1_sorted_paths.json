@@ -1,0 +1,658 @@
+{
+  "strategyName": "Ex17",
+  "projectName": "3-1",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-6",
+      "name": "Buyer purchase happy path (add cart -> checkout -> pay success -> orders)",
+      "semanticGoal": "覆蓋買家主流程：商品詳情加入購物車、購物車結帳、建單付款成功、付款結果成功後查看訂單列表一致性。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0001",
+        "t.page_catalog.0007",
+        "t.page_catalog.0004",
+        "c.page_catalog.invokes.feature_add_cart.s.page_CatalogPage_DetailReady.to.feature_AddCartFeature_Init",
+        "t.feature_add_cart.0001",
+        "t.feature_add_cart.0002",
+        "c.feature_add_cart.invokes.page_cart.s.feature_AddCartFeature_Done.to.page_CartPage_Init",
+        "t.page_cart.0001",
+        "c.page_cart.invokes.page_checkout.s.page_CartPage_Ready.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001",
+        "c.page_checkout.invokes.feature_checkout_create_order.s.page_CheckoutPage_Ready.to.feature_CheckoutCreateOrderFeature_Init",
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0002",
+        "c.feature_checkout_create_order.invokes.page_payment_result.s.feature_CheckoutCreateOrderFeature_PaymentSucceeded.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0001",
+        "c.page_payment_result.invokes.page_orders.s.page_PaymentResultPage_Success.to.page_OrdersPage_Init",
+        "t.page_orders.0001"
+      ],
+      "pathLength": 18
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-16",
+      "name": "Admin login -> refund intervention approve -> leave to catalog",
+      "semanticGoal": "驗證管理員登入後可進入退款處理並核准退款；操作可稽核、返回管理頁後可離開回到商品頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_admin_console.s.feature_AuthLoginFeature_AdminDone.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0005",
+        "c.page_admin_console.invokes.feature_admin_refund_intervention.s.page_AdminConsolePage_RefundsReady.to.feature_AdminRefundInterventionFeature_Init",
+        "t.feature_admin_refund_intervention.0001",
+        "t.feature_admin_refund_intervention.0002",
+        "c.feature_admin_refund_intervention.invokes.page_admin_console.s.feature_AdminRefundInterventionFeature_Approved.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0006",
+        "c.page_admin_console.invokes.page_catalog.s.page_AdminConsolePage_AnalyticsReady.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-48",
+      "name": "Admin categories -> orders intervene -> forbidden -> leave to catalog",
+      "semanticGoal": "覆蓋管理端分類/訂單頁進入與跨頁導航的未走過 transition，覆蓋訂單介入功能的未走過成功分支，並覆蓋 admin forbidden 與離開 forbidden 的未走過流程。",
+      "edgeIds": [
+        "t.page_admin_console.0002",
+        "t.page_admin_console.0009",
+        "t.page_admin_console.0003",
+        "c.page_admin_console.invokes.feature_admin_order_intervention.s.page_AdminConsolePage_OrdersReady.to.feature_AdminOrderInterventionFeature_Init",
+        "t.feature_admin_order_intervention.0001",
+        "t.feature_admin_order_intervention.0002",
+        "c.feature_admin_order_intervention.invokes.page_admin_console.s.feature_AdminOrderInterventionFeature_Done.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0007",
+        "c.page_admin_console.invokes.page_catalog.s.page_AdminConsolePage_Forbidden.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-14",
+      "name": "Seller login -> create product -> saved -> products list",
+      "semanticGoal": "驗證賣家登入後可新增商品並保存成功；返回商品列表可看到當前賣家商品且不洩漏他人資料。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_seller_console.s.feature_AuthLoginFeature_SellerDone.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0003",
+        "c.page_seller_console.invokes.feature_seller_product_save.s.page_SellerConsolePage_ProductNewDraft.to.feature_SellerProductSaveFeature_Init",
+        "t.feature_seller_product_save.0001",
+        "t.feature_seller_product_save.0002",
+        "c.feature_seller_product_save.invokes.page_seller_console.s.feature_SellerProductSaveFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0002"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-3",
+      "name": "Signup success -> login buyer -> catalog",
+      "semanticGoal": "驗證註冊成功後導向登入；買家登入成功建立 session 並回到商品頁，導覽權限正確。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_signup.s.page_Entry_Init.to.page_SignupPage_Init",
+        "t.page_signup.0001",
+        "c.page_signup.invokes.feature_auth_signup.s.page_SignupPage_Ready.to.feature_AuthSignupFeature_Init",
+        "t.feature_auth_signup.0001",
+        "t.feature_auth_signup.0002",
+        "c.feature_auth_signup.invokes.page_login.s.feature_AuthSignupFeature_Done.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_catalog.s.feature_AuthLoginFeature_BuyerDone.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-7",
+      "name": "Checkout blocked -> adjust cart -> cart empty -> back to browse",
+      "semanticGoal": "驗證結帳因不可用商品被阻擋後能回購物車調整；異動使購物車變空後 UI/CTA 正確，且可返回商品頁。",
+      "edgeIds": [
+        "t.page_cart.0001",
+        "c.page_cart.invokes.page_checkout.s.page_CartPage_Ready.to.page_CheckoutPage_Init",
+        "t.page_checkout.0002",
+        "c.page_checkout.invokes.page_cart.s.page_CheckoutPage_Blocked.to.page_CartPage_Init",
+        "t.page_cart.0001",
+        "c.page_cart.invokes.feature_cart_mutate.s.page_CartPage_Ready.to.feature_CartMutateFeature_Init",
+        "t.feature_cart_mutate.0001",
+        "t.feature_cart_mutate.0003",
+        "c.feature_cart_mutate.invokes.page_cart.s.feature_CartMutateFeature_Empty.to.page_CartPage_Init",
+        "t.page_cart.0002",
+        "c.page_cart.invokes.page_catalog.s.page_CartPage_Empty.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-27",
+      "name": "Payment cancelled -> retry rejected -> back to result -> back to checkout",
+      "semanticGoal": "覆蓋付款取消後可進入重試的未走過 connector，並走到重試被拒絕的未走過分支，再回到付款結果頁並回結帳，驗證不會重複建單且狀態保持一致。",
+      "edgeIds": [
+        "t.page_payment_result.0003",
+        "c.page_payment_result.invokes.feature_payment_retry.s.page_PaymentResultPage_Cancelled.to.feature_PaymentRetryFeature_Init",
+        "t.feature_payment_retry.0001",
+        "t.feature_payment_retry.0003",
+        "c.feature_payment_retry.invokes.page_payment_result.s.feature_PaymentRetryFeature_Blocked.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0002",
+        "c.page_payment_result.invokes.page_checkout.s.page_PaymentResultPage_Failed.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-13",
+      "name": "Buyer seller-apply submit -> still forbidden -> leave to catalog",
+      "semanticGoal": "驗證買家可進入賣家申請並成功送出，但未核准前仍無 seller 權限；嘗試進 seller-only 路徑會顯示 forbidden 並可離開返回商品頁。",
+      "edgeIds": [
+        "t.page_seller_console.0001",
+        "c.page_seller_console.invokes.feature_seller_application_submit.s.page_SellerConsolePage_ApplyReady.to.feature_SellerApplicationSubmitFeature_Init",
+        "t.feature_seller_application_submit.0001",
+        "t.feature_seller_application_submit.0002",
+        "c.feature_seller_application_submit.invokes.page_seller_console.s.feature_SellerApplicationSubmitFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0009",
+        "c.page_seller_console.invokes.page_catalog.s.page_SellerConsolePage_Forbidden.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-29",
+      "name": "Review blocked -> then review rejected",
+      "semanticGoal": "覆蓋不可評價阻擋狀態與返回子訂單的未走過 transition，並延伸到評價提交被拒絕的未走過分支，驗證 eligibility/validation 失敗時不落地 Review。",
+      "edgeIds": [
+        "t.page_orders.0006",
+        "t.page_orders.0013",
+        "t.page_orders.0005",
+        "c.page_orders.invokes.feature_review_create.s.page_OrdersPage_ReviewDraft.to.feature_ReviewCreateFeature_Init",
+        "t.feature_review_create.0001",
+        "t.feature_review_create.0003",
+        "c.feature_review_create.invokes.page_orders.s.feature_ReviewCreateFeature_Blocked.to.page_OrdersPage_Init"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-15",
+      "name": "Seller login -> ship suborder -> back to seller orders",
+      "semanticGoal": "驗證賣家可在子訂單狀態允許時進行出貨；出貨成功後返回明細/列表且狀態計算一致。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_seller_console.s.feature_AuthLoginFeature_SellerDone.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0006",
+        "c.page_seller_console.invokes.feature_seller_fulfillment.s.page_SellerConsolePage_OrderDetailReady.to.feature_SellerFulfillmentFeature_Init",
+        "t.feature_seller_fulfillment.0001",
+        "t.feature_seller_fulfillment.0002",
+        "c.feature_seller_fulfillment.invokes.page_seller_console.s.feature_SellerFulfillmentFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0005"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-10",
+      "name": "Order cancel before payment -> back to order detail",
+      "semanticGoal": "驗證買家在可取消狀態可進入取消功能；取消成功後回訂單詳情狀態一致、可稽核。",
+      "edgeIds": [
+        "t.page_orders.0003",
+        "c.page_orders.invokes.feature_order_cancel.s.page_OrdersPage_DetailReady.to.feature_OrderCancelFeature_Init",
+        "t.feature_order_cancel.0001",
+        "t.feature_order_cancel.0002",
+        "c.feature_order_cancel.invokes.page_orders.s.feature_OrderCancelFeature_Done.to.page_OrdersPage_Init",
+        "t.page_orders.0003"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-11",
+      "name": "Refund request success -> back to suborder detail",
+      "semanticGoal": "驗證買家可對符合規則的子訂單送出退款申請；申請成功後子訂單狀態變更一致並返回明細頁。",
+      "edgeIds": [
+        "t.page_orders.0004",
+        "c.page_orders.invokes.feature_refund_request.s.page_OrdersPage_SubOrderReady.to.feature_RefundRequestFeature_Init",
+        "t.feature_refund_request.0001",
+        "t.feature_refund_request.0002",
+        "c.feature_refund_request.invokes.page_orders.s.feature_RefundRequestFeature_Done.to.page_OrdersPage_Init",
+        "t.page_orders.0004"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-47",
+      "name": "Admin seller-application review approve -> refresh list",
+      "semanticGoal": "覆蓋管理員進入賣家申請列表與審核核准流程的未走過 transitions/feature，驗證核准會授權 Seller role 且回到列表後狀態更新一致。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_admin_console.s.feature_AuthLoginFeature_AdminDone.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0001",
+        "c.page_admin_console.invokes.feature_admin_seller_application_review.s.page_AdminConsolePage_SellerApplicationsReady.to.feature_AdminSellerApplicationReviewFeature_Init",
+        "t.feature_admin_seller_application_review.0001",
+        "t.feature_admin_seller_application_review.0002",
+        "c.feature_admin_seller_application_review.invokes.page_admin_console.s.feature_AdminSellerApplicationReviewFeature_Approved.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-18",
+      "name": "List -> open search -> empty -> change filters -> matched -> refine",
+      "semanticGoal": "覆蓋列表進入搜尋入口、空搜尋後改條件、命中結果後再 refine 的路由/資料刷新一致性，並增加未走過搜尋相關 transition 覆蓋。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0001",
+        "t.page_catalog.0006",
+        "t.page_catalog.0003",
+        "t.page_catalog.0010",
+        "t.page_catalog.0002",
+        "t.page_catalog.0008",
+        "t.page_catalog.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-46",
+      "name": "Seller refund review escalate -> admin refunds -> open analytics nav",
+      "semanticGoal": "覆蓋賣家退款審核功能(提交/升級)的未走過主支線，並驗證升級後能交由管理端接手且管理端導航連通一致。",
+      "edgeIds": [
+        "t.page_seller_console.0006",
+        "c.page_seller_console.invokes.feature_seller_refund_review.s.page_SellerConsolePage_OrderDetailReady.to.feature_SellerRefundReviewFeature_Init",
+        "t.feature_seller_refund_review.0001",
+        "t.feature_seller_refund_review.0004",
+        "c.feature_seller_refund_review.invokes.page_admin_console.s.feature_SellerRefundReviewFeature_Escalated.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0005",
+        "t.page_admin_console.0012"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-32",
+      "name": "Seller settlements list -> detail -> back",
+      "semanticGoal": "覆蓋賣家結算列表/結算詳情的未走過進入路徑與返回流程，驗證僅顯示當前賣家結算資料且導航連通一致。",
+      "edgeIds": [
+        "t.page_seller_console.0007",
+        "t.page_seller_console.0019",
+        "t.page_seller_console.0008",
+        "t.page_seller_console.0021",
+        "t.page_seller_console.0007"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-8",
+      "name": "Payment failed -> retry payment -> back to checkout",
+      "semanticGoal": "驗證付款失敗結果頁可進入重試付款功能；重試以既有訂單為基礎，不重複建單，並能返回結帳頁繼續。",
+      "edgeIds": [
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0003",
+        "c.feature_checkout_create_order.invokes.page_payment_result.s.feature_CheckoutCreateOrderFeature_PaymentFailed.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0002",
+        "c.page_payment_result.invokes.feature_payment_retry.s.page_PaymentResultPage_Failed.to.feature_PaymentRetryFeature_Init",
+        "t.feature_payment_retry.0001",
+        "t.feature_payment_retry.0002",
+        "c.feature_payment_retry.invokes.page_checkout.s.feature_PaymentRetryFeature_Done.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-45",
+      "name": "Seller edit product -> save rejected -> back to products",
+      "semanticGoal": "覆蓋賣家由商品列表進入編輯、觸發 saveProductChanges、以及儲存被拒的未走過分支與返回流程，驗證跨賣家不可編輯且拒絕不落地變更。",
+      "edgeIds": [
+        "t.page_seller_console.0002",
+        "t.page_seller_console.0011",
+        "t.page_seller_console.0004",
+        "c.page_seller_console.invokes.feature_seller_product_save.s.page_SellerConsolePage_ProductEditDraft.to.feature_SellerProductSaveFeature_Init",
+        "t.feature_seller_product_save.0001",
+        "t.feature_seller_product_save.0003",
+        "c.feature_seller_product_save.invokes.page_seller_console.s.feature_SellerProductSaveFeature_Blocked.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-31",
+      "name": "Seller login -> change product status -> back to products",
+      "semanticGoal": "覆蓋賣家商品狀態變更功能的未走過 feature 流程（提交/成功/返回），驗證僅能操作當前賣家商品且狀態變更不越權。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_seller_console.s.feature_AuthLoginFeature_SellerDone.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0002",
+        "c.page_seller_console.invokes.feature_seller_product_status.s.page_SellerConsolePage_ProductsReady.to.feature_SellerProductStatusFeature_Init",
+        "t.feature_seller_product_status.0001",
+        "t.feature_seller_product_status.0002",
+        "c.feature_seller_product_status.invokes.page_seller_console.s.feature_SellerProductStatusFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0002"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 38,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-38",
+      "name": "Add-to-cart blocked -> return to product -> unavailable detail",
+      "semanticGoal": "覆蓋加入購物車因商品不可用而被阻擋的未走過分支與返回商品詳情 connector，並延伸到不可用詳情狀態以驗證不可購買/404 呈現一致。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0001",
+        "t.page_catalog.0007",
+        "t.page_catalog.0004",
+        "c.page_catalog.invokes.feature_add_cart.s.page_CatalogPage_DetailReady.to.feature_AddCartFeature_Init",
+        "t.feature_add_cart.0001",
+        "t.feature_add_cart.0003",
+        "c.feature_add_cart.invokes.page_catalog.s.feature_AddCartFeature_Blocked.to.page_CatalogPage_Init",
+        "t.page_catalog.0005"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-9",
+      "name": "Payment cancelled -> back to checkout",
+      "semanticGoal": "驗證付款取消結果頁可回到結帳頁，且不會將訂單誤標為已付款。",
+      "edgeIds": [
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0004",
+        "c.feature_checkout_create_order.invokes.page_payment_result.s.feature_CheckoutCreateOrderFeature_PaymentCancelled.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0003",
+        "c.page_payment_result.invokes.page_checkout.s.page_PaymentResultPage_Cancelled.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 35,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-35",
+      "name": "Orders list -> open order -> back -> leave to catalog",
+      "semanticGoal": "覆蓋訂單列表點進詳情與返回列表等未走過的導覽 transition，並驗證從列表返回商品頁的未走過連結與資料一致性。",
+      "edgeIds": [
+        "t.page_orders.0001",
+        "t.page_orders.0007",
+        "t.page_orders.0003",
+        "t.page_orders.0009",
+        "t.page_orders.0001",
+        "c.page_orders.invokes.page_catalog.s.page_OrdersPage_ListReady.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 17,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-17",
+      "name": "Search matched -> open product -> open cart -> continue shopping",
+      "semanticGoal": "覆蓋未走過的搜尋有結果流程，並驗證從搜尋結果進入商品詳情後可開啟購物車、再返回商品列表流程連通與狀態一致。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0002",
+        "t.page_catalog.0009",
+        "t.page_catalog.0004",
+        "c.page_catalog.invokes.page_cart.s.page_CatalogPage_DetailReady.to.page_CartPage_Init",
+        "t.page_cart.0001",
+        "c.page_cart.invokes.page_catalog.s.page_CartPage_Ready.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-20",
+      "name": "Login -> signup -> back to login -> cancel to catalog",
+      "semanticGoal": "覆蓋登入頁切換到註冊頁、再切回登入頁的未走過連結，並驗證取消登入回到 catalog 的畫面/狀態一致性。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_signup.s.page_LoginPage_Ready.to.page_SignupPage_Init",
+        "t.page_signup.0001",
+        "c.page_signup.invokes.page_login.s.page_SignupPage_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_catalog.s.page_LoginPage_Ready.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-28",
+      "name": "Orders empty list -> start shopping",
+      "semanticGoal": "覆蓋未走過的空訂單列表狀態，並驗證從空狀態返回商品頁的未走過導覽連結與資料呈現一致性。",
+      "edgeIds": [
+        "t.page_orders.0002",
+        "c.page_orders.invokes.page_catalog.s.page_OrdersPage_ListEmpty.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-26",
+      "name": "Create order blocked -> return to checkout -> blocked -> adjust cart",
+      "semanticGoal": "覆蓋建單因商品/庫存問題被阻擋的未走過分支，以及阻擋後返回結帳的未走過 connector，並串接到結帳阻擋後回購物車的實際解法路徑。",
+      "edgeIds": [
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0005",
+        "c.feature_checkout_create_order.invokes.page_checkout.s.feature_CheckoutCreateOrderFeature_Blocked.to.page_CheckoutPage_Init",
+        "t.page_checkout.0002",
+        "c.page_checkout.invokes.page_cart.s.page_CheckoutPage_Blocked.to.page_CartPage_Init",
+        "t.page_cart.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144357_enxpue.json",
+      "sourcePathId": "path-12",
+      "name": "Create review success -> back to orders list",
+      "semanticGoal": "驗證已送達商品可開啟評價草稿並提交評價；成功後回子訂單/訂單頁且避免重複評價。",
+      "edgeIds": [
+        "t.page_orders.0005",
+        "c.page_orders.invokes.feature_review_create.s.page_OrdersPage_ReviewDraft.to.feature_ReviewCreateFeature_Init",
+        "t.feature_review_create.0001",
+        "t.feature_review_create.0002",
+        "c.feature_review_create.invokes.page_orders.s.feature_ReviewCreateFeature_Done.to.page_OrdersPage_Init",
+        "t.page_orders.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-39",
+      "name": "Cart mutate success -> return to cart",
+      "semanticGoal": "覆蓋購物車異動成功(cartUpdated)與成功返回購物車(mutationDone)的未走過分支，驗證僅影響當前買家購物車且數量/總計刷新一致。",
+      "edgeIds": [
+        "t.page_cart.0001",
+        "c.page_cart.invokes.feature_cart_mutate.s.page_CartPage_Ready.to.feature_CartMutateFeature_Init",
+        "t.feature_cart_mutate.0001",
+        "t.feature_cart_mutate.0002",
+        "c.feature_cart_mutate.invokes.page_cart.s.feature_CartMutateFeature_Done.to.page_CartPage_Init",
+        "t.page_cart.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-40",
+      "name": "Cart mutate rejected -> return to cart with error",
+      "semanticGoal": "覆蓋購物車異動被拒(quantityRejected)與阻擋返回(mutationBlocked)的未走過分支，驗證拒絕時不落地變更且錯誤回饋可見。",
+      "edgeIds": [
+        "t.page_cart.0001",
+        "c.page_cart.invokes.feature_cart_mutate.s.page_CartPage_Ready.to.feature_CartMutateFeature_Init",
+        "t.feature_cart_mutate.0001",
+        "t.feature_cart_mutate.0004",
+        "c.feature_cart_mutate.invokes.page_cart.s.feature_CartMutateFeature_Blocked.to.page_CartPage_Init",
+        "t.page_cart.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-41",
+      "name": "Order cancel rejected -> back to order detail",
+      "semanticGoal": "覆蓋取消訂單被拒絕(cancellationRejected)與 cancelBlocked 返回 connector 的未走過分支，驗證不可取消狀態不被改動且回到同一訂單詳情。",
+      "edgeIds": [
+        "t.page_orders.0003",
+        "c.page_orders.invokes.feature_order_cancel.s.page_OrdersPage_DetailReady.to.feature_OrderCancelFeature_Init",
+        "t.feature_order_cancel.0001",
+        "t.feature_order_cancel.0003",
+        "c.feature_order_cancel.invokes.page_orders.s.feature_OrderCancelFeature_Blocked.to.page_OrdersPage_Init",
+        "t.page_orders.0003"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144759_6kb5wm.json",
+      "sourcePathId": "path-44",
+      "name": "Seller application blocked -> back to apply",
+      "semanticGoal": "覆蓋賣家申請送出在入口即被阻擋的未走過分支與返回 connector，驗證不建立申請資料且可回到申請頁呈現阻擋回饋。",
+      "edgeIds": [
+        "t.page_seller_console.0001",
+        "c.page_seller_console.invokes.feature_seller_application_submit.s.page_SellerConsolePage_ApplyReady.to.feature_SellerApplicationSubmitFeature_Init",
+        "t.feature_seller_application_submit.0001",
+        "t.feature_seller_application_submit.0003",
+        "c.feature_seller_application_submit.invokes.page_seller_console.s.feature_SellerApplicationSubmitFeature_Blocked.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex17\\3-1\\20260401_144558_5xk473.json",
+      "sourcePathId": "path-30",
+      "name": "Refund request rejected at entry -> back to suborder detail route",
+      "semanticGoal": "覆蓋退款申請在入口即被阻擋的未走過分支，並驗證回到子訂單詳情後狀態未被改動且顯示阻擋回饋。",
+      "edgeIds": [
+        "t.page_orders.0004",
+        "c.page_orders.invokes.feature_refund_request.s.page_OrdersPage_SubOrderReady.to.feature_RefundRequestFeature_Init",
+        "t.feature_refund_request.0001",
+        "t.feature_refund_request.0003",
+        "c.feature_refund_request.invokes.page_orders.s.feature_RefundRequestFeature_Blocked.to.page_OrdersPage_Init"
+      ],
+      "pathLength": 5
+    }
+  ]
+}

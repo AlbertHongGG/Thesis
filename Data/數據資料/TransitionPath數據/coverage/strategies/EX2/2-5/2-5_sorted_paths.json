@@ -1,0 +1,569 @@
+{
+  "strategyName": "EX2",
+  "projectName": "2-5",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-16",
+      "name": "Moderator tools→thread status hide→back→close tools",
+      "semanticGoal": "覆蓋主題治理差異圖：開啟治理工具、進入 ThreadStatusFeature、將 published 隱藏，返回治理工具並關閉回主題頁。",
+      "edgeIds": [
+        "t.page_thread.0001",
+        "c.page_thread.invokes.page_thread_moderator_admin.s.page_ThreadPage_Viewing.to.page_ThreadPage_moderator_admin_Init",
+        "t.page_thread_moderator_admin.0001",
+        "c.page_thread_moderator_admin.invokes.feature_thread_status.s.page_ThreadPage_moderator_admin_ToolsReady.to.feature_ThreadStatusFeature_Init",
+        "t.feature_thread_status.0001",
+        "t.feature_thread_status.0004",
+        "c.feature_thread_status.invokes.page_thread_moderator_admin.s.feature_ThreadStatusFeature_Hidden.to.page_ThreadPage_moderator_admin_Init",
+        "t.page_thread_moderator_admin.0001",
+        "c.page_thread_moderator_admin.invokes.page_thread.s.page_ThreadPage_moderator_admin_ToolsReady.to.page_ThreadPage_Init",
+        "t.page_thread.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-6",
+      "name": "Register reject→retry page load failure recovery",
+      "semanticGoal": "覆蓋註冊送出失敗(400/409)後返回註冊頁，再覆蓋註冊頁載入失敗與重試回復表單。",
+      "edgeIds": [
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Init",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0002",
+        "t.feature_auth_register.0004",
+        "c.feature_auth_register.invokes.page_register.s.feature_AuthRegisterFeature_Failed.to.page_RegisterPage_Init",
+        "t.page_register.0002",
+        "t.page_register.0003",
+        "t.page_register.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 1,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-1",
+      "name": "Guest browse→search→open thread→back to board",
+      "semanticGoal": "以 Guest 身分從 Entry 進首頁、進搜尋、開啟搜尋結果主題並回到看板，覆蓋跨頁 connector 串接與主要 happy path。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_home.s.page_Entry_Init.to.page_HomePage_Init",
+        "t.page_home.0001",
+        "c.page_home.invokes.page_search.s.page_HomePage_Ready.to.page_SearchPage_Init",
+        "t.page_search.0001",
+        "t.page_search.0002",
+        "c.page_search.invokes.page_thread.s.page_SearchPage_Results.to.page_ThreadPage_Init",
+        "t.page_thread.0001",
+        "c.page_thread.invokes.page_board.s.page_ThreadPage_Viewing.to.page_BoardPage_Init",
+        "t.page_board.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-14",
+      "name": "Thread fail→retry→participant locked→like flow",
+      "semanticGoal": "覆蓋主題載入失敗重試後進入互動差異圖的鎖定狀態，並走 Like 功能(未讚→按讚→返回)。",
+      "edgeIds": [
+        "t.page_thread.0004",
+        "t.page_thread.0005",
+        "t.page_thread.0001",
+        "c.page_thread.invokes.page_thread_user_moderator_admin.s.page_ThreadPage_Viewing.to.page_ThreadPage_user_moderator_admin_Init",
+        "t.page_thread_user_moderator_admin.0002",
+        "c.page_thread_user_moderator_admin.invokes.feature_like.s.page_ThreadPage_user_moderator_admin_Locked.to.feature_LikeFeature_Init",
+        "t.feature_like.0001",
+        "t.feature_like.0003",
+        "c.feature_like.invokes.page_thread_user_moderator_admin.s.feature_LikeFeature_DoneLiked.to.page_ThreadPage_user_moderator_admin_Init"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-3",
+      "name": "Login success→return to admin console",
+      "semanticGoal": "覆蓋從登入頁進入 AuthLoginFeature 並成功回到 /admin，驗證成功登入建立 session 與後台入口。",
+      "edgeIds": [
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_admin.s.feature_AuthLoginFeature_Done.to.page_AdminPage_Init",
+        "t.page_admin.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-15",
+      "name": "Participant ready→report duplicate→ack→close participant",
+      "semanticGoal": "覆蓋互動差異圖可互動狀態的檢舉流程，包含重複檢舉阻擋與返回互動區，最後關閉回主題頁。",
+      "edgeIds": [
+        "t.page_thread.0001",
+        "c.page_thread.invokes.page_thread_user_moderator_admin.s.page_ThreadPage_Viewing.to.page_ThreadPage_user_moderator_admin_Init",
+        "t.page_thread_user_moderator_admin.0001",
+        "c.page_thread_user_moderator_admin.invokes.feature_report_submission.s.page_ThreadPage_user_moderator_admin_Ready.to.feature_ReportSubmissionFeature_Init",
+        "t.feature_report_submission.0001",
+        "t.feature_report_submission.0003",
+        "c.feature_report_submission.invokes.page_thread_user_moderator_admin.s.feature_ReportSubmissionFeature_Duplicate.to.page_ThreadPage_user_moderator_admin_Init",
+        "t.page_thread_user_moderator_admin.0001",
+        "c.page_thread_user_moderator_admin.invokes.page_thread.s.page_ThreadPage_user_moderator_admin_Ready.to.page_ThreadPage_Init"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-25",
+      "name": "Board→NewThread→publish→open new thread",
+      "semanticGoal": "覆蓋從看板進入發文頁、顯示表單、送出發布並導向新主題頁的完整新內容建立 happy path。",
+      "edgeIds": [
+        "t.page_board.0001",
+        "c.page_board.invokes.page_new_thread.s.page_BoardPage_Ready.to.page_NewThreadPage_Init",
+        "t.page_new_thread.0001",
+        "c.page_new_thread.invokes.feature_thread_create.s.page_NewThreadPage_Ready.to.feature_ThreadCreateFeature_Init",
+        "t.feature_thread_create.0001",
+        "t.feature_thread_create.0003",
+        "c.feature_thread_create.invokes.page_thread.s.feature_ThreadCreateFeature_Published.to.page_ThreadPage_Init",
+        "t.page_thread.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-9",
+      "name": "Board fail→retry→open governance→close→empty list",
+      "semanticGoal": "覆蓋看板載入失敗重試，並覆蓋進入治理差異圖、關閉回到看板後顯示空列表。",
+      "edgeIds": [
+        "t.page_board.0006",
+        "t.page_board.0007",
+        "t.page_board.0001",
+        "c.page_board.invokes.page_board_moderator_admin.s.page_BoardPage_Ready.to.page_BoardPage_moderator_admin_Init",
+        "t.page_board_moderator_admin.0001",
+        "c.page_board_moderator_admin.invokes.page_board.s.page_BoardPage_moderator_admin_PanelReady.to.page_BoardPage_Init",
+        "t.page_board.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-2",
+      "name": "Home load fail→retry→empty→login page recover",
+      "semanticGoal": "驗證首頁載入失敗可重試並可在空列表狀態進入登入頁，同時覆蓋 LoginPage 載入失敗重試流程。",
+      "edgeIds": [
+        "t.page_home.0003",
+        "t.page_home.0004",
+        "t.page_home.0002",
+        "c.page_home.invokes.page_login.s.page_HomePage_Empty.to.page_LoginPage_Init",
+        "t.page_login.0002",
+        "t.page_login.0003",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-28",
+      "name": "Reply success→return to thread",
+      "semanticGoal": "覆蓋回覆功能從開啟編輯器到送出成功並返回主題頁重新載入的流程，驗證回覆即時可見。",
+      "edgeIds": [
+        "t.feature_reply.0001",
+        "t.feature_reply.0002",
+        "t.feature_reply.0003",
+        "c.feature_reply.invokes.page_thread.s.feature_ReplyFeature_Done.to.page_ThreadPage_Init",
+        "t.page_thread.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 37,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-37",
+      "name": "Board ready→logout→guest home",
+      "semanticGoal": "覆蓋看板頁的登出入口，驗證登出後治理/互動入口消失並回到 Guest 首頁。",
+      "edgeIds": [
+        "c.page_board.invokes.feature_logout.s.page_BoardPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "t.feature_logout.0002",
+        "c.feature_logout.invokes.page_home.s.feature_LogoutFeature_Done.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-10",
+      "name": "Governance empty→close→inactive board readonly→back home",
+      "semanticGoal": "覆蓋治理面板空檢舉狀態並返回看板，再覆蓋停用看板唯讀狀態與返回首頁。",
+      "edgeIds": [
+        "t.page_board_moderator_admin.0002",
+        "c.page_board_moderator_admin.invokes.page_board.s.page_BoardPage_moderator_admin_PanelEmpty.to.page_BoardPage_Init",
+        "t.page_board.0003",
+        "c.page_board.invokes.page_home.s.page_BoardPage_ReadOnly.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-30",
+      "name": "Favorite: not favorited→favorite→return participant",
+      "semanticGoal": "覆蓋 Favorite 功能從未收藏到收藏成功並返回互動區，驗證 target 只能是 thread 且狀態同步。",
+      "edgeIds": [
+        "t.feature_favorite.0001",
+        "t.feature_favorite.0003",
+        "c.feature_favorite.invokes.page_thread_user_moderator_admin.s.feature_FavoriteFeature_DoneFavorited.to.page_ThreadPage_user_moderator_admin_Init"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-47",
+      "name": "Favorite already→unfavorite→return participant",
+      "semanticGoal": "覆蓋收藏功能已收藏初始狀態與取消收藏流程，驗證冪等與狀態同步。",
+      "edgeIds": [
+        "t.feature_favorite.0002",
+        "t.feature_favorite.0004",
+        "c.feature_favorite.invokes.page_thread_user_moderator_admin.s.feature_FavoriteFeature_DoneUnfavorited.to.page_ThreadPage_user_moderator_admin_Init"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-29",
+      "name": "Like: already liked→unlike→return participant",
+      "semanticGoal": "覆蓋 Like 功能的已按讚初始狀態與取消按讚(unlike)回互動區，驗證冪等與計數同步。",
+      "edgeIds": [
+        "t.feature_like.0002",
+        "t.feature_like.0004",
+        "c.feature_like.invokes.page_thread_user_moderator_admin.s.feature_LikeFeature_DoneUnliked.to.page_ThreadPage_user_moderator_admin_Init"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-13",
+      "name": "Thread forbidden→back home→open register",
+      "semanticGoal": "覆蓋主題無權限(403/404收斂)後回首頁，並從首頁進入註冊頁入口。",
+      "edgeIds": [
+        "t.page_thread.0002",
+        "c.page_thread.invokes.page_home.s.page_ThreadPage_Forbidden.to.page_HomePage_Init",
+        "t.page_home.0001",
+        "c.page_home.invokes.page_register.s.page_HomePage_Ready.to.page_RegisterPage_Init",
+        "t.page_register.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-34",
+      "name": "Home ready→open admin→reject→back home",
+      "semanticGoal": "覆蓋首頁導向 /admin 的入口與非 admin 的拒絕分支，驗證 guard 與回首頁導覽一致性。",
+      "edgeIds": [
+        "c.page_home.invokes.page_admin.s.page_HomePage_Ready.to.page_AdminPage_Init",
+        "t.page_admin.0003",
+        "c.page_admin.invokes.page_home.s.page_AdminPage_Forbidden.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-11",
+      "name": "Search no match→clear→back home",
+      "semanticGoal": "覆蓋搜尋無結果分支、清空查詢回到初始，再從搜尋返回首頁並載入列表。",
+      "edgeIds": [
+        "t.page_search.0001",
+        "t.page_search.0003",
+        "t.page_search.0006",
+        "t.page_search.0001",
+        "c.page_search.invokes.page_home.s.page_SearchPage_Ready.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-12",
+      "name": "Search failed→retry→open login→show form",
+      "semanticGoal": "覆蓋搜尋失敗可重試，並從搜尋頁導向登入頁入口與顯示登入表單。",
+      "edgeIds": [
+        "t.page_search.0001",
+        "t.page_search.0004",
+        "t.page_search.0007",
+        "t.page_search.0001",
+        "c.page_search.invokes.page_login.s.page_SearchPage_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-7",
+      "name": "Open board→404→back home→empty state",
+      "semanticGoal": "覆蓋從首頁開啟看板後遇到 404，能返回首頁並進入空看板狀態，驗證錯誤分支與回導航。",
+      "edgeIds": [
+        "t.page_home.0001",
+        "c.page_home.invokes.page_board.s.page_HomePage_Ready.to.page_BoardPage_Init",
+        "t.page_board.0004",
+        "c.page_board.invokes.page_home.s.page_BoardPage_NotFound.to.page_HomePage_Init",
+        "t.page_home.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 24,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-24",
+      "name": "Board ready→open thread→thread missing→back board",
+      "semanticGoal": "覆蓋看板列表點主題(openThread)後遇到 threadMissing，再 backBoard 回看板的錯誤回復路徑。",
+      "edgeIds": [
+        "t.page_board.0001",
+        "c.page_board.invokes.page_thread.s.page_BoardPage_Ready.to.page_ThreadPage_Init",
+        "t.page_thread.0003",
+        "c.page_thread.invokes.page_board.s.page_ThreadPage_NotFound.to.page_BoardPage_Init",
+        "t.page_board.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-18",
+      "name": "Entry→Register→continue guest→Home empty→Search",
+      "semanticGoal": "覆蓋 Entry 選擇註冊、註冊頁放棄回到首頁、首頁空列表導向搜尋頁的跨頁連通與導覽一致性。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_register.s.page_Entry_Init.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.page_home.s.page_RegisterPage_Ready.to.page_HomePage_Init",
+        "t.page_home.0002",
+        "c.page_home.invokes.page_search.s.page_HomePage_Empty.to.page_SearchPage_Init",
+        "t.page_search.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 17,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-17",
+      "name": "Entry→Login→switch to Register→back to Login",
+      "semanticGoal": "覆蓋 Entry 選擇登入、LoginPage 切換到 RegisterPage、再切回 LoginPage 的導覽串接，驗證 returnTo/導覽入口不重複。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_register.s.page_LoginPage_Ready.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.page_login.s.page_RegisterPage_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222116_3rk992.json",
+      "sourcePathId": "path-8",
+      "name": "Board forbidden→back home→home load fail",
+      "semanticGoal": "覆蓋看板 403 分支返回首頁，並覆蓋首頁載入失敗分支以驗證權限錯誤不污染首頁資料。",
+      "edgeIds": [
+        "t.page_board.0005",
+        "c.page_board.invokes.page_home.s.page_BoardPage_Forbidden.to.page_HomePage_Init",
+        "t.page_home.0003"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-39",
+      "name": "New thread blocked(inactive)→back board→readonly",
+      "semanticGoal": "覆蓋停用看板禁止發文分支與返回看板後的唯讀收斂。",
+      "edgeIds": [
+        "t.page_new_thread.0002",
+        "c.page_new_thread.invokes.page_board.s.page_NewThreadPage_Forbidden.to.page_BoardPage_Init",
+        "t.page_board.0003"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-40",
+      "name": "New thread load fail→retry→show composer",
+      "semanticGoal": "覆蓋發文頁載入失敗與重試回復，驗證可回到可編輯表單狀態。",
+      "edgeIds": [
+        "t.page_new_thread.0003",
+        "t.page_new_thread.0004",
+        "t.page_new_thread.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222332_wkzhli.json",
+      "sourcePathId": "path-27",
+      "name": "ThreadCreate: save draft→publish draft→open thread",
+      "semanticGoal": "覆蓋發文功能的草稿保存與草稿發布轉換(draft→published)並導向主題頁，驗證狀態轉換合法性。",
+      "edgeIds": [
+        "t.feature_thread_create.0001",
+        "t.feature_thread_create.0002",
+        "t.feature_thread_create.0006",
+        "c.feature_thread_create.invokes.page_thread.s.feature_ThreadCreateFeature_Published.to.page_ThreadPage_Init",
+        "t.page_thread.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-44",
+      "name": "Thread create reject→retry to composer",
+      "semanticGoal": "覆蓋發文提交失敗(驗證/停用/伺服器錯誤)後返回發文頁重試，驗證不產生重複 thread。",
+      "edgeIds": [
+        "t.feature_thread_create.0001",
+        "t.feature_thread_create.0004",
+        "c.feature_thread_create.invokes.page_new_thread.s.feature_ThreadCreateFeature_Failed.to.page_NewThreadPage_Init",
+        "t.page_new_thread.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-48",
+      "name": "Thread status lock→back to moderation tools",
+      "semanticGoal": "覆蓋主題治理的鎖定流程與返回治理工具分支，驗證 locked 生效且可回治理視角。",
+      "edgeIds": [
+        "t.feature_thread_status.0001",
+        "t.feature_thread_status.0006",
+        "c.feature_thread_status.invokes.page_thread_moderator_admin.s.feature_ThreadStatusFeature_Locked.to.page_ThreadPage_moderator_admin_Init",
+        "t.page_thread_moderator_admin.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-41",
+      "name": "Auth login reject→retry back to login",
+      "semanticGoal": "覆蓋登入功能帳密錯誤分支與返回登入頁重試，驗證不建立 session cookie。",
+      "edgeIds": [
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Failed.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-43",
+      "name": "Auth register success→return home",
+      "semanticGoal": "覆蓋註冊成功後無 returnTo 回首頁分支，驗證直接登入 session 建立與導覽更新。",
+      "edgeIds": [
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0002",
+        "t.feature_auth_register.0003",
+        "c.feature_auth_register.invokes.page_home.s.feature_AuthRegisterFeature_Done.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-5\\20260321_222748_2d4em0.json",
+      "sourcePathId": "path-46",
+      "name": "Reply reject→back to participant",
+      "semanticGoal": "覆蓋回覆提交失敗分支與回到互動區重試入口，驗證錯誤原因保留且不建立 post。",
+      "edgeIds": [
+        "t.feature_reply.0001",
+        "t.feature_reply.0002",
+        "t.feature_reply.0004",
+        "c.feature_reply.invokes.page_thread_user_moderator_admin.s.feature_ReplyFeature_Failed.to.page_ThreadPage_user_moderator_admin_Init",
+        "t.page_thread_user_moderator_admin.0001"
+      ],
+      "pathLength": 5
+    }
+  ]
+}

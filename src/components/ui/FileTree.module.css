@@ -1,0 +1,104 @@
+.container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.treeRoot {
+  display: flex;
+  flex-direction: column;
+}
+
+.nodeItem {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.nodeItem:hover {
+  background: var(--bg-tertiary);
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  color: var(--text-muted);
+}
+
+.iconFolder {
+  color: var(--accent-primary);
+  margin-right: 6px;
+  fill: rgba(59, 130, 246, 0.2);
+}
+
+.iconImage {
+  color: #10b981;
+  margin-right: 6px;
+  margin-left: 20px;
+}
+
+.iconDoc {
+  color: var(--text-secondary);
+  margin-right: 6px;
+  margin-left: 20px;
+}
+
+.iconDefault {
+  color: var(--text-muted);
+  margin-right: 6px;
+  margin-left: 20px;
+}
+
+.nodeName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.childrenContainer {
+  overflow: hidden;
+}
+
+.empty {
+  padding: var(--space-4);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px dashed var(--border-highlight);
+}
+
+/* Deletion Button styling */
+.deleteBtn {
+  opacity: 0;
+  margin-left: auto;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.nodeItem:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}

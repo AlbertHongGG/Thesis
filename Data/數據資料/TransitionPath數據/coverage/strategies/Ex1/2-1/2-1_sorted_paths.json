@@ -1,0 +1,622 @@
+{
+  "strategyName": "Ex1",
+  "projectName": "2-1",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-13",
+      "name": "Purchase course success then owned library shows course",
+      "semanticGoal": "Verify eligible signed-in student can purchase a course and then see it in my courses library.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Idle",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_courses_list.s.feature_AuthLoginFeature_StudentAuthenticated.to.page_CoursesListPage_Init",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0002",
+        "c.page_courses_list.invokes.page_course_detail.s.page_CoursesListPage_Ready.to.page_CourseDetailPage_Init",
+        "t.page_course_detail.0001",
+        "t.page_course_detail.0002",
+        "c.page_course_detail.invokes.feature_purchase_course.s.page_CourseDetailPage_OutlineVisible.to.feature_PurchaseCourseFeature_Idle",
+        "t.feature_purchase_course.0001",
+        "t.feature_purchase_course.0002",
+        "c.feature_purchase_course.invokes.page_my_courses.s.feature_PurchaseCourseFeature_Purchased.to.page_MyCoursesPage_Init",
+        "t.page_my_courses.0001",
+        "t.page_my_courses.0002"
+      ],
+      "pathLength": 17
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-16",
+      "name": "Instructor creates draft course then opens editor",
+      "semanticGoal": "Verify instructor login can reach instructor management, create a new draft course, and transition into edit page with loaded data.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Idle",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_instructor_courses.s.feature_AuthLoginFeature_InstructorAuthenticated.to.page_InstructorCoursesPage_Init",
+        "t.page_instructor_courses.0001",
+        "t.page_instructor_courses.0002",
+        "c.page_instructor_courses.invokes.page_new_course.s.page_InstructorCoursesPage_Ready.to.page_NewCoursePage_Init",
+        "t.page_new_course.0001",
+        "c.page_new_course.invokes.feature_create_course.s.page_NewCoursePage_Ready.to.feature_CreateCourseFeature_Idle",
+        "t.feature_create_course.0001",
+        "t.feature_create_course.0002",
+        "c.feature_create_course.invokes.page_edit_course.s.feature_CreateCourseFeature_DraftCreated.to.page_EditCoursePage_Init",
+        "t.page_edit_course.0001",
+        "t.page_edit_course.0002"
+      ],
+      "pathLength": 16
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-15",
+      "name": "Reader completion updates then back to library",
+      "semanticGoal": "Verify authorized reader can open a lesson, mark it complete, return to reader, and navigate back to my courses.",
+      "edgeIds": [
+        "t.page_course_reader.0001",
+        "t.page_course_reader.0002",
+        "t.page_course_reader.0005",
+        "c.page_course_reader.invokes.feature_lesson_completion.s.page_CourseReaderPage_LessonReading.to.feature_LessonCompletionFeature_Idle",
+        "t.feature_lesson_completion.0001",
+        "t.feature_lesson_completion.0002",
+        "c.feature_lesson_completion.invokes.page_course_reader.s.feature_LessonCompletionFeature_Completed.to.page_CourseReaderPage_Init",
+        "t.page_course_reader.0001",
+        "t.page_course_reader.0002",
+        "t.page_course_reader.0005",
+        "c.page_course_reader.invokes.page_my_courses.s.page_CourseReaderPage_LessonReading.to.page_MyCoursesPage_Init"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-41",
+      "name": "Admin login then approve a submitted course",
+      "semanticGoal": "Verify admin can login, load review queue, approve a course, and return to queue.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Idle",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_admin_review.s.feature_AuthLoginFeature_AdminAuthenticated.to.page_AdminReviewPage_Init",
+        "t.page_admin_review.0001",
+        "t.page_admin_review.0002",
+        "c.page_admin_review.invokes.feature_review_decision.s.page_AdminReviewPage_Ready.to.feature_ReviewDecisionFeature_Idle",
+        "t.feature_review_decision.0001",
+        "t.feature_review_decision.0003",
+        "c.feature_review_decision.invokes.page_admin_review.s.feature_ReviewDecisionFeature_Approved.to.page_AdminReviewPage_Init"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-45",
+      "name": "Admin taxonomy load then save taxonomy mutation success",
+      "semanticGoal": "Verify admin taxonomy loads, mutation saves successfully, and taxonomy reloads with latest state.",
+      "edgeIds": [
+        "t.page_admin_taxonomy.0001",
+        "t.page_admin_taxonomy.0002",
+        "c.page_admin_taxonomy.invokes.feature_taxonomy_mutation.s.page_AdminTaxonomyPage_Ready.to.feature_TaxonomyMutationFeature_Idle",
+        "t.feature_taxonomy_mutation.0001",
+        "t.feature_taxonomy_mutation.0002",
+        "c.feature_taxonomy_mutation.invokes.page_admin_taxonomy.s.feature_TaxonomyMutationFeature_Saved.to.page_AdminTaxonomyPage_Init",
+        "t.page_admin_taxonomy.0001",
+        "t.page_admin_taxonomy.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-46",
+      "name": "Admin users load then change primary role success",
+      "semanticGoal": "Verify admin can load users, change a user’s primary role successfully, and return to refreshed user list.",
+      "edgeIds": [
+        "t.page_admin_users.0001",
+        "t.page_admin_users.0002",
+        "c.page_admin_users.invokes.feature_user_management.s.page_AdminUsersPage_Ready.to.feature_UserManagementFeature_Idle",
+        "t.feature_user_management.0001",
+        "t.feature_user_management.0003",
+        "c.feature_user_management.invokes.page_admin_users.s.feature_UserManagementFeature_Saved.to.page_AdminUsersPage_Init",
+        "t.page_admin_users.0001",
+        "t.page_admin_users.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 36,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-36",
+      "name": "Save curriculum mutation success then reopen editor",
+      "semanticGoal": "Verify saving curriculum changes succeeds and returns to curriculum editor where data reloads.",
+      "edgeIds": [
+        "t.page_curriculum_editor.0001",
+        "t.page_curriculum_editor.0002",
+        "c.page_curriculum_editor.invokes.feature_curriculum_mutation.s.page_CurriculumEditorPage_Ready.to.feature_CurriculumMutationFeature_Idle",
+        "t.feature_curriculum_mutation.0001",
+        "t.feature_curriculum_mutation.0002",
+        "c.feature_curriculum_mutation.invokes.page_curriculum_editor.s.feature_CurriculumMutationFeature_Saved.to.page_CurriculumEditorPage_Init",
+        "t.page_curriculum_editor.0001",
+        "t.page_curriculum_editor.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-8",
+      "name": "Registration rejected then retry register form",
+      "semanticGoal": "Verify invalid registration is rejected and user can return to register page and see the form again for correction.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_register.s.page_Entry_Init.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Idle",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0003",
+        "c.feature_auth_register.invokes.page_register.s.feature_AuthRegisterFeature_Rejected.to.page_RegisterPage_Init",
+        "t.page_register.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-43",
+      "name": "Admin review empty queue then open admin course management",
+      "semanticGoal": "Verify empty review queue state and navigation to admin course management loads successfully.",
+      "edgeIds": [
+        "t.page_admin_review.0001",
+        "t.page_admin_review.0003",
+        "c.page_admin_review.invokes.page_admin_courses.s.page_AdminReviewPage_Empty.to.page_AdminCoursesPage_Init",
+        "t.page_admin_courses.0001",
+        "t.page_admin_courses.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-39",
+      "name": "Submit course for review success then return to instructor courses",
+      "semanticGoal": "Verify instructor/admin can submit a draft/rejected course for review and return with submitted status reflected.",
+      "edgeIds": [
+        "c.page_instructor_courses.invokes.feature_submit_course.s.page_InstructorCoursesPage_Ready.to.feature_SubmitCourseFeature_Idle",
+        "t.feature_submit_course.0001",
+        "t.feature_submit_course.0002",
+        "c.feature_submit_course.invokes.page_instructor_courses.s.feature_SubmitCourseFeature_Submitted.to.page_InstructorCoursesPage_Init",
+        "t.page_instructor_courses.0001",
+        "t.page_instructor_courses.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 37,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-37",
+      "name": "Edit course save success then reopen editor",
+      "semanticGoal": "Verify authorized edit course flow can submit updates successfully and reopen the editor with latest data.",
+      "edgeIds": [
+        "t.page_edit_course.0001",
+        "t.page_edit_course.0002",
+        "c.page_edit_course.invokes.feature_update_course.s.page_EditCoursePage_Ready.to.feature_UpdateCourseFeature_Idle",
+        "t.feature_update_course.0001",
+        "t.feature_update_course.0002",
+        "c.feature_update_course.invokes.page_edit_course.s.feature_UpdateCourseFeature_Saved.to.page_EditCoursePage_Init",
+        "t.page_edit_course.0001",
+        "t.page_edit_course.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 23,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-23",
+      "name": "Courses list back to home",
+      "semanticGoal": "Verify course list ready state can navigate back to home and home content renders.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_courses_list.s.page_Entry_Init.to.page_CoursesListPage_Init",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0002",
+        "c.page_courses_list.invokes.page_home.s.page_CoursesListPage_Ready.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-47",
+      "name": "Admin users load then activation change rejected",
+      "semanticGoal": "Verify admin activation toggle can be rejected and user returns to admin users list without partial updates.",
+      "edgeIds": [
+        "t.page_admin_users.0001",
+        "t.page_admin_users.0002",
+        "c.page_admin_users.invokes.feature_user_management.s.page_AdminUsersPage_Ready.to.feature_UserManagementFeature_Idle",
+        "t.feature_user_management.0002",
+        "t.feature_user_management.0006",
+        "c.feature_user_management.invokes.page_admin_users.s.feature_UserManagementFeature_Rejected.to.page_AdminUsersPage_Init",
+        "t.page_admin_users.0001",
+        "t.page_admin_users.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 42,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-42",
+      "name": "Admin rejection blocked (missing reason) then return to queue",
+      "semanticGoal": "Verify admin rejection flow can be blocked (e.g., missing reason/invalid state) and queue remains consistent after returning.",
+      "edgeIds": [
+        "t.page_admin_review.0001",
+        "t.page_admin_review.0002",
+        "c.page_admin_review.invokes.feature_review_decision.s.page_AdminReviewPage_Ready.to.feature_ReviewDecisionFeature_Idle",
+        "t.feature_review_decision.0002",
+        "t.feature_review_decision.0006",
+        "c.feature_review_decision.invokes.page_admin_review.s.feature_ReviewDecisionFeature_Blocked.to.page_AdminReviewPage_Init"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-34",
+      "name": "Curriculum editor unauthorized access becomes hidden then returns",
+      "semanticGoal": "Verify unauthorized curriculum editor access yields hidden state and back navigation returns safely to instructor courses.",
+      "edgeIds": [
+        "c.page_instructor_courses.invokes.page_curriculum_editor.s.page_InstructorCoursesPage_Ready.to.page_CurriculumEditorPage_Init",
+        "t.page_curriculum_editor.0001",
+        "t.page_curriculum_editor.0003",
+        "c.page_curriculum_editor.invokes.page_instructor_courses.s.page_CurriculumEditorPage_Hidden.to.page_InstructorCoursesPage_Init",
+        "t.page_instructor_courses.0001",
+        "t.page_instructor_courses.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-29",
+      "name": "Reader load fails then retry to open lesson",
+      "semanticGoal": "Verify reader load failure shows retriable error and retry can reach outline and open a lesson.",
+      "edgeIds": [
+        "t.page_course_reader.0001",
+        "t.page_course_reader.0004",
+        "t.page_course_reader.0006",
+        "t.page_course_reader.0001",
+        "t.page_course_reader.0002",
+        "t.page_course_reader.0005"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-44",
+      "name": "Admin courses forbidden then return to public course list",
+      "semanticGoal": "Verify unauthorized access to admin course management becomes forbidden and user can return to public browsing safely.",
+      "edgeIds": [
+        "t.page_admin_courses.0001",
+        "t.page_admin_courses.0003",
+        "c.page_admin_courses.invokes.page_courses_list.s.page_AdminCoursesPage_Forbidden.to.page_CoursesListPage_Init",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-28",
+      "name": "Reader access blocked then return to course detail",
+      "semanticGoal": "Verify unauthorized reader access is blocked and user can navigate back to course detail without content leakage.",
+      "edgeIds": [
+        "t.page_course_reader.0001",
+        "t.page_course_reader.0003",
+        "c.page_course_reader.invokes.page_course_detail.s.page_CourseReaderPage_Forbidden.to.page_CourseDetailPage_Init",
+        "t.page_course_detail.0001",
+        "t.page_course_detail.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-32",
+      "name": "Edit course hidden then back to instructor courses",
+      "semanticGoal": "Verify unauthorized edit course access becomes hidden and back navigation returns to instructor courses safely.",
+      "edgeIds": [
+        "t.page_edit_course.0001",
+        "t.page_edit_course.0003",
+        "c.page_edit_course.invokes.page_instructor_courses.s.page_EditCoursePage_Hidden.to.page_InstructorCoursesPage_Init",
+        "t.page_instructor_courses.0001",
+        "t.page_instructor_courses.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-26",
+      "name": "My courses empty then browse marketplace",
+      "semanticGoal": "Verify signed-in library can render empty state and user can navigate to public course list from empty library.",
+      "edgeIds": [
+        "t.page_my_courses.0001",
+        "t.page_my_courses.0003",
+        "c.page_my_courses.invokes.page_courses_list.s.page_MyCoursesPage_Empty.to.page_CoursesListPage_Init",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-27",
+      "name": "My courses load fails then retry",
+      "semanticGoal": "Verify my courses shows retriable failure state and retry can recover to ready state.",
+      "edgeIds": [
+        "t.page_my_courses.0001",
+        "t.page_my_courses.0005",
+        "t.page_my_courses.0006",
+        "t.page_my_courses.0001",
+        "t.page_my_courses.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-30",
+      "name": "Instructor courses empty then create first course",
+      "semanticGoal": "Verify instructor management can show empty state and navigate to new course page to start creating a course.",
+      "edgeIds": [
+        "t.page_instructor_courses.0001",
+        "t.page_instructor_courses.0003",
+        "c.page_instructor_courses.invokes.page_new_course.s.page_InstructorCoursesPage_Empty.to.page_NewCoursePage_Init",
+        "t.page_new_course.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-14",
+      "name": "Guest blocked from my courses then redirected to login",
+      "semanticGoal": "Verify unauthenticated access to my courses is blocked and user can be routed to login.",
+      "edgeIds": [
+        "t.page_my_courses.0001",
+        "t.page_my_courses.0004",
+        "c.page_my_courses.invokes.page_login.s.page_MyCoursesPage_Forbidden.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-40",
+      "name": "Submit course blocked then return to instructor courses",
+      "semanticGoal": "Verify illegal/unauthorized submission is blocked and returning keeps course state unchanged.",
+      "edgeIds": [
+        "c.page_instructor_courses.invokes.feature_submit_course.s.page_InstructorCoursesPage_Ready.to.feature_SubmitCourseFeature_Idle",
+        "t.feature_submit_course.0001",
+        "t.feature_submit_course.0003",
+        "c.feature_submit_course.invokes.page_instructor_courses.s.feature_SubmitCourseFeature_Blocked.to.page_InstructorCoursesPage_Init",
+        "t.page_instructor_courses.0001",
+        "t.page_instructor_courses.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-3",
+      "name": "Course list empty then refresh to results",
+      "semanticGoal": "Verify empty course list state and refresh restarts loading and can reach ready list.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_courses_list.s.page_Entry_Init.to.page_CoursesListPage_Init",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0003",
+        "t.page_courses_list.0005",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-4",
+      "name": "Course list load failure then retry",
+      "semanticGoal": "Verify course list failure state and retry restarts loading and can recover to ready list.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_courses_list.s.page_Entry_Init.to.page_CoursesListPage_Init",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0004",
+        "t.page_courses_list.0006",
+        "t.page_courses_list.0001",
+        "t.page_courses_list.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 35,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-35",
+      "name": "Curriculum editor load failure then retry to ready",
+      "semanticGoal": "Verify curriculum editor shows retriable failure on load error and retry can recover to ready state.",
+      "edgeIds": [
+        "c.page_instructor_courses.invokes.page_curriculum_editor.s.page_InstructorCoursesPage_Ready.to.page_CurriculumEditorPage_Init",
+        "t.page_curriculum_editor.0001",
+        "t.page_curriculum_editor.0004",
+        "t.page_curriculum_editor.0005",
+        "t.page_curriculum_editor.0001",
+        "t.page_curriculum_editor.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 24,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-24",
+      "name": "Purchase duplicate blocked then return to detail",
+      "semanticGoal": "Verify duplicate purchase attempt is blocked as already-owned and returning to course detail still loads correctly.",
+      "edgeIds": [
+        "t.page_course_detail.0001",
+        "t.page_course_detail.0002",
+        "c.page_course_detail.invokes.feature_purchase_course.s.page_CourseDetailPage_OutlineVisible.to.feature_PurchaseCourseFeature_Idle",
+        "t.feature_purchase_course.0001",
+        "t.feature_purchase_course.0003",
+        "c.feature_purchase_course.invokes.page_course_detail.s.feature_PurchaseCourseFeature_AlreadyOwned.to.page_CourseDetailPage_Init",
+        "t.page_course_detail.0001",
+        "t.page_course_detail.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210843_oirker.json",
+      "sourcePathId": "path-25",
+      "name": "Purchase blocked then return to detail",
+      "semanticGoal": "Verify invalid/non-purchasable purchase is blocked and returning to course detail preserves correct state.",
+      "edgeIds": [
+        "t.page_course_detail.0001",
+        "t.page_course_detail.0002",
+        "c.page_course_detail.invokes.feature_purchase_course.s.page_CourseDetailPage_OutlineVisible.to.feature_PurchaseCourseFeature_Idle",
+        "t.feature_purchase_course.0001",
+        "t.feature_purchase_course.0004",
+        "c.feature_purchase_course.invokes.page_course_detail.s.feature_PurchaseCourseFeature_Blocked.to.page_CourseDetailPage_Init",
+        "t.page_course_detail.0001",
+        "t.page_course_detail.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 38,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_211555_4j4tud.json",
+      "sourcePathId": "path-38",
+      "name": "Edit course save rejected then return to editor",
+      "semanticGoal": "Verify invalid course update is rejected and user returns to edit page for correction.",
+      "edgeIds": [
+        "t.page_edit_course.0001",
+        "t.page_edit_course.0002",
+        "c.page_edit_course.invokes.feature_update_course.s.page_EditCoursePage_Ready.to.feature_UpdateCourseFeature_Idle",
+        "t.feature_update_course.0001",
+        "t.feature_update_course.0003",
+        "c.feature_update_course.invokes.page_edit_course.s.feature_UpdateCourseFeature_Rejected.to.page_EditCoursePage_Init",
+        "t.page_edit_course.0001",
+        "t.page_edit_course.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-9",
+      "name": "Registration success then proceed to login",
+      "semanticGoal": "Verify successful registration creates a user and routes to login page where login form is shown.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_register.s.page_Entry_Init.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Idle",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0002",
+        "c.feature_auth_register.invokes.page_login.s.feature_AuthRegisterFeature_Registered.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\2-1\\20260321_210638_dihkc7.json",
+      "sourcePathId": "path-6",
+      "name": "Login denied then retry shows clean form",
+      "semanticGoal": "Verify invalid credentials lead to denied state and retry returns to login page entry with form shown again.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Idle",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0005",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Denied.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    }
+  ]
+}

@@ -1,0 +1,664 @@
+{
+  "strategyName": "Ex8",
+  "projectName": "1-3",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-7",
+      "name": "Categories empty → add category success → toggle status success → back transactions → logout",
+      "semanticGoal": "驗證空自訂類別狀態可新增類別成功、可切換類別啟用狀態成功、並能返回帳務頁與登出",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.page_categories.s.page_TransactionsPage_Ready.to.page_CategoriesPage_Init",
+        "t.page_categories.0002",
+        "c.page_categories.invokes.feature_category_form.s.page_CategoriesPage_Empty.to.feature_CategoryFormFeature_Init",
+        "t.feature_category_form.0001",
+        "t.feature_category_form.0002",
+        "t.feature_category_form.0004",
+        "c.feature_category_form.invokes.page_categories.s.feature_CategoryFormFeature_Submitting.to.page_CategoriesPage_Ready",
+        "c.page_categories.invokes.feature_category_toggle.s.page_CategoriesPage_Ready.to.feature_CategoryToggleFeature_Init",
+        "t.feature_category_toggle.0001",
+        "t.feature_category_toggle.0002",
+        "c.feature_category_toggle.invokes.page_categories.s.feature_CategoryToggleFeature_Submitting.to.page_CategoriesPage_Ready",
+        "c.page_categories.invokes.page_transactions.s.page_CategoriesPage_Ready.to.page_TransactionsPage_Init",
+        "t.page_transactions.0002",
+        "c.page_transactions.invokes.feature_logout.s.page_TransactionsPage_Empty.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 18
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-5",
+      "name": "Register success → empty transactions → add tx → reports ready",
+      "semanticGoal": "驗證註冊成功自動登入、帳務空狀態可新增第一筆帳務並回到清單，接著可導向月報表並載入成功",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_register.s.page_LoginPage_Ready.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Init",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0002",
+        "c.feature_auth_register.invokes.page_transactions.s.feature_AuthRegisterFeature_Submitting.to.page_TransactionsPage_Init",
+        "t.page_transactions.0002",
+        "c.page_transactions.invokes.feature_transaction_form.s.page_TransactionsPage_Empty.to.feature_TransactionFormFeature_Init",
+        "t.feature_transaction_form.0001",
+        "t.feature_transaction_form.0002",
+        "t.feature_transaction_form.0004",
+        "c.feature_transaction_form.invokes.page_transactions.s.feature_TransactionFormFeature_Submitting.to.page_TransactionsPage_Ready",
+        "c.page_transactions.invokes.page_reports.s.page_TransactionsPage_Ready.to.page_ReportsPage_Init",
+        "t.page_reports.0001"
+      ],
+      "pathLength": 16
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-12",
+      "name": "Login success returnTo reports → export CSV success → change month empty → logout",
+      "semanticGoal": "驗證登入成功可依 returnTo 回到報表頁；可匯出 CSV 成功；切換年月到空資料並可登出",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_reports.s.feature_AuthLoginFeature_Submitting.to.page_ReportsPage_Init",
+        "t.page_reports.0001",
+        "c.page_reports.invokes.feature_csv_export.s.page_ReportsPage_Ready.to.feature_CsvExportFeature_Init",
+        "t.feature_csv_export.0001",
+        "c.feature_csv_export.invokes.page_reports.s.feature_CsvExportFeature_Exporting.to.page_ReportsPage_Ready.success",
+        "t.page_reports.0004",
+        "t.page_reports.0002",
+        "c.page_reports.invokes.feature_logout.s.page_ReportsPage_Empty.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 15
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-10",
+      "name": "Delete transaction rejected → cancel → reports retry to ready",
+      "semanticGoal": "驗證刪除流程失敗會回確認狀態且可取消；報表載入失敗可重試並覆蓋到 Empty/Ready 分支",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.feature_transaction_delete.s.page_TransactionsPage_Ready.to.feature_TransactionDeleteFeature_Init",
+        "t.feature_transaction_delete.0001",
+        "t.feature_transaction_delete.0002",
+        "t.feature_transaction_delete.0003",
+        "c.feature_transaction_delete.invokes.page_transactions.s.feature_TransactionDeleteFeature_Confirming.to.page_TransactionsPage_Ready",
+        "c.page_transactions.invokes.page_reports.s.page_TransactionsPage_Ready.to.page_ReportsPage_Init",
+        "t.page_reports.0003",
+        "t.page_reports.0006",
+        "t.page_reports.0002",
+        "t.page_reports.0005",
+        "t.page_reports.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-6",
+      "name": "Transactions load fail → retry → categories → add category validation fail → logout",
+      "semanticGoal": "驗證帳務載入失敗可重試；類別頁可開新增類別但前端驗證失敗後可取消；最後可正常登出",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0003",
+        "t.page_transactions.0005",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.page_categories.s.page_TransactionsPage_Ready.to.page_CategoriesPage_Init",
+        "t.page_categories.0001",
+        "c.page_categories.invokes.feature_category_form.s.page_CategoriesPage_Ready.to.feature_CategoryFormFeature_Init.add",
+        "t.feature_category_form.0001",
+        "t.feature_category_form.0002",
+        "t.feature_category_form.0003",
+        "c.feature_category_form.invokes.page_categories.s.feature_CategoryFormFeature_Editing.to.page_CategoriesPage_Ready",
+        "c.page_categories.invokes.feature_logout.s.page_CategoriesPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-13",
+      "name": "Reports export CSV rejected → categories load retry → logout",
+      "semanticGoal": "驗證 CSV 匯出失敗會回到報表頁且不影響導覽；類別載入失敗可重試成功並可登出",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.page_reports.s.page_TransactionsPage_Ready.to.page_ReportsPage_Init",
+        "t.page_reports.0001",
+        "c.page_reports.invokes.feature_csv_export.s.page_ReportsPage_Ready.to.feature_CsvExportFeature_Init",
+        "t.feature_csv_export.0001",
+        "c.feature_csv_export.invokes.page_reports.s.feature_CsvExportFeature_Exporting.to.page_ReportsPage_Ready.rejected",
+        "c.page_reports.invokes.page_categories.s.page_ReportsPage_Ready.to.page_CategoriesPage_Init",
+        "t.page_categories.0003",
+        "t.page_categories.0004",
+        "t.page_categories.0001",
+        "c.page_categories.invokes.feature_logout.s.page_CategoriesPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-10",
+      "name": "Register submit rejected → recover → back login",
+      "semanticGoal": "覆蓋註冊 API 拒絕回到 RegisterPage.Failed，修正後可回 Ready 並可切回登入頁",
+      "edgeIds": [
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Init",
+        "t.feature_auth_register.0001",
+        "t.feature_auth_register.0002",
+        "c.feature_auth_register.invokes.page_register.s.feature_AuthRegisterFeature_Submitting.to.page_RegisterPage_Failed",
+        "t.page_register.0002",
+        "c.page_register.invokes.page_login.s.page_RegisterPage_Ready.to.page_LoginPage_Init"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-14",
+      "name": "Categories auth required → login success returnTo categories → empty → logout",
+      "semanticGoal": "覆蓋類別頁未登入導向登入並回跳；回到類別頁後進入空狀態並可登出回登入頁",
+      "edgeIds": [
+        "c.page_categories.invokes.page_login.s.page_CategoriesPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_categories.s.feature_AuthLoginFeature_Submitting.to.page_CategoriesPage_Init",
+        "t.page_categories.0002",
+        "c.page_categories.invokes.feature_logout.s.page_CategoriesPage_Empty.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-15",
+      "name": "Transactions empty → reports empty → categories empty → back reports ready",
+      "semanticGoal": "覆蓋空帳務→空報表→空類別的跨頁導覽串接，並能回到報表頁完成成功載入",
+      "edgeIds": [
+        "t.page_transactions.0002",
+        "c.page_transactions.invokes.page_reports.s.page_TransactionsPage_Empty.to.page_ReportsPage_Init",
+        "t.page_reports.0002",
+        "c.page_reports.invokes.page_categories.s.page_ReportsPage_Empty.to.page_CategoriesPage_Init",
+        "t.page_categories.0002",
+        "c.page_categories.invokes.page_reports.s.page_CategoriesPage_Empty.to.page_ReportsPage_Init",
+        "t.page_reports.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-9",
+      "name": "Add transaction → save rejected → resubmit success → load more",
+      "semanticGoal": "驗證新增帳務儲存失敗可留在表單重試；成功後回清單並可繼續載入更多帳務",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.feature_transaction_form.s.page_TransactionsPage_Ready.to.feature_TransactionFormFeature_Init.add",
+        "t.feature_transaction_form.0001",
+        "t.feature_transaction_form.0002",
+        "t.feature_transaction_form.0004",
+        "t.feature_transaction_form.0005",
+        "t.feature_transaction_form.0002",
+        "t.feature_transaction_form.0004",
+        "c.feature_transaction_form.invokes.page_transactions.s.feature_TransactionFormFeature_Submitting.to.page_TransactionsPage_Ready",
+        "t.page_transactions.0004"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-8",
+      "name": "Edit transaction → validation reject → cancel",
+      "semanticGoal": "驗證從清單編輯帳務時，送出前端驗證失敗會回到編輯態且可取消回清單",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.feature_transaction_form.s.page_TransactionsPage_Ready.to.feature_TransactionFormFeature_Init.edit",
+        "t.feature_transaction_form.0001",
+        "t.feature_transaction_form.0002",
+        "t.feature_transaction_form.0003",
+        "c.feature_transaction_form.invokes.page_transactions.s.feature_TransactionFormFeature_Editing.to.page_TransactionsPage_Ready"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-15",
+      "name": "Category toggle cancel → reports retry to ready → back transactions",
+      "semanticGoal": "驗證類別狀態切換可取消不變更；報表載入失敗可重試成功；可由報表回到帳務頁",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.page_categories.s.page_TransactionsPage_Ready.to.page_CategoriesPage_Init",
+        "t.page_categories.0001",
+        "c.page_categories.invokes.feature_category_toggle.s.page_CategoriesPage_Ready.to.feature_CategoryToggleFeature_Init",
+        "t.feature_category_toggle.0001",
+        "c.feature_category_toggle.invokes.page_categories.s.feature_CategoryToggleFeature_Confirming.to.page_CategoriesPage_Ready",
+        "c.page_categories.invokes.page_reports.s.page_CategoriesPage_Ready.to.page_ReportsPage_Init",
+        "t.page_reports.0003",
+        "t.page_reports.0006",
+        "t.page_reports.0001",
+        "c.page_reports.invokes.page_transactions.s.page_ReportsPage_Ready.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-2",
+      "name": "Login form validation fail → recover",
+      "semanticGoal": "驗證登入前端驗證失敗會回到 LoginPage.Failed，並可重新編輯回到可送出狀態",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Validating.to.page_LoginPage_Failed",
+        "t.page_login.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-16",
+      "name": "Transactions auth required → login → success return categories → categories empty → back transactions",
+      "semanticGoal": "驗證受保護頁未登入會被導向登入並保留 returnTo；登入成功可回到指定頁並可在導覽間往返",
+      "edgeIds": [
+        "c.page_transactions.invokes.page_login.s.page_TransactionsPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_categories.s.feature_AuthLoginFeature_Submitting.to.page_CategoriesPage_Init",
+        "t.page_categories.0002",
+        "c.page_categories.invokes.page_transactions.s.page_CategoriesPage_Empty.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 17,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-01",
+      "name": "Authenticated /register redirect → transactions → logout",
+      "semanticGoal": "覆蓋已登入使用者進入註冊頁會自動導向帳務頁，並可正常登出回登入頁",
+      "edgeIds": [
+        "c.page_register.invokes.page_transactions.s.page_RegisterPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.feature_logout.s.page_TransactionsPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 19,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-03",
+      "name": "Transactions empty → categories → open add category → cancel back empty",
+      "semanticGoal": "覆蓋空帳務頁導向類別頁分支，並驗證在空自訂類別狀態開啟新增類別後可取消返回空狀態",
+      "edgeIds": [
+        "t.page_transactions.0002",
+        "c.page_transactions.invokes.page_categories.s.page_TransactionsPage_Empty.to.page_CategoriesPage_Init",
+        "t.page_categories.0002",
+        "c.page_categories.invokes.feature_category_form.s.page_CategoriesPage_Empty.to.feature_CategoryFormFeature_Init",
+        "t.feature_category_form.0001",
+        "c.feature_category_form.invokes.page_categories.s.feature_CategoryFormFeature_Editing.to.page_CategoriesPage_Empty"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-14",
+      "name": "Edit category save rejected → cancel back list",
+      "semanticGoal": "驗證編輯類別儲存失敗時可留在表單並取消回類別列表",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.page_categories.s.page_TransactionsPage_Ready.to.page_CategoriesPage_Init",
+        "t.page_categories.0001",
+        "c.page_categories.invokes.feature_category_form.s.page_CategoriesPage_Ready.to.feature_CategoryFormFeature_Init.edit",
+        "t.feature_category_form.0001",
+        "t.feature_category_form.0002",
+        "t.feature_category_form.0004",
+        "t.feature_category_form.0005",
+        "c.feature_category_form.invokes.page_categories.s.feature_CategoryFormFeature_Editing.to.page_CategoriesPage_Ready"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-11",
+      "name": "Delete last transaction → empty → start add → cancel back empty",
+      "semanticGoal": "驗證刪除最後一筆會回到空帳務狀態；空狀態開啟新增後可取消回空狀態",
+      "edgeIds": [
+        "c.page_login.invokes.page_transactions.s.page_LoginPage_Init.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.feature_transaction_delete.s.page_TransactionsPage_Ready.to.feature_TransactionDeleteFeature_Init",
+        "t.feature_transaction_delete.0001",
+        "t.feature_transaction_delete.0002",
+        "c.feature_transaction_delete.invokes.page_transactions.s.feature_TransactionDeleteFeature_Deleting.to.page_TransactionsPage_Empty",
+        "c.page_transactions.invokes.feature_transaction_form.s.page_TransactionsPage_Empty.to.feature_TransactionFormFeature_Init",
+        "t.feature_transaction_form.0001",
+        "c.feature_transaction_form.invokes.page_transactions.s.feature_TransactionFormFeature_Editing.to.page_TransactionsPage_Empty"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-13",
+      "name": "Reports auth required → login success returnTo reports",
+      "semanticGoal": "覆蓋報表頁未登入導向登入並保留 returnTo，登入成功可回到報表頁並載入成功",
+      "edgeIds": [
+        "c.page_reports.invokes.page_login.s.page_ReportsPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_reports.s.feature_AuthLoginFeature_Submitting.to.page_ReportsPage_Init",
+        "t.page_reports.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 21,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-05",
+      "name": "Reports empty → transactions → empty → logout",
+      "semanticGoal": "覆蓋空報表狀態仍可回到帳務頁，並在空帳務狀態下可登出回登入頁",
+      "edgeIds": [
+        "t.page_reports.0002",
+        "c.page_reports.invokes.page_transactions.s.page_ReportsPage_Empty.to.page_TransactionsPage_Init",
+        "t.page_transactions.0002",
+        "c.page_transactions.invokes.feature_logout.s.page_TransactionsPage_Empty.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-04",
+      "name": "Reports ready → logout → back login",
+      "semanticGoal": "覆蓋月報表 Ready 狀態可從 Header 觸發登出流程並回到登入頁",
+      "edgeIds": [
+        "t.page_reports.0001",
+        "c.page_reports.invokes.feature_logout.s.page_ReportsPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-12",
+      "name": "Category toggle rejected → cancel back list",
+      "semanticGoal": "覆蓋類別狀態切換 API 失敗會回到確認狀態，且可取消返回類別列表",
+      "edgeIds": [
+        "c.page_categories.invokes.feature_category_toggle.s.page_CategoriesPage_Ready.to.feature_CategoryToggleFeature_Init",
+        "t.feature_category_toggle.0001",
+        "t.feature_category_toggle.0002",
+        "t.feature_category_toggle.0003",
+        "c.feature_category_toggle.invokes.page_categories.s.feature_CategoryToggleFeature_Confirming.to.page_CategoriesPage_Ready"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-11",
+      "name": "Delete transaction success keep list → load more",
+      "semanticGoal": "覆蓋刪除成功但清單仍有資料會回到帳務 Ready，且可繼續載入更多帳務",
+      "edgeIds": [
+        "c.page_transactions.invokes.feature_transaction_delete.s.page_TransactionsPage_Ready.to.feature_TransactionDeleteFeature_Init",
+        "t.feature_transaction_delete.0001",
+        "t.feature_transaction_delete.0002",
+        "c.feature_transaction_delete.invokes.page_transactions.s.feature_TransactionDeleteFeature_Deleting.to.page_TransactionsPage_Ready",
+        "t.page_transactions.0004"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 1,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-1",
+      "name": "Guest login success → transactions → logout",
+      "semanticGoal": "驗證入口導向登入、登入成功預設回帳務列表、並可正常登出回登入頁",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_transactions.s.feature_AuthLoginFeature_Submitting.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001",
+        "c.page_transactions.invokes.feature_logout.s.page_TransactionsPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-3",
+      "name": "Login API rejected → go register",
+      "semanticGoal": "驗證登入 API 拒絕後能顯示錯誤、恢復可輸入狀態，並可從登入頁切到註冊頁",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Submitting.to.page_LoginPage_Failed",
+        "t.page_login.0002",
+        "c.page_login.invokes.page_register.s.page_LoginPage_Ready.to.page_RegisterPage_Init",
+        "t.page_register.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173553_f01ooa.json",
+      "sourcePathId": "path-4",
+      "name": "Register validation fail → recover → back login",
+      "semanticGoal": "驗證註冊前端驗證失敗回到 RegisterPage.Failed，修正後可回 Ready 並可返回登入頁",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_register.s.page_LoginPage_Ready.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_auth_register.s.page_RegisterPage_Ready.to.feature_AuthRegisterFeature_Init",
+        "t.feature_auth_register.0001",
+        "c.feature_auth_register.invokes.page_register.s.feature_AuthRegisterFeature_Validating.to.page_RegisterPage_Failed",
+        "t.page_register.0002",
+        "c.page_register.invokes.page_login.s.page_RegisterPage_Ready.to.page_LoginPage_Init"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-16",
+      "name": "Reports export rejected → logout from ready",
+      "semanticGoal": "覆蓋匯出 CSV 失敗仍回到報表 Ready，且可從報表 Ready 直接登出",
+      "edgeIds": [
+        "t.page_reports.0001",
+        "c.page_reports.invokes.feature_csv_export.s.page_ReportsPage_Ready.to.feature_CsvExportFeature_Init",
+        "t.feature_csv_export.0001",
+        "c.feature_csv_export.invokes.page_reports.s.feature_CsvExportFeature_Exporting.to.page_ReportsPage_Ready.rejected",
+        "c.page_reports.invokes.feature_logout.s.page_ReportsPage_Ready.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 24,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-08",
+      "name": "Categories empty → reports → reports empty → back transactions ready",
+      "semanticGoal": "覆蓋空類別頁可導向報表頁，報表空狀態可回到帳務頁並完成載入",
+      "edgeIds": [
+        "t.page_categories.0002",
+        "c.page_categories.invokes.page_reports.s.page_CategoriesPage_Empty.to.page_ReportsPage_Init",
+        "t.page_reports.0002",
+        "c.page_reports.invokes.page_transactions.s.page_ReportsPage_Empty.to.page_TransactionsPage_Init",
+        "t.page_transactions.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 22,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-06",
+      "name": "Reports empty → categories → back reports ready",
+      "semanticGoal": "覆蓋空報表狀態可導向類別頁，並可再返回報表頁且成功載入",
+      "edgeIds": [
+        "t.page_reports.0002",
+        "c.page_reports.invokes.page_categories.s.page_ReportsPage_Empty.to.page_CategoriesPage_Init",
+        "t.page_categories.0001",
+        "c.page_categories.invokes.page_reports.s.page_CategoriesPage_Ready.to.page_ReportsPage_Init",
+        "t.page_reports.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 23,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-07",
+      "name": "Categories auth required → login → go register",
+      "semanticGoal": "覆蓋類別頁未登入會導向登入頁，且登入頁可前往註冊頁並顯示註冊表單",
+      "edgeIds": [
+        "c.page_categories.invokes.page_login.s.page_CategoriesPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_register.s.page_LoginPage_Ready.to.page_RegisterPage_Init",
+        "t.page_register.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-09",
+      "name": "Categories empty → logout → back login",
+      "semanticGoal": "覆蓋空類別頁可直接登出並回到登入頁",
+      "edgeIds": [
+        "t.page_categories.0002",
+        "c.page_categories.invokes.feature_logout.s.page_CategoriesPage_Empty.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_ClearingSession.to.page_LoginPage_Init"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex8\\1-3\\20260325_173759_e33tk8.json",
+      "sourcePathId": "path-r1-02",
+      "name": "Transactions empty → reports → auth required → login form ready",
+      "semanticGoal": "覆蓋空帳務頁仍可導向月報表，且未登入時報表會要求登入並進入可操作的登入表單狀態",
+      "edgeIds": [
+        "t.page_transactions.0002",
+        "c.page_transactions.invokes.page_reports.s.page_TransactionsPage_Empty.to.page_ReportsPage_Init",
+        "c.page_reports.invokes.page_login.s.page_ReportsPage_Init.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 4
+    }
+  ]
+}

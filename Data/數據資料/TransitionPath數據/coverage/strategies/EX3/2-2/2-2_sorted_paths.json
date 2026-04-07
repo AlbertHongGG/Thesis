@@ -1,0 +1,598 @@
+{
+  "strategyName": "EX3",
+  "projectName": "2-2",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-7",
+      "name": "Login as Provider -> Timeslot manage rejected -> Logout",
+      "semanticGoal": "覆蓋 Provider 登入到控制台、進入時段管理遭拒絕後回控制台並登出回 Guest。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_provider_dashboard.s.feature_AuthLoginFeature_ProviderDone.to.page_ProviderDashboardPage_provider_Init",
+        "t.page_provider_dashboard.0002",
+        "c.page_provider_dashboard.invokes.feature_provider_timeslot_manage.s.page_ProviderDashboardPage_provider_Ready.to.feature_ProviderTimeSlotManageFeature_Init",
+        "t.feature_provider_timeslot_manage.0001",
+        "t.feature_provider_timeslot_manage.0003",
+        "c.feature_provider_timeslot_manage.invokes.page_provider_dashboard.s.feature_ProviderTimeSlotManageFeature_Rejected.to.page_ProviderDashboardPage_provider_Init",
+        "t.page_provider_dashboard.0002",
+        "c.page_provider_dashboard.invokes.page_home_guest.s.page_ProviderDashboardPage_provider_Ready.to.page_HomePage_guest_Init"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-16",
+      "name": "Admin load failed retry -> Manage users rejected -> Manage services done",
+      "semanticGoal": "覆蓋 Admin 後台載入失敗重試後成功，並測試帳號狀態管理拒絕與服務狀態管理成功兩條功能分支。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_admin.s.page_Entry_Init.to.page_AdminPage_admin_Init",
+        "t.page_admin.0004",
+        "t.page_admin.0005",
+        "t.page_admin.0002",
+        "c.page_admin.invokes.feature_admin_user_status_manage.s.page_AdminPage_admin_Ready.to.feature_AdminUserStatusManageFeature_Init",
+        "t.feature_admin_user_status_manage.0001",
+        "t.feature_admin_user_status_manage.0003",
+        "c.feature_admin_user_status_manage.invokes.page_admin.s.feature_AdminUserStatusManageFeature_Rejected.to.page_AdminPage_admin_Init",
+        "t.page_admin.0002",
+        "c.page_admin.invokes.feature_admin_service_status_manage.s.page_AdminPage_admin_Ready.to.feature_AdminServiceStatusManageFeature_Init",
+        "t.feature_admin_service_status_manage.0001",
+        "t.feature_admin_service_status_manage.0002",
+        "c.feature_admin_service_status_manage.invokes.page_admin.s.feature_AdminServiceStatusManageFeature_Done.to.page_AdminPage_admin_Init"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-12",
+      "name": "User book service rejected -> Back detail -> Back services",
+      "semanticGoal": "覆蓋建立預約被拒絕後回詳情，並可返回服務列表重新瀏覽。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_services_list.s.page_Entry_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001",
+        "c.page_services_list.invokes.page_service_detail.s.page_ServicesListPage_Ready.to.page_ServiceDetailPage_Init",
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_service_detail_user.s.page_ServiceDetailPage_Ready.to.page_ServiceDetailPage_user_Init",
+        "c.page_service_detail_user.invokes.feature_user_booking_create.s.page_ServiceDetailPage_user_Init.to.feature_UserBookingCreateFeature_Init",
+        "t.feature_user_booking_create.0001",
+        "t.feature_user_booking_create.0003",
+        "c.feature_user_booking_create.invokes.page_service_detail.s.feature_UserBookingCreateFeature_Rejected.to.page_ServiceDetailPage_Init",
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_services_list.s.page_ServiceDetailPage_Ready.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-14",
+      "name": "User cancel booking accepted -> Back home",
+      "semanticGoal": "覆蓋 User 從首頁進入我的預約、進入取消流程成功後回列表並可回首頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_home.s.page_Entry_Init.to.page_HomePage_Init",
+        "t.page_home.0001",
+        "c.page_home.invokes.page_home_user.s.page_HomePage_Ready.to.page_HomePage_user_Init",
+        "c.page_home_user.invokes.page_my_bookings.s.page_HomePage_user_Init.to.page_MyBookingsPage_user_Init",
+        "t.page_my_bookings.0002",
+        "c.page_my_bookings.invokes.feature_booking_cancel.s.page_MyBookingsPage_user_Ready.to.feature_BookingCancelFeature_Init",
+        "t.feature_booking_cancel.0001",
+        "t.feature_booking_cancel.0002",
+        "c.feature_booking_cancel.invokes.page_my_bookings.s.feature_BookingCancelFeature_Done.to.page_MyBookingsPage_user_Init",
+        "t.page_my_bookings.0002",
+        "c.page_my_bookings.invokes.page_home.s.page_MyBookingsPage_user_Ready.to.page_HomePage_Init"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-15",
+      "name": "Provider dashboard empty -> Create service -> Update booking status",
+      "semanticGoal": "覆蓋 Provider 控制台 Empty 分支建立第一個服務成功，並進一步更新預約狀態成功回控制台。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_provider_dashboard.s.page_Entry_Init.to.page_ProviderDashboardPage_provider_Init",
+        "t.page_provider_dashboard.0003",
+        "c.page_provider_dashboard.invokes.feature_provider_service_manage.s.page_ProviderDashboardPage_provider_Empty.to.feature_ProviderServiceManageFeature_Init",
+        "t.feature_provider_service_manage.0001",
+        "t.feature_provider_service_manage.0002",
+        "c.feature_provider_service_manage.invokes.page_provider_dashboard.s.feature_ProviderServiceManageFeature_Done.to.page_ProviderDashboardPage_provider_Init",
+        "t.page_provider_dashboard.0002",
+        "c.page_provider_dashboard.invokes.feature_provider_booking_status_update.s.page_ProviderDashboardPage_provider_Ready.to.feature_ProviderBookingStatusUpdateFeature_Init",
+        "t.feature_provider_booking_status_update.0001",
+        "t.feature_provider_booking_status_update.0002",
+        "c.feature_provider_booking_status_update.invokes.page_provider_dashboard.s.feature_ProviderBookingStatusUpdateFeature_Done.to.page_ProviderDashboardPage_provider_Init",
+        "t.page_provider_dashboard.0002"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-9",
+      "name": "Register user -> Proceed login -> Login rejected",
+      "semanticGoal": "覆蓋 User 註冊成功導回登入頁，並驗證登入失敗會回到登入頁且不建立登入狀態。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_register.s.page_Entry_Init.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_register_account.s.page_RegisterPage_Ready.to.feature_RegisterAccountFeature_Init",
+        "t.feature_register_account.0001",
+        "t.feature_register_account.0002",
+        "c.feature_register_account.invokes.page_login.s.feature_RegisterAccountFeature_UserCreated.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0005",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Failed.to.page_LoginPage_Init"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-4",
+      "name": "Home guest -> Login -> Forgot password success",
+      "semanticGoal": "覆蓋 Guest 導覽到登入頁，並完成忘記密碼成功流程後回登入頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_home.s.page_Entry_Init.to.page_HomePage_Init",
+        "t.page_home.0001",
+        "c.page_home.invokes.page_home_guest.s.page_HomePage_Ready.to.page_HomePage_guest_Init",
+        "c.page_home_guest.invokes.page_login.s.page_HomePage_guest_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_forgot_password.s.page_LoginPage_Ready.to.feature_ForgotPasswordFeature_Init",
+        "t.feature_forgot_password.0001",
+        "t.feature_forgot_password.0002",
+        "c.feature_forgot_password.invokes.page_login.s.feature_ForgotPasswordFeature_Done.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-8",
+      "name": "Login as Admin -> Reports failed -> Logout",
+      "semanticGoal": "覆蓋 Admin 登入到後台、進入報表載入失敗回後台並登出。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_admin.s.feature_AuthLoginFeature_AdminDone.to.page_AdminPage_admin_Init",
+        "t.page_admin.0002",
+        "c.page_admin.invokes.feature_admin_report_view.s.page_AdminPage_admin_Ready.to.feature_AdminReportViewFeature_Init",
+        "t.feature_admin_report_view.0003",
+        "c.feature_admin_report_view.invokes.page_admin.s.feature_AdminReportViewFeature_Failed.to.page_AdminPage_admin_Init",
+        "t.page_admin.0002",
+        "c.page_admin.invokes.page_home_guest.s.page_AdminPage_admin_Ready.to.page_HomePage_guest_Init"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-13",
+      "name": "MyBookings auth required -> Login user -> Empty -> Browse services",
+      "semanticGoal": "覆蓋未登入直訪我的預約導向登入、登入後回流並走到 Empty 分支再前往服務列表。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_my_bookings.s.page_Entry_Init.to.page_MyBookingsPage_user_Init",
+        "c.page_my_bookings.invokes.page_login.s.page_MyBookingsPage_user_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_my_bookings.s.feature_AuthLoginFeature_UserDone.to.page_MyBookingsPage_user_Init",
+        "t.page_my_bookings.0003",
+        "c.page_my_bookings.invokes.page_services_list.s.page_MyBookingsPage_user_Empty.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-40",
+      "name": "User home -> Services -> MyBookings forbidden -> Home",
+      "semanticGoal": "覆蓋 User 首頁點擊服務列表（clickServices），再由 User 版服務列表進入我的預約並走到 Forbidden 分支，最後返回首頁。",
+      "edgeIds": [
+        "c.page_home_user.invokes.page_services_list.s.page_HomePage_user_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001",
+        "c.page_services_list.invokes.page_services_list_user.s.page_ServicesListPage_Ready.to.page_ServicesListPage_user_Init",
+        "c.page_services_list_user.invokes.page_my_bookings.s.page_ServicesListPage_user_Init.to.page_MyBookingsPage_user_Init",
+        "t.page_my_bookings.0001",
+        "c.page_my_bookings.invokes.page_home.s.page_MyBookingsPage_user_Forbidden.to.page_HomePage_Init"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-3",
+      "name": "Services list empty/failed retries -> Home guest",
+      "semanticGoal": "覆蓋列表 Empty/Failed 兩種分支與重試收斂，並驗證返回首頁後可切到 Guest 視角。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_services_list.s.page_Entry_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0002",
+        "t.page_services_list.0004",
+        "t.page_services_list.0003",
+        "t.page_services_list.0005",
+        "t.page_services_list.0001",
+        "c.page_services_list.invokes.page_home.s.page_ServicesListPage_Ready.to.page_HomePage_Init",
+        "t.page_home.0001",
+        "c.page_home.invokes.page_home_guest.s.page_HomePage_Ready.to.page_HomePage_guest_Init"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-5",
+      "name": "Login reset mode -> Reset password rejected",
+      "semanticGoal": "覆蓋帶 token 進入重設密碼模式，並驗證失敗路徑回到登入頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "c.page_login.invokes.feature_reset_password.s.page_LoginPage_Init.to.feature_ResetPasswordFeature_Init",
+        "t.feature_reset_password.0001",
+        "t.feature_reset_password.0003",
+        "c.feature_reset_password.invokes.page_login.s.feature_ResetPasswordFeature_Failed.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-47",
+      "name": "Admin no data -> Reports empty -> Back admin",
+      "semanticGoal": "覆蓋 Admin 後台無資料（Empty）分支，進入報表功能後走到報表 Empty 分支並返回後台。",
+      "edgeIds": [
+        "t.page_admin.0003",
+        "c.page_admin.invokes.feature_admin_report_view.s.page_AdminPage_admin_Empty.to.feature_AdminReportViewFeature_Init",
+        "t.feature_admin_report_view.0002",
+        "c.feature_admin_report_view.invokes.page_admin.s.feature_AdminReportViewFeature_Empty.to.page_AdminPage_admin_Init"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-44",
+      "name": "Provider manage service rejected -> Back dashboard empty",
+      "semanticGoal": "覆蓋 Provider 從控制台進入服務管理（manageService 分支）後提交被拒絕，返回控制台並走到 Empty 分支。",
+      "edgeIds": [
+        "c.page_provider_dashboard.invokes.feature_provider_service_manage.s.page_ProviderDashboardPage_provider_Ready.to.feature_ProviderServiceManageFeature_Init",
+        "t.feature_provider_service_manage.0001",
+        "t.feature_provider_service_manage.0003",
+        "c.feature_provider_service_manage.invokes.page_provider_dashboard.s.feature_ProviderServiceManageFeature_Rejected.to.page_ProviderDashboardPage_provider_Init",
+        "t.page_provider_dashboard.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-43",
+      "name": "Provider dashboard load failed -> Retry -> Browse services",
+      "semanticGoal": "覆蓋 Provider 控制台載入失敗、重試收斂後成功，並從控制台切回服務列表瀏覽。",
+      "edgeIds": [
+        "t.page_provider_dashboard.0004",
+        "t.page_provider_dashboard.0005",
+        "t.page_provider_dashboard.0002",
+        "c.page_provider_dashboard.invokes.page_services_list.s.page_ProviderDashboardPage_provider_Ready.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-27",
+      "name": "Service detail load failed -> Retry -> Go home",
+      "semanticGoal": "覆蓋服務詳情載入失敗 Failed 分支、重試收斂後成功，並可返回首頁。",
+      "edgeIds": [
+        "t.page_service_detail.0004",
+        "t.page_service_detail.0005",
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_home.s.page_ServiceDetailPage_Ready.to.page_HomePage_Init"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-10",
+      "name": "Register provider rejected -> Back register -> Go login",
+      "semanticGoal": "覆蓋註冊失敗回註冊頁、再切換到登入頁的路徑。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_register.s.page_Entry_Init.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.feature_register_account.s.page_RegisterPage_Ready.to.feature_RegisterAccountFeature_Init",
+        "t.feature_register_account.0001",
+        "t.feature_register_account.0004",
+        "c.feature_register_account.invokes.page_register.s.feature_RegisterAccountFeature_Failed.to.page_RegisterPage_Init",
+        "t.page_register.0001",
+        "c.page_register.invokes.page_login.s.page_RegisterPage_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-46",
+      "name": "MyBookings load failed -> Retry -> Empty -> Browse services",
+      "semanticGoal": "覆蓋我的預約載入失敗、重試收斂後進入 Empty，並從 Empty 前往服務列表繼續探索。",
+      "edgeIds": [
+        "t.page_my_bookings.0004",
+        "t.page_my_bookings.0005",
+        "t.page_my_bookings.0003",
+        "c.page_my_bookings.invokes.page_services_list.s.page_MyBookingsPage_user_Empty.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 42,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-42",
+      "name": "Provider dashboard role rejected -> Home",
+      "semanticGoal": "覆蓋 Provider 控制台角色驗證失敗（Forbidden）分支，並可返回首頁。",
+      "edgeIds": [
+        "t.page_provider_dashboard.0001",
+        "c.page_provider_dashboard.invokes.page_home.s.page_ProviderDashboardPage_provider_Forbidden.to.page_HomePage_Init",
+        "t.page_home.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-32",
+      "name": "Admin reports load success -> Return admin",
+      "semanticGoal": "覆蓋 Admin 報表載入成功 Ready 分支並返回後台。",
+      "edgeIds": [
+        "t.feature_admin_report_view.0001",
+        "c.feature_admin_report_view.invokes.page_admin.s.feature_AdminReportViewFeature_Ready.to.page_AdminPage_admin_Init"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-29",
+      "name": "Forgot password failed -> Back login",
+      "semanticGoal": "覆蓋忘記密碼寄送失敗 Failed 分支並返回登入頁。",
+      "edgeIds": [
+        "t.feature_forgot_password.0003",
+        "c.feature_forgot_password.invokes.page_login.s.feature_ForgotPasswordFeature_Failed.to.page_LoginPage_Init"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-31",
+      "name": "Provider timeslot manage success -> Return dashboard",
+      "semanticGoal": "覆蓋 Provider 時段管理成功 Done 分支並返回控制台。",
+      "edgeIds": [
+        "t.feature_provider_timeslot_manage.0002",
+        "c.feature_provider_timeslot_manage.invokes.page_provider_dashboard.s.feature_ProviderTimeSlotManageFeature_Done.to.page_ProviderDashboardPage_provider_Init"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-30",
+      "name": "Register provider success -> Proceed login",
+      "semanticGoal": "覆蓋 Provider 註冊成功分支，並導回登入頁以進行後續登入。",
+      "edgeIds": [
+        "t.feature_register_account.0003",
+        "c.feature_register_account.invokes.page_login.s.feature_RegisterAccountFeature_ProviderCreated.to.page_LoginPage_Init"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-28",
+      "name": "Reset password success -> Back login",
+      "semanticGoal": "覆蓋重設密碼成功 Done 分支並返回登入頁。",
+      "edgeIds": [
+        "t.feature_reset_password.0002",
+        "c.feature_reset_password.invokes.page_login.s.feature_ResetPasswordFeature_Done.to.page_LoginPage_Init"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231019_el3pkf.json",
+      "sourcePathId": "path-26",
+      "name": "Service detail no slots -> Back to services",
+      "semanticGoal": "覆蓋服務詳情無可預約時段 Empty 分支，並可返回服務列表。",
+      "edgeIds": [
+        "t.page_service_detail.0002",
+        "c.page_service_detail.invokes.page_services_list.s.page_ServiceDetailPage_Empty.to.page_ServicesListPage_Init"
+      ],
+      "pathLength": 2
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-48",
+      "name": "Admin user status update done -> Back admin -> Load admin ready",
+      "semanticGoal": "覆蓋 Admin 帳號狀態管理成功（Done）分支，返回後台並可正常載入後台資料。",
+      "edgeIds": [
+        "t.feature_admin_user_status_manage.0001",
+        "t.feature_admin_user_status_manage.0002",
+        "c.feature_admin_user_status_manage.invokes.page_admin.s.feature_AdminUserStatusManageFeature_Done.to.page_AdminPage_admin_Init",
+        "t.page_admin.0002"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-45",
+      "name": "Cancel booking rejected -> Back my bookings ready",
+      "semanticGoal": "覆蓋取消預約被拒絕（超時/狀態不符/非本人等）分支，並返回我的預約列表可正常載入。",
+      "edgeIds": [
+        "t.feature_booking_cancel.0001",
+        "t.feature_booking_cancel.0003",
+        "c.feature_booking_cancel.invokes.page_my_bookings.s.feature_BookingCancelFeature_Rejected.to.page_MyBookingsPage_user_Init",
+        "t.page_my_bookings.0002"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 35,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-35",
+      "name": "Service detail -> Admin view -> Back to services",
+      "semanticGoal": "覆蓋服務詳情 Ready 切換到 Admin 視角（只讀不預約），並可返回服務列表。",
+      "edgeIds": [
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_service_detail_admin.s.page_ServiceDetailPage_Ready.to.page_ServiceDetailPage_admin_Init",
+        "c.page_service_detail_admin.invokes.page_services_list.s.page_ServiceDetailPage_admin_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 33,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-33",
+      "name": "Service detail -> Guest view -> Back to services",
+      "semanticGoal": "覆蓋服務詳情 Ready 切換到 Guest 視角（不顯示立即預約 CTA），並可返回服務列表再次載入。",
+      "edgeIds": [
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_service_detail_guest.s.page_ServiceDetailPage_Ready.to.page_ServiceDetailPage_guest_Init",
+        "c.page_service_detail_guest.invokes.page_services_list.s.page_ServiceDetailPage_guest_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_231606_idvqzp.json",
+      "sourcePathId": "path-34",
+      "name": "Service detail -> Provider view -> Back to services",
+      "semanticGoal": "覆蓋服務詳情 Ready 切換到 Provider 視角（只讀不預約），並返回服務列表驗證導覽/權限一致。",
+      "edgeIds": [
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_service_detail_provider.s.page_ServiceDetailPage_Ready.to.page_ServiceDetailPage_provider_Init",
+        "c.page_service_detail_provider.invokes.page_services_list.s.page_ServiceDetailPage_provider_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-2",
+      "name": "Services list -> Detail 404 -> Back",
+      "semanticGoal": "覆蓋服務列表成功載入、進入詳情遇到 404、再返回列表並可再次載入。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_services_list.s.page_Entry_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001",
+        "c.page_services_list.invokes.page_service_detail.s.page_ServicesListPage_Ready.to.page_ServiceDetailPage_Init",
+        "t.page_service_detail.0003",
+        "c.page_service_detail.invokes.page_services_list.s.page_ServiceDetailPage_NotFound.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\2-2\\20260321_230629_e9hqj3.json",
+      "sourcePathId": "path-11",
+      "name": "User book service success -> MyBookings ready",
+      "semanticGoal": "覆蓋列表到詳情成功、切到 User 視角後建立預約成功並在我的預約可見。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_services_list.s.page_Entry_Init.to.page_ServicesListPage_Init",
+        "t.page_services_list.0001",
+        "c.page_services_list.invokes.page_service_detail.s.page_ServicesListPage_Ready.to.page_ServiceDetailPage_Init",
+        "t.page_service_detail.0001",
+        "c.page_service_detail.invokes.page_service_detail_user.s.page_ServiceDetailPage_Ready.to.page_ServiceDetailPage_user_Init",
+        "c.page_service_detail_user.invokes.feature_user_booking_create.s.page_ServiceDetailPage_user_Init.to.feature_UserBookingCreateFeature_Init",
+        "t.feature_user_booking_create.0001",
+        "t.feature_user_booking_create.0002",
+        "c.feature_user_booking_create.invokes.page_my_bookings.s.feature_UserBookingCreateFeature_Done.to.page_MyBookingsPage_user_Init",
+        "t.page_my_bookings.0002"
+      ],
+      "pathLength": 10
+    }
+  ]
+}

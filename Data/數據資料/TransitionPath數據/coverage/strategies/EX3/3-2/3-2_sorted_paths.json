@@ -1,0 +1,665 @@
+{
+  "strategyName": "EX3",
+  "projectName": "3-2",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-9",
+      "name": "PM board→Status transition→PM detail→Comment",
+      "semanticGoal": "覆蓋 Project Manager 從 board 觸發狀態轉換後回到 issue detail，並新增留言。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "t.page_login.0003",
+        "c.page_login.invokes.page_org_switch.s.page_LoginPage_Submitting.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0001",
+        "c.page_org_switch.invokes.page_org_overview.s.page_OrgSwitchPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001",
+        "c.page_org_overview.invokes.page_org_projects.s.page_OrgOverviewPage_Ready.to.page_OrgProjectsPage_Init",
+        "t.page_org_projects.0001",
+        "c.page_org_projects.invokes.page_project_board.s.page_OrgProjectsPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_board_project_manager.s.page_ProjectBoardPage_Ready.to.page_ProjectBoardManagerPage_project_manager_Viewing",
+        "c.page_project_board_project_manager.invokes.feature_issue_status_transition.s.page_ProjectBoardManagerPage_project_manager_Viewing.to.feature_IssueStatusTransitionFeature_Init",
+        "t.feature_issue_status_transition.0001",
+        "c.feature_issue_status_transition.invokes.page_issue_detail.s.feature_IssueStatusTransitionFeature_TransitioningIssue.to.page_IssueDetailPage_Init",
+        "t.page_issue_detail.0001",
+        "c.page_issue_detail.invokes.page_issue_detail_project_manager.s.page_IssueDetailPage_Ready.to.page_IssueDetailManagerPage_project_manager_Viewing",
+        "c.page_issue_detail_project_manager.invokes.feature_issue_comment.s.page_IssueDetailManagerPage_project_manager_Viewing.to.feature_IssueCommentFeature_Init",
+        "t.feature_issue_comment.0001",
+        "c.feature_issue_comment.invokes.page_issue_detail.s.feature_IssueCommentFeature_SubmittingComment.to.page_IssueDetailPage_Init",
+        "t.page_issue_detail.0001"
+      ],
+      "pathLength": 21
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-5",
+      "name": "Invite accept→Create membership→Members admin→Send invite",
+      "semanticGoal": "覆蓋邀請接受成功建立 membership，進入 Org Members Admin 視角並發送邀請後返回 Members。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_accept_invite.s.page_Entry_Init.to.page_AcceptInvitePage_Init",
+        "t.page_accept_invite.0001",
+        "c.page_accept_invite.invokes.feature_email_invite_accept.s.page_AcceptInvitePage_Ready.to.feature_EmailInviteAcceptFeature_Init",
+        "t.feature_email_invite_accept.0001",
+        "t.feature_email_invite_accept.0002",
+        "t.feature_email_invite_accept.0004",
+        "c.feature_email_invite_accept.invokes.page_org_switch.s.feature_EmailInviteAcceptFeature_MembershipCreated.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0001",
+        "c.page_org_switch.invokes.page_org_overview.s.page_OrgSwitchPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001",
+        "c.page_org_overview.invokes.page_org_members.s.page_OrgOverviewPage_Ready.to.page_OrgMembersPage_Init",
+        "t.page_org_members.0001",
+        "c.page_org_members.invokes.page_org_members_org_admin.s.page_OrgMembersPage_Ready.to.page_OrgMembersAdminPage_org_admin_Viewing",
+        "c.page_org_members_org_admin.invokes.feature_organization_member_management.s.page_OrgMembersAdminPage_org_admin_Viewing.to.feature_OrganizationMemberManagementFeature_Init",
+        "t.feature_organization_member_management.0001",
+        "c.feature_organization_member_management.invokes.page_org_members.s.feature_OrganizationMemberManagementFeature_SendingInvite.to.page_OrgMembersPage_Init",
+        "t.page_org_members.0001"
+      ],
+      "pathLength": 17
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-14",
+      "name": "Settings(PM)→Workflow save→Issue types save→Back",
+      "semanticGoal": "覆蓋 PM settings 進入 workflow 與 issue type 管理功能，儲存後回到 settings 再返回 board。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_settings.s.page_ProjectBoardPage_Ready.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_settings_project_manager.s.page_ProjectSettingsPage_Ready.to.page_ProjectSettingsManagerPage_project_manager_Viewing",
+        "c.page_project_settings_project_manager.invokes.feature_workflow_management.s.page_ProjectSettingsManagerPage_project_manager_Viewing.to.feature_WorkflowManagementFeature_Init",
+        "t.feature_workflow_management.0001",
+        "c.feature_workflow_management.invokes.page_project_settings.s.feature_WorkflowManagementFeature_EditingWorkflow.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_settings_project_manager.s.page_ProjectSettingsPage_Ready.to.page_ProjectSettingsManagerPage_project_manager_Viewing",
+        "c.page_project_settings_project_manager.invokes.feature_issue_type_management.s.page_ProjectSettingsManagerPage_project_manager_Viewing.to.feature_IssueTypeManagementFeature_Init",
+        "t.feature_issue_type_management.0001",
+        "c.feature_issue_type_management.invokes.page_project_settings.s.feature_IssueTypeManagementFeature_EditingIssueTypes.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_board.s.page_ProjectSettingsPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 15
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-3",
+      "name": "Login load error→Retry→Platform audit→Back",
+      "semanticGoal": "覆蓋登入頁初始化失敗/重試與平台管理導覽（平台稽核頁往返）。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0002",
+        "t.page_login.0005",
+        "t.page_login.0001",
+        "t.page_login.0003",
+        "c.page_login.invokes.page_org_switch.s.page_LoginPage_Submitting.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0001",
+        "c.page_org_switch.invokes.page_platform_organizations.s.page_OrgSwitchPage_Ready.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0001",
+        "c.page_platform_organizations.invokes.page_platform_audit_log.s.page_PlatformOrganizationsPage_Ready.to.page_PlatformAuditLogPage_Init",
+        "t.page_platform_audit_log.0001",
+        "c.page_platform_audit_log.invokes.page_platform_organizations.s.page_PlatformAuditLogPage_Ready.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0003",
+        "t.page_platform_organizations.0004"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-11",
+      "name": "Viewer board→Issue list empty→Attempt create issue",
+      "semanticGoal": "覆蓋 Viewer 視角切到 issue list 空狀態，嘗試走建立入口以驗證前後端權限收斂。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_board_viewer.s.page_ProjectBoardPage_Ready.to.page_ProjectBoardViewerPage_viewer_Viewing",
+        "c.page_project_board_viewer.invokes.page_project_issues_list.s.page_ProjectBoardViewerPage_viewer_Viewing.to.page_ProjectIssuesListPage_Init",
+        "t.page_project_issues_list.0002",
+        "c.page_project_issues_list.invokes.feature_issue_create.s.page_ProjectIssuesListPage_Empty.to.feature_IssueCreateFeature_Init",
+        "t.feature_issue_create.0001",
+        "t.feature_issue_create.0002",
+        "t.feature_issue_create.0001",
+        "c.feature_issue_create.invokes.page_project_issues_list.s.feature_IssueCreateFeature_CreatingIssue.to.page_ProjectIssuesListPage_Init",
+        "t.page_project_issues_list.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-12",
+      "name": "Backlog→Sprint planning reject then save→Back to board",
+      "semanticGoal": "覆蓋 backlog 進入 sprint planning 的拒絕與成功儲存後返回 backlog/board。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_backlog.s.page_ProjectBoardPage_Ready.to.page_ProjectBacklogPage_Init",
+        "t.page_project_backlog.0001",
+        "c.page_project_backlog.invokes.feature_sprint_planning.s.page_ProjectBacklogPage_Ready.to.feature_SprintPlanningFeature_Init",
+        "t.feature_sprint_planning.0001",
+        "t.feature_sprint_planning.0002",
+        "t.feature_sprint_planning.0001",
+        "c.feature_sprint_planning.invokes.page_project_backlog.s.feature_SprintPlanningFeature_ManagingBacklog.to.page_ProjectBacklogPage_Init",
+        "t.page_project_backlog.0001",
+        "c.page_project_backlog.invokes.page_project_board.s.page_ProjectBacklogPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-13",
+      "name": "Sprints→Lifecycle update→Back to board",
+      "semanticGoal": "覆蓋 scrum-only sprints 導覽、sprint 狀態更新成功後返回 sprints/board。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_sprints.s.page_ProjectBoardPage_Ready.to.page_ProjectSprintsPage_Init",
+        "t.page_project_sprints.0001",
+        "c.page_project_sprints.invokes.feature_sprint_lifecycle.s.page_ProjectSprintsPage_Ready.to.feature_SprintLifecycleFeature_Init",
+        "t.feature_sprint_lifecycle.0001",
+        "c.feature_sprint_lifecycle.invokes.page_project_sprints.s.feature_SprintLifecycleFeature_ManagingSprintLifecycle.to.page_ProjectSprintsPage_Init",
+        "t.page_project_sprints.0001",
+        "c.page_project_sprints.invokes.page_project_board.s.page_ProjectSprintsPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-2",
+      "name": "Login fail once→Success→Org empty→Logout→Back to login",
+      "semanticGoal": "覆蓋登入失敗重試與登出流程，確認 session 清除後回到登入頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "t.page_login.0003",
+        "t.page_login.0004",
+        "t.page_login.0003",
+        "c.page_login.invokes.page_org_switch.s.page_LoginPage_Submitting.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0002",
+        "c.page_org_switch.invokes.feature_logout.s.page_OrgSwitchPage_Empty.to.feature_LogoutFeature_Init",
+        "t.feature_logout.0001",
+        "t.feature_logout.0002",
+        "c.feature_logout.invokes.page_login.s.feature_LogoutFeature_Done.to.page_LoginPage_Init"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-8",
+      "name": "Org projects admin→Create project fail→Success→Back",
+      "semanticGoal": "覆蓋 Org Admin 專案視角建立 project 的失敗與成功回到 projects 清單。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "t.page_login.0003",
+        "c.page_login.invokes.page_org_switch.s.page_LoginPage_Submitting.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0001",
+        "c.page_org_switch.invokes.page_org_overview.s.page_OrgSwitchPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001",
+        "c.page_org_overview.invokes.page_org_projects.s.page_OrgOverviewPage_Ready.to.page_OrgProjectsPage_Init",
+        "t.page_org_projects.0001",
+        "c.page_org_projects.invokes.page_org_projects_org_admin.s.page_OrgProjectsPage_Ready.to.page_OrgProjectsAdminPage_org_admin_Viewing",
+        "c.page_org_projects_org_admin.invokes.feature_project_create.s.page_OrgProjectsAdminPage_org_admin_Viewing.to.feature_ProjectCreateFeature_Init",
+        "t.feature_project_create.0001",
+        "t.feature_project_create.0002",
+        "t.feature_project_create.0001",
+        "c.feature_project_create.invokes.page_org_projects.s.feature_ProjectCreateFeature_CreatingProject.to.page_OrgProjectsPage_Init",
+        "t.page_org_projects.0001"
+      ],
+      "pathLength": 16
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 23,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-23",
+      "name": "Org audit load_failed→Retry→Loaded→Back",
+      "semanticGoal": "覆蓋 Org Audit Log 載入失敗/重試後成功載入，並驗證 Ready 返回 Overview 的行為。",
+      "edgeIds": [
+        "c.page_org_overview.invokes.page_org_audit_log.s.page_OrgOverviewPage_Ready.to.page_OrgAuditLogPage_Init",
+        "t.page_org_audit_log.0003",
+        "t.page_org_audit_log.0004",
+        "t.page_org_audit_log.0001",
+        "c.page_org_audit_log.invokes.page_org_overview.s.page_OrgAuditLogPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-30",
+      "name": "Board load_failed→Retry→Open detail→Viewer view→Back",
+      "semanticGoal": "覆蓋 Project Board 載入失敗/重試，並探索從 board 進入 issue detail、切到 Viewer detail 視角再返回 board 的導覽分支。",
+      "edgeIds": [
+        "t.page_project_board.0003",
+        "t.page_project_board.0004",
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_issue_detail.s.page_ProjectBoardPage_Ready.to.page_IssueDetailPage_Init",
+        "t.page_issue_detail.0001",
+        "c.page_issue_detail.invokes.page_issue_detail_viewer.s.page_IssueDetailPage_Ready.to.page_IssueDetailViewerPage_viewer_Viewing",
+        "c.page_issue_detail_viewer.invokes.page_project_board.s.page_IssueDetailViewerPage_viewer_Viewing.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-31",
+      "name": "Board no_issues→Open list→List load_failed/retry→Back",
+      "semanticGoal": "覆蓋 Project Board 空資料（no_issues）與從 Empty 進入 issue list，再覆蓋 issue list 載入失敗/重試並返回 board。",
+      "edgeIds": [
+        "t.page_project_board.0002",
+        "c.page_project_board.invokes.page_project_issues_list.s.page_ProjectBoardPage_Empty.to.page_ProjectIssuesListPage_Init",
+        "t.page_project_issues_list.0003",
+        "t.page_project_issues_list.0004",
+        "t.page_project_issues_list.0001",
+        "c.page_project_issues_list.invokes.page_project_board.s.page_ProjectIssuesListPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-7",
+      "name": "Members member view→Back→Switch org error/retry",
+      "semanticGoal": "覆蓋 Org Member 成員視角返回 overview，再走 org switch 載入失敗與 retry。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "t.page_login.0003",
+        "c.page_login.invokes.page_org_switch.s.page_LoginPage_Submitting.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0001",
+        "c.page_org_switch.invokes.page_org_overview.s.page_OrgSwitchPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001",
+        "c.page_org_overview.invokes.page_org_members.s.page_OrgOverviewPage_Ready.to.page_OrgMembersPage_Init",
+        "t.page_org_members.0001",
+        "c.page_org_members.invokes.page_org_members_org_member.s.page_OrgMembersPage_Ready.to.page_OrgMembersMemberPage_org_member_Viewing",
+        "c.page_org_members_org_member.invokes.page_org_overview.s.page_OrgMembersMemberPage_org_member_Viewing.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001",
+        "c.page_org_overview.invokes.page_org_switch.s.page_OrgOverviewPage_Ready.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0003",
+        "t.page_org_switch.0004"
+      ],
+      "pathLength": 15
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-25",
+      "name": "Platform orgs empty→Create first org",
+      "semanticGoal": "覆蓋 Platform Organizations 空清單（no_organizations）與從 Empty 進入 Organization Management 建立第一個 organization 的流程。",
+      "edgeIds": [
+        "t.page_platform_organizations.0002",
+        "c.page_platform_organizations.invokes.feature_organization_management.s.page_PlatformOrganizationsPage_Empty.to.feature_OrganizationManagementFeature_Init",
+        "t.feature_organization_management.0001",
+        "c.feature_organization_management.invokes.page_platform_organizations.s.feature_OrganizationManagementFeature_CreatingOrganization.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-16",
+      "name": "Settings(Org Admin)→Assign project role→Back",
+      "semanticGoal": "覆蓋 Org Admin settings 視角進入專案角色指派功能，成功更新後回到 settings/board。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_settings.s.page_ProjectBoardPage_Ready.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_settings_org_admin.s.page_ProjectSettingsPage_Ready.to.page_ProjectSettingsOrgAdminPage_org_admin_Viewing",
+        "c.page_project_settings_org_admin.invokes.feature_project_role_assignment.s.page_ProjectSettingsOrgAdminPage_org_admin_Viewing.to.feature_ProjectRoleAssignmentFeature_Init",
+        "t.feature_project_role_assignment.0001",
+        "c.feature_project_role_assignment.invokes.page_project_settings.s.feature_ProjectRoleAssignmentFeature_UpdatingRole.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_board.s.page_ProjectSettingsPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-15",
+      "name": "Settings(PM)→Archive project→Return archived settings→Back",
+      "semanticGoal": "覆蓋不可逆的 project archive 確認與成功後返回 settings，確認 archived 狀態同步。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_settings.s.page_ProjectBoardPage_Ready.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_settings_project_manager.s.page_ProjectSettingsPage_Ready.to.page_ProjectSettingsManagerPage_project_manager_Viewing",
+        "c.page_project_settings_project_manager.invokes.feature_project_archive.s.page_ProjectSettingsManagerPage_project_manager_Viewing.to.feature_ProjectArchiveFeature_Init",
+        "t.feature_project_archive.0001",
+        "t.feature_project_archive.0002",
+        "c.feature_project_archive.invokes.page_project_settings.s.feature_ProjectArchiveFeature_Archived.to.page_ProjectSettingsPage_Init",
+        "t.page_project_settings.0001",
+        "c.page_project_settings.invokes.page_project_board.s.page_ProjectSettingsPage_Ready.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-29",
+      "name": "Platform audit load_failed→Retry→Empty→Back",
+      "semanticGoal": "覆蓋 Platform Audit Log 載入失敗/重試後走空資料分支，並從 Empty 返回 Platform Organizations。",
+      "edgeIds": [
+        "t.page_platform_audit_log.0003",
+        "t.page_platform_audit_log.0004",
+        "t.page_platform_audit_log.0002",
+        "c.page_platform_audit_log.invokes.page_platform_organizations.s.page_PlatformAuditLogPage_Empty.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-20",
+      "name": "Projects load_failed→Retry→Org member view→Back",
+      "semanticGoal": "覆蓋 Org Projects 載入失敗/重試，並探索 Org Member projects 視角與返回 Overview 的導覽分支。",
+      "edgeIds": [
+        "c.page_org_overview.invokes.page_org_projects.s.page_OrgOverviewPage_Ready.to.page_OrgProjectsPage_Init",
+        "t.page_org_projects.0003",
+        "t.page_org_projects.0004",
+        "t.page_org_projects.0001",
+        "c.page_org_projects.invokes.page_org_projects_org_member.s.page_OrgProjectsPage_Ready.to.page_OrgProjectsMemberPage_org_member_Viewing",
+        "c.page_org_projects_org_member.invokes.page_org_overview.s.page_OrgProjectsMemberPage_org_member_Viewing.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-4",
+      "name": "Invite reject→Return→Invalid→Go login",
+      "semanticGoal": "覆蓋邀請驗證成功後的拒絕分支，回到邀請頁再走無效邀請→導回登入。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_accept_invite.s.page_Entry_Init.to.page_AcceptInvitePage_Init",
+        "t.page_accept_invite.0001",
+        "c.page_accept_invite.invokes.feature_email_invite_accept.s.page_AcceptInvitePage_Ready.to.feature_EmailInviteAcceptFeature_Init",
+        "t.feature_email_invite_accept.0001",
+        "t.feature_email_invite_accept.0003",
+        "c.feature_email_invite_accept.invokes.page_accept_invite.s.feature_EmailInviteAcceptFeature_Rejected.to.page_AcceptInvitePage_Init",
+        "t.page_accept_invite.0002",
+        "c.page_accept_invite.invokes.page_login.s.page_AcceptInvitePage_Invalid.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232306_b3vmnc.json",
+      "sourcePathId": "path-6",
+      "name": "Org audit empty→Back→Overview retry",
+      "semanticGoal": "覆蓋 Org Audit Log 空資料返回與 Org Overview 載入失敗/重試。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "t.page_login.0003",
+        "c.page_login.invokes.page_org_switch.s.page_LoginPage_Submitting.to.page_OrgSwitchPage_Init",
+        "t.page_org_switch.0001",
+        "c.page_org_switch.invokes.page_org_overview.s.page_OrgSwitchPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001",
+        "c.page_org_overview.invokes.page_org_audit_log.s.page_OrgOverviewPage_Ready.to.page_OrgAuditLogPage_Init",
+        "t.page_org_audit_log.0002",
+        "c.page_org_audit_log.invokes.page_org_overview.s.page_OrgAuditLogPage_Empty.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0002",
+        "t.page_org_overview.0003",
+        "t.page_org_overview.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-2",
+      "name": "Board→Developer view→Issue detail→Developer detail view",
+      "semanticGoal": "探索 Developer board 視角與其導向 issue detail 的分支，並進入 Developer issue detail 視角以驗證權限收斂。",
+      "edgeIds": [
+        "t.page_project_board.0001",
+        "c.page_project_board.invokes.page_project_board_developer.s.page_ProjectBoardPage_Ready.to.page_ProjectBoardDeveloperPage_developer_Viewing",
+        "c.page_project_board_developer.invokes.page_issue_detail.s.page_ProjectBoardDeveloperPage_developer_Viewing.to.page_IssueDetailPage_Init",
+        "t.page_issue_detail.0001",
+        "c.page_issue_detail.invokes.page_issue_detail_developer.s.page_IssueDetailPage_Ready.to.page_IssueDetailDeveloperPage_developer_Viewing"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-32",
+      "name": "PM detail→Issue edit save→Back to detail",
+      "semanticGoal": "覆蓋從 issue detail 進入 Project Manager 視角後，觸發 Issue Edit 功能的儲存路徑並返回 detail。",
+      "edgeIds": [
+        "t.page_issue_detail.0001",
+        "c.page_issue_detail.invokes.page_issue_detail_project_manager.s.page_IssueDetailPage_Ready.to.page_IssueDetailManagerPage_project_manager_Viewing",
+        "c.page_issue_detail_project_manager.invokes.feature_issue_edit.s.page_IssueDetailManagerPage_project_manager_Viewing.to.feature_IssueEditFeature_Init",
+        "t.feature_issue_edit.0001",
+        "c.feature_issue_edit.invokes.page_issue_detail.s.feature_IssueEditFeature_EditingIssue.to.page_IssueDetailPage_Init",
+        "t.page_issue_detail.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 55,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_233040_8is0ps.json",
+      "sourcePathId": "path-54",
+      "name": "PM issue detail → Epic link rejected",
+      "semanticGoal": "覆蓋 PM detail 進入 epic link 管理的未走過導覽分支，並覆蓋 epic link 變更被拒絕以驗證資料不被改寫。",
+      "edgeIds": [
+        "t.page_issue_detail.0001",
+        "c.page_issue_detail.invokes.page_issue_detail_project_manager.s.page_IssueDetailPage_Ready.to.page_IssueDetailManagerPage_project_manager_Viewing",
+        "c.page_issue_detail_project_manager.invokes.feature_epic_link_management.s.page_IssueDetailManagerPage_project_manager_Viewing.to.feature_EpicLinkFeature_Init",
+        "t.feature_epic_link_management.0001",
+        "t.feature_epic_link_management.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 17,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-17",
+      "name": "Invite load_failed→Retry→Accept→Prompt login",
+      "semanticGoal": "覆蓋邀請頁載入失敗/重試分支，並驗證接受邀請後不 auto-login 時會導回 /login 的流程。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_accept_invite.s.page_Entry_Init.to.page_AcceptInvitePage_Init",
+        "t.page_accept_invite.0003",
+        "t.page_accept_invite.0004",
+        "t.page_accept_invite.0001",
+        "c.page_accept_invite.invokes.feature_email_invite_accept.s.page_AcceptInvitePage_Ready.to.feature_EmailInviteAcceptFeature_Init",
+        "t.feature_email_invite_accept.0001",
+        "t.feature_email_invite_accept.0002",
+        "t.feature_email_invite_accept.0004",
+        "c.feature_email_invite_accept.invokes.page_login.s.feature_EmailInviteAcceptFeature_MembershipCreated.to.page_LoginPage_Init",
+        "t.page_login.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-18",
+      "name": "Members load_failed→Retry→Back to overview",
+      "semanticGoal": "覆蓋 Org Members 成員清單載入失敗/重試，並驗證從 Members(Ready) 返回 Overview 的導覽一致性。",
+      "edgeIds": [
+        "c.page_org_overview.invokes.page_org_members.s.page_OrgOverviewPage_Ready.to.page_OrgMembersPage_Init",
+        "t.page_org_members.0003",
+        "t.page_org_members.0004",
+        "t.page_org_members.0001",
+        "c.page_org_members.invokes.page_org_overview.s.page_OrgMembersPage_Ready.to.page_OrgOverviewPage_Init",
+        "t.page_org_overview.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232829_rt2g3i.json",
+      "sourcePathId": "path-26",
+      "name": "Platform orgs→Manage→Change plan→Back",
+      "semanticGoal": "覆蓋 Platform Organizations(Ready) 進入 Organization Management 後變更 plan 並返回 /platform/orgs 的流程。",
+      "edgeIds": [
+        "t.page_platform_organizations.0001",
+        "c.page_platform_organizations.invokes.feature_organization_management.s.page_PlatformOrganizationsPage_Ready.to.feature_OrganizationManagementFeature_Init",
+        "t.feature_organization_management.0003",
+        "c.feature_organization_management.invokes.page_platform_organizations.s.feature_OrganizationManagementFeature_UpdatingPlan.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0001"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-11",
+      "name": "Platform org management→Suspend org→Back to platform orgs",
+      "semanticGoal": "覆蓋平台停權組織流程與返回清單的未走過分支，驗證停權後全域唯讀策略可觸發。",
+      "edgeIds": [
+        "t.feature_organization_management.0004",
+        "c.feature_organization_management.invokes.page_platform_organizations.s.feature_OrganizationManagementFeature_SuspendingOrganization.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-12",
+      "name": "Platform org management→Unsuspend org→Back to platform orgs",
+      "semanticGoal": "覆蓋平台解除停權流程與返回清單的未走過分支，驗證權限與可寫入入口恢復一致。",
+      "edgeIds": [
+        "t.feature_organization_management.0005",
+        "c.feature_organization_management.invokes.page_platform_organizations.s.feature_OrganizationManagementFeature_UnsuspendingOrganization.to.page_PlatformOrganizationsPage_Init",
+        "t.page_platform_organizations.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-13",
+      "name": "Org member management→Update member status→Back to members",
+      "semanticGoal": "覆蓋成員狀態更新成功返回 Members 的未走過分支，驗證不可跨組織操作與狀態同步。",
+      "edgeIds": [
+        "t.feature_organization_member_management.0003",
+        "c.feature_organization_member_management.invokes.page_org_members.s.feature_OrganizationMemberManagementFeature_UpdatingMemberStatus.to.page_OrgMembersPage_Init",
+        "t.page_org_members.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-7",
+      "name": "Backlog empty→Back to board",
+      "semanticGoal": "覆蓋 backlog 無項目（Empty）分支並返回 board，驗證不會自動建立資料。",
+      "edgeIds": [
+        "t.page_project_backlog.0002",
+        "c.page_project_backlog.invokes.page_project_board.s.page_ProjectBacklogPage_Empty.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-9",
+      "name": "Sprints empty→Back to board",
+      "semanticGoal": "覆蓋 sprints 無資料（Empty）分支並返回 board，驗證 scrum-only 導覽規則不被破壞。",
+      "edgeIds": [
+        "t.page_project_sprints.0002",
+        "c.page_project_sprints.invokes.page_project_board.s.page_ProjectSprintsPage_Empty.to.page_ProjectBoardPage_Init",
+        "t.page_project_board.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 35,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-2\\20260321_232934_joky5k.json",
+      "sourcePathId": "path-3",
+      "name": "Issue detail load fail→Retry→Load success",
+      "semanticGoal": "覆蓋 issue detail 載入失敗與 retry 分支，避免錯誤狀態殘留造成誤編輯。",
+      "edgeIds": [
+        "t.page_issue_detail.0002",
+        "t.page_issue_detail.0003",
+        "t.page_issue_detail.0001"
+      ],
+      "pathLength": 3
+    }
+  ]
+}

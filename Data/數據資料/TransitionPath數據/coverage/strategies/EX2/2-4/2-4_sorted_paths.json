@@ -1,0 +1,607 @@
+{
+  "strategyName": "EX2",
+  "projectName": "2-4",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-16",
+      "name": "Results analytics then export responses",
+      "semanticGoal": "覆蓋結果頁載入成功後進入分析功能完成返回，並覆蓋匯出回覆成功返回結果頁。",
+      "edgeIds": [
+        "t.page_surveys.0001",
+        "t.page_surveys.0002",
+        "c.page_surveys.invokes.page_survey_results.a.open_survey_results",
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0002",
+        "c.page_survey_results.invokes.feature_results_analytics.a.refresh_analytics",
+        "t.feature_results_analytics.0001",
+        "t.feature_results_analytics.0002",
+        "c.feature_results_analytics.invokes.page_survey_results.a.return_to_results_page_ready",
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0002",
+        "c.page_survey_results.invokes.feature_export_responses.a.export_responses",
+        "t.feature_export_responses.0001",
+        "t.feature_export_responses.0002",
+        "c.feature_export_responses.invokes.page_survey_results.a.return_to_results_page_exported"
+      ],
+      "pathLength": 15
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-2",
+      "name": "Public survey (user) requires login then return",
+      "semanticGoal": "覆蓋記名提交未登入觸發導向登入、登入成功後 return_to 回到原問卷的流程鏈。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_survey_respond.a.open_survey_link",
+        "t.page_survey_respond.0001",
+        "c.page_survey_respond.invokes.page_survey_respond_user.a.ready_for_user_response",
+        "t.page_survey_respond_user.0001",
+        "c.page_survey_respond_user.invokes.feature_response_submit.a.submit_user_response",
+        "t.feature_response_submit.0001",
+        "t.feature_response_submit.0002",
+        "t.feature_response_submit.0003",
+        "c.feature_response_submit.invokes.page_login.a.redirect_to_login",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_login_submission.a.submit_login",
+        "t.feature_login_submission.0001",
+        "t.feature_login_submission.0003",
+        "c.feature_login_submission.invokes.page_survey_respond.a.finish_login_return"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-13",
+      "name": "Publish draft then back to surveys",
+      "semanticGoal": "覆蓋 Draft 發佈成功後返回鎖定編輯頁(Published/Closed loaded)並返回列表。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0002",
+        "c.page_survey_edit.invokes.feature_survey_publish_and_close.a.publish_survey",
+        "t.feature_survey_publish_and_close.0001",
+        "t.feature_survey_publish_and_close.0002",
+        "t.feature_survey_publish_and_close.0005",
+        "c.feature_survey_publish_and_close.invokes.page_survey_edit.a.return_locked_survey",
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0003",
+        "c.page_survey_edit.invokes.page_surveys.a.back_to_survey_list_locked"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 38,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222758_tldpab.json",
+      "sourcePathId": "path-38",
+      "name": "Preview reset then recompute then exit",
+      "semanticGoal": "覆蓋預覽模擬重設後再次重算可見題目(recomputeVisibleQuestions)並離開返回預覽頁。",
+      "edgeIds": [
+        "c.page_surveys.invokes.page_survey_preview.a.open_survey_preview",
+        "t.page_survey_preview.0001",
+        "t.page_survey_preview.0002",
+        "c.page_survey_preview.invokes.feature_preview_simulation.a.start_preview",
+        "t.feature_preview_simulation.0001",
+        "t.feature_preview_simulation.0003",
+        "t.feature_preview_simulation.0004",
+        "t.feature_preview_simulation.0002",
+        "t.feature_preview_simulation.0005",
+        "c.feature_preview_simulation.invokes.page_survey_preview.a.return_to_preview_page"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-31",
+      "name": "Guest change answer clears hidden then return",
+      "semanticGoal": "覆蓋 Guest 填答中修改答案觸發草稿處理：重算可見題目、清除 hidden 答案、返回填答頁再重新載入。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_survey_respond.a.open_survey_link",
+        "t.page_survey_respond.0001",
+        "c.page_survey_respond.invokes.page_survey_respond_guest.a.ready_for_guest_response",
+        "t.page_survey_respond_guest.0001",
+        "c.page_survey_respond_guest.invokes.feature_response_draft_session.a.change_answer_or_move_question_guest",
+        "t.feature_response_draft_session.0001",
+        "t.feature_response_draft_session.0002",
+        "t.feature_response_draft_session.0004",
+        "c.feature_response_draft_session.invokes.page_survey_respond.a.return_to_respond_page",
+        "t.page_survey_respond.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-9",
+      "name": "Open edit and save structure success",
+      "semanticGoal": "覆蓋從列表打開編輯頁(Draft)到結構編輯保存成功並返回編輯頁的主幹。",
+      "edgeIds": [
+        "t.page_surveys.0001",
+        "t.page_surveys.0002",
+        "c.page_surveys.invokes.page_survey_edit.a.open_survey_edit",
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0002",
+        "c.page_survey_edit.invokes.feature_survey_structure_editing.a.edit_survey_structure",
+        "t.feature_survey_structure_editing.0001",
+        "t.feature_survey_structure_editing.0002",
+        "t.feature_survey_structure_editing.0003",
+        "c.feature_survey_structure_editing.invokes.page_survey_edit.a.return_to_edit_page_saved"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-8",
+      "name": "Create draft failed then surveys retry load",
+      "semanticGoal": "覆蓋建立 Draft 失敗後返回列表，並覆蓋列表載入失敗與 retryLoad 重試鏈。",
+      "edgeIds": [
+        "t.feature_survey_creation.0001",
+        "t.feature_survey_creation.0003",
+        "c.feature_survey_creation.invokes.page_surveys.a.back_to_survey_list_failed",
+        "t.page_surveys.0001",
+        "t.page_surveys.0004",
+        "t.page_surveys.0005"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-3",
+      "name": "Response submit accepted to completion",
+      "semanticGoal": "覆蓋提交驗證通過、雜湊準備、不可變回覆寫入、完成頁顯示的成功主幹。",
+      "edgeIds": [
+        "t.feature_response_submit.0001",
+        "t.feature_response_submit.0002",
+        "t.feature_response_submit.0004",
+        "t.feature_response_submit.0006",
+        "t.feature_response_submit.0007",
+        "c.feature_response_submit.invokes.page_survey_respond.a.finish_response_on_same_route"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-11",
+      "name": "Rule validation failed and return issues",
+      "semanticGoal": "覆蓋 Draft 規則驗證失敗並返回編輯頁顯示可修正問題。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0002",
+        "c.page_survey_edit.invokes.feature_rule_validation.a.validate_draft_rules",
+        "t.feature_rule_validation.0001",
+        "t.feature_rule_validation.0003",
+        "c.feature_rule_validation.invokes.page_survey_edit.a.return_validation_issues"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-7",
+      "name": "Surveys empty then create and open edit",
+      "semanticGoal": "覆蓋 /surveys 空狀態(無問卷)並從空狀態建立 Draft 後直接進入編輯頁。",
+      "edgeIds": [
+        "t.page_surveys.0001",
+        "t.page_surveys.0003",
+        "c.page_surveys.invokes.feature_survey_creation.a.click_create_survey_empty",
+        "t.feature_survey_creation.0001",
+        "t.feature_survey_creation.0002",
+        "c.feature_survey_creation.invokes.page_survey_edit.a.open_created_survey"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-27",
+      "name": "Close survey from locked edit flow",
+      "semanticGoal": "覆蓋鎖定編輯頁觸發 closeSurvey 進入關閉流程，完成 Published->Closed 並返回列表。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0003",
+        "c.page_survey_edit.invokes.feature_survey_publish_and_close.a.close_survey_locked",
+        "t.feature_survey_publish_and_close.0001",
+        "t.feature_survey_publish_and_close.0003",
+        "t.feature_survey_publish_and_close.0006",
+        "c.feature_survey_publish_and_close.invokes.page_surveys.a.return_to_survey_list_closed"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-4",
+      "name": "Login success to surveys ready",
+      "semanticGoal": "覆蓋入口導向登入、送出登入、登入成功進入 /surveys 並完成列表載入 Ready。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.a.choose_login",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_login_submission.a.submit_login",
+        "t.feature_login_submission.0001",
+        "t.feature_login_submission.0002",
+        "c.feature_login_submission.invokes.page_surveys.a.finish_login",
+        "t.page_surveys.0001",
+        "t.page_surveys.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 21,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-21",
+      "name": "Preview load failed then retry to ready",
+      "semanticGoal": "覆蓋預覽頁載入失敗進入 Error，點擊 retryLoad 後重新初始化並成功載入到 Ready。",
+      "edgeIds": [
+        "c.page_survey_edit.invokes.page_survey_preview.a.open_preview_editable",
+        "t.page_survey_preview.0001",
+        "t.page_survey_preview.0004",
+        "t.page_survey_preview.0005",
+        "t.page_survey_preview.0001",
+        "t.page_survey_preview.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 1,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-1",
+      "name": "Public survey (guest) submit rejected",
+      "semanticGoal": "覆蓋公開問卷 Guest 填答進入提交流程，並驗證提交驗證失敗後返回填答頁可保留草稿與錯誤。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_survey_respond.a.open_survey_link",
+        "t.page_survey_respond.0001",
+        "c.page_survey_respond.invokes.page_survey_respond_guest.a.ready_for_guest_response",
+        "t.page_survey_respond_guest.0001",
+        "c.page_survey_respond_guest.invokes.feature_response_submit.a.submit_guest_response",
+        "t.feature_response_submit.0001",
+        "t.feature_response_submit.0002",
+        "t.feature_response_submit.0005",
+        "c.feature_response_submit.invokes.page_survey_respond.a.return_to_respond_page_rejected"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 23,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-23",
+      "name": "Edit load failed then retry and succeed",
+      "semanticGoal": "覆蓋編輯頁載入失敗進入 Error，retryLoad 回到 Init 後再次載入並成功進入 ReadyEditable。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0005",
+        "t.page_survey_edit.0006",
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 22,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-22",
+      "name": "Edit load unavailable then return to surveys",
+      "semanticGoal": "覆蓋編輯頁載入中遇到問卷不可用(surveyUnavailable)轉入 Empty，並從 Empty 返回問卷列表重新載入。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0004",
+        "c.page_survey_edit.invokes.page_surveys.a.return_to_survey_list_empty",
+        "t.page_surveys.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-32",
+      "name": "Results page no responses then back to surveys",
+      "semanticGoal": "覆蓋結果頁載入後判定尚無回覆(noResponses)進入 Empty，並從 Empty 返回問卷列表。",
+      "edgeIds": [
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0003",
+        "c.page_survey_results.invokes.page_surveys.a.back_to_survey_list_empty",
+        "t.page_surveys.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-12",
+      "name": "Rule validation passed and return",
+      "semanticGoal": "覆蓋 Draft 規則驗證通過並返回編輯頁以進入可發佈前置條件狀態。",
+      "edgeIds": [
+        "t.feature_rule_validation.0001",
+        "t.feature_rule_validation.0002",
+        "c.feature_rule_validation.invokes.page_survey_edit.a.return_validated_draft"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-15",
+      "name": "Invalid status change rejected",
+      "semanticGoal": "覆蓋非法狀態變更被拒並返回編輯頁顯示狀態錯誤且原值不變。",
+      "edgeIds": [
+        "t.feature_survey_publish_and_close.0001",
+        "t.feature_survey_publish_and_close.0004",
+        "c.feature_survey_publish_and_close.invokes.page_survey_edit.a.return_status_issue"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222758_tldpab.json",
+      "sourcePathId": "path-43",
+      "name": "Results error retry minimal",
+      "semanticGoal": "覆蓋結果頁載入失敗到 Error，並觸發 retryLoad 回到 Init 的最小重試鏈。",
+      "edgeIds": [
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0004",
+        "t.page_survey_results.0005"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-30",
+      "name": "Respond page load failed then retry to guest init",
+      "semanticGoal": "覆蓋填答頁載入失敗(loadFailed)進入 Error，retryLoad 後重新載入並成功切到 Guest 視角。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_survey_respond.a.open_survey_link",
+        "t.page_survey_respond.0001",
+        "t.page_survey_respond.0003",
+        "t.page_survey_respond.0004",
+        "t.page_survey_respond.0001",
+        "c.page_survey_respond.invokes.page_survey_respond_guest.a.ready_for_guest_response"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-20",
+      "name": "Preview has no questions then back to edit",
+      "semanticGoal": "覆蓋預覽頁載入後發現無題目(noQuestions)的空狀態，並從空狀態返回編輯頁。",
+      "edgeIds": [
+        "c.page_surveys.invokes.page_survey_preview.a.open_survey_preview",
+        "t.page_survey_preview.0001",
+        "t.page_survey_preview.0003",
+        "c.page_survey_preview.invokes.page_survey_edit.a.back_to_edit_empty"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-10",
+      "name": "Structure save rejected then return",
+      "semanticGoal": "覆蓋結構保存失敗(驗證拒絕)並返回編輯頁可呈現錯誤資訊。",
+      "edgeIds": [
+        "t.feature_survey_structure_editing.0001",
+        "t.feature_survey_structure_editing.0002",
+        "t.feature_survey_structure_editing.0004",
+        "c.feature_survey_structure_editing.invokes.page_survey_edit.a.return_to_edit_page_failed"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-5",
+      "name": "Login rejected then retry",
+      "semanticGoal": "覆蓋登入失敗(401)回到登入頁並能再次回到可互動表單狀態。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.a.choose_login",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_login_submission.a.submit_login",
+        "t.feature_login_submission.0001",
+        "t.feature_login_submission.0004",
+        "c.feature_login_submission.invokes.page_login.a.retry_login",
+        "t.page_login.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_221940_8c1oc0.json",
+      "sourcePathId": "path-6",
+      "name": "Login canceled back to login",
+      "semanticGoal": "覆蓋登入送出後取消流程，並驗證取消後返回登入頁且不誤導向成功。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.a.choose_login",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_login_submission.a.submit_login",
+        "t.feature_login_submission.0001",
+        "t.feature_login_submission.0005",
+        "c.feature_login_submission.invokes.page_login.a.back_to_login"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 36,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222758_tldpab.json",
+      "sourcePathId": "path-36",
+      "name": "Export rejected then return to results",
+      "semanticGoal": "覆蓋結果頁進入匯出流程，匯出失敗(exportRejected)後回到結果頁並保留既有統計。",
+      "edgeIds": [
+        "c.page_surveys.invokes.page_survey_results.a.open_survey_results",
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0002",
+        "c.page_survey_results.invokes.feature_export_responses.a.export_responses",
+        "t.feature_export_responses.0001",
+        "t.feature_export_responses.0003",
+        "c.feature_export_responses.invokes.page_survey_results.a.return_to_results_page_failed"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 34,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222758_tldpab.json",
+      "sourcePathId": "path-34",
+      "name": "Analytics empty then return to results",
+      "semanticGoal": "覆蓋結果頁進入分析功能後走 noResponsesYet 分支到 Empty，並從 Empty 返回結果頁。",
+      "edgeIds": [
+        "c.page_surveys.invokes.page_survey_results.a.open_survey_results",
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0002",
+        "c.page_survey_results.invokes.feature_results_analytics.a.refresh_analytics",
+        "t.feature_results_analytics.0001",
+        "t.feature_results_analytics.0003",
+        "c.feature_results_analytics.invokes.page_survey_results.a.return_to_results_page_empty"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 35,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222758_tldpab.json",
+      "sourcePathId": "path-35",
+      "name": "Analytics failed then return to results",
+      "semanticGoal": "覆蓋結果頁進入分析功能後走 analyticsUnavailable 分支到 Failed，並從 Failed 返回結果頁可重試。",
+      "edgeIds": [
+        "c.page_surveys.invokes.page_survey_results.a.open_survey_results",
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0002",
+        "c.page_survey_results.invokes.feature_results_analytics.a.refresh_analytics",
+        "t.feature_results_analytics.0001",
+        "t.feature_results_analytics.0004",
+        "c.feature_results_analytics.invokes.page_survey_results.a.return_to_results_page_failed"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-25",
+      "name": "Locked edit open results then back to surveys",
+      "semanticGoal": "覆蓋鎖定編輯頁(ReadyLocked)進入結果頁並載入成功後，從結果頁返回問卷列表。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0003",
+        "c.page_survey_edit.invokes.page_survey_results.a.open_results_locked",
+        "t.page_survey_results.0001",
+        "t.page_survey_results.0002",
+        "c.page_survey_results.invokes.page_surveys.a.back_to_survey_list_ready",
+        "t.page_surveys.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-26",
+      "name": "Locked edit open preview then back to edit",
+      "semanticGoal": "覆蓋鎖定編輯頁(ReadyLocked)進入預覽頁、成功載入後返回編輯頁的路由串接。",
+      "edgeIds": [
+        "t.page_survey_edit.0001",
+        "t.page_survey_edit.0003",
+        "c.page_survey_edit.invokes.page_survey_preview.a.open_preview_locked",
+        "t.page_survey_preview.0001",
+        "t.page_survey_preview.0002",
+        "c.page_survey_preview.invokes.page_survey_edit.a.back_to_edit_ready"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222758_tldpab.json",
+      "sourcePathId": "path-40",
+      "name": "User change answer draft still visible",
+      "semanticGoal": "覆蓋已登入使用者在填答中修改答案進入草稿處理，走 draftStillVisible 分支後返回填答頁。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_survey_respond.a.open_survey_link",
+        "t.page_survey_respond.0001",
+        "c.page_survey_respond.invokes.page_survey_respond_user.a.ready_for_user_response",
+        "t.page_survey_respond_user.0001",
+        "c.page_survey_respond_user.invokes.feature_response_draft_session.a.change_answer_or_move_question_user",
+        "t.feature_response_draft_session.0001",
+        "t.feature_response_draft_session.0003",
+        "c.feature_response_draft_session.invokes.page_survey_respond.a.return_to_respond_page"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX2\\2-4\\20260321_222357_3ukkrv.json",
+      "sourcePathId": "path-29",
+      "name": "Respond page survey unavailable",
+      "semanticGoal": "覆蓋公開填答頁載入後判定問卷不可填答(surveyUnavailable)的不可用狀態分支。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_survey_respond.a.open_survey_link",
+        "t.page_survey_respond.0001",
+        "t.page_survey_respond.0002"
+      ],
+      "pathLength": 3
+    }
+  ]
+}

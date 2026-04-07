@@ -1,0 +1,159 @@
+{
+  "projectName": "2-2",
+  "pathLimit": 5,
+  "points": [
+    {
+      "strategyName": "Ex1",
+      "stateCoverage": 33,
+      "stateCoverageRatio": 0.3473684210526316,
+      "transitionCoverage": 34,
+      "transitionCoverageRatio": 0.17346938775510204,
+      "averagePathLength": 7.4,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "EX2",
+      "stateCoverage": 42,
+      "stateCoverageRatio": 0.4421052631578947,
+      "transitionCoverage": 57,
+      "transitionCoverageRatio": 0.29081632653061223,
+      "averagePathLength": 13.8,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "EX3",
+      "stateCoverage": 44,
+      "stateCoverageRatio": 0.4631578947368421,
+      "transitionCoverage": 54,
+      "transitionCoverageRatio": 0.2755102040816326,
+      "averagePathLength": 12.2,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "EX4",
+      "stateCoverage": 55,
+      "stateCoverageRatio": 0.5789473684210527,
+      "transitionCoverage": 75,
+      "transitionCoverageRatio": 0.3826530612244898,
+      "averagePathLength": 18.8,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex5",
+      "stateCoverage": 53,
+      "stateCoverageRatio": 0.5578947368421052,
+      "transitionCoverage": 68,
+      "transitionCoverageRatio": 0.3469387755102041,
+      "averagePathLength": 19.2,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex6",
+      "stateCoverage": 50,
+      "stateCoverageRatio": 0.5263157894736842,
+      "transitionCoverage": 65,
+      "transitionCoverageRatio": 0.33163265306122447,
+      "averagePathLength": 17.4,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex7",
+      "stateCoverage": 48,
+      "stateCoverageRatio": 0.5052631578947369,
+      "transitionCoverage": 65,
+      "transitionCoverageRatio": 0.33163265306122447,
+      "averagePathLength": 16.6,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex8",
+      "stateCoverage": 46,
+      "stateCoverageRatio": 0.4842105263157895,
+      "transitionCoverage": 60,
+      "transitionCoverageRatio": 0.30612244897959184,
+      "averagePathLength": 13.4,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex9",
+      "stateCoverage": 55,
+      "stateCoverageRatio": 0.5789473684210527,
+      "transitionCoverage": 71,
+      "transitionCoverageRatio": 0.3622448979591837,
+      "averagePathLength": 17.0,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "EX10",
+      "stateCoverage": 57,
+      "stateCoverageRatio": 0.6,
+      "transitionCoverage": 77,
+      "transitionCoverageRatio": 0.39285714285714285,
+      "averagePathLength": 21.8,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex11",
+      "stateCoverage": 59,
+      "stateCoverageRatio": 0.6210526315789474,
+      "transitionCoverage": 80,
+      "transitionCoverageRatio": 0.40816326530612246,
+      "averagePathLength": 20.6,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex12",
+      "stateCoverage": 43,
+      "stateCoverageRatio": 0.45263157894736844,
+      "transitionCoverage": 52,
+      "transitionCoverageRatio": 0.2653061224489796,
+      "averagePathLength": 13.2,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "EX13",
+      "stateCoverage": 53,
+      "stateCoverageRatio": 0.5578947368421052,
+      "transitionCoverage": 70,
+      "transitionCoverageRatio": 0.35714285714285715,
+      "averagePathLength": 17.0,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex14",
+      "stateCoverage": 60,
+      "stateCoverageRatio": 0.631578947368421,
+      "transitionCoverage": 84,
+      "transitionCoverageRatio": 0.42857142857142855,
+      "averagePathLength": 23.0,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex15",
+      "stateCoverage": 50,
+      "stateCoverageRatio": 0.5263157894736842,
+      "transitionCoverage": 69,
+      "transitionCoverageRatio": 0.3520408163265306,
+      "averagePathLength": 17.0,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex16",
+      "stateCoverage": 45,
+      "stateCoverageRatio": 0.47368421052631576,
+      "transitionCoverage": 59,
+      "transitionCoverageRatio": 0.3010204081632653,
+      "averagePathLength": 14.4,
+      "actualPathCountUsed": 5
+    },
+    {
+      "strategyName": "Ex17",
+      "stateCoverage": 51,
+      "stateCoverageRatio": 0.5368421052631579,
+      "transitionCoverage": 70,
+      "transitionCoverageRatio": 0.35714285714285715,
+      "averagePathLength": 17.2,
+      "actualPathCountUsed": 5
+    }
+  ]
+}

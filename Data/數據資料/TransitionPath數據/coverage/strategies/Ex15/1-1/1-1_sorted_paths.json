@@ -1,0 +1,672 @@
+{
+  "strategyName": "Ex15",
+  "projectName": "1-1",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-03",
+      "name": "Guest login success then registration rejected",
+      "semanticGoal": "從活動詳情觸發登入並以會員成功登入後回到詳情，嘗試報名但因狀態/截止/額滿/重複報名等原因被拒絕，確認不產生多餘報名紀錄。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_auth.s.page_ActivityDetailPage_Ready.to.page_AuthPage_Init",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitLogin",
+        "t.feature_auth.0001",
+        "t.feature_auth.0003",
+        "c.feature_auth.invokes.page_activity_detail.s.feature_AuthFeature_MemberDone.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_detail_member.s.page_ActivityDetailPage_Ready.to.page_ActivityDetailPage_member_Init",
+        "t.page_activity_detail_member.0001",
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.register",
+        "t.feature_registration.0001",
+        "t.feature_registration.0004",
+        "c.feature_registration.invokes.page_activity_detail.s.feature_RegistrationFeature_Blocked.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001"
+      ],
+      "pathLength": 18
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 29,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-29",
+      "name": "Admin login -> draft save -> exit to activities",
+      "semanticGoal": "管理員登入後返回後台（未走過），進入活動管理儲存草稿後用未走過 connector 返回後台，再用未走過後台返回活動列表離開，驗證多段受保護流程串接不掉狀態。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_auth.s.page_Entry_Init.to.page_AuthPage_Init.login",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitLogin",
+        "t.feature_auth.0001",
+        "t.feature_auth.0004",
+        "c.feature_auth.invokes.page_admin_panel.s.feature_AuthFeature_AdminDone.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_activity_management.s.page_AdminPanelPage_Ready.to.feature_ActivityManagementFeature_Init",
+        "t.feature_activity_management.0001",
+        "c.feature_activity_management.invokes.page_admin_panel.s.feature_ActivityManagementFeature_DraftSaved.to.page_AdminPanelPage_Init.draft",
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.page_activity_list.s.page_AdminPanelPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-08",
+      "name": "Register success then open My Activities",
+      "semanticGoal": "從入口走註冊流程成功建立會員身分後落地活動列表，切到會員視角並進入我的活動確認資料可見。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_auth.s.page_Entry_Init.to.page_AuthPage_Init.register",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitRegister",
+        "t.feature_auth.0002",
+        "t.feature_auth.0006",
+        "c.feature_auth.invokes.page_activity_list.s.feature_AuthFeature_MemberDone.to.page_ActivityListPage_Init.member",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001",
+        "c.page_activity_list_member.invokes.page_my_activities.s.page_ActivityListPage_member_Ready.to.page_MyActivitiesPage_Init",
+        "t.page_my_activities.0001"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-27",
+      "name": "Admin toggles view, opens panel, exits to list",
+      "semanticGoal": "管理員在活動列表中多次切換 admin 視角/基底視角（含未走過 returnToBase），再進入後台並用未走過的後台返回列表動作離開，驗證導覽狀態穩定且無重複入口。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_admin.s.page_ActivityListPage_Ready.to.page_ActivityListPage_admin_Init",
+        "t.page_activity_list_admin.0001",
+        "c.page_activity_list_admin.invokes.page_activity_list.s.page_ActivityListPage_admin_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_admin.s.page_ActivityListPage_Ready.to.page_ActivityListPage_admin_Init",
+        "t.page_activity_list_admin.0001",
+        "c.page_activity_list_admin.invokes.page_admin_panel.s.page_ActivityListPage_admin_Ready.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.page_activity_list.s.page_AdminPanelPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-15",
+      "name": "Admin registration list export CSV",
+      "semanticGoal": "管理員從後台進入報名名單，載入名單後匯出 CSV 並完成回到可再次操作狀態，最後返回後台確保資料不外洩。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_registration_list.s.page_AdminPanelPage_Ready.to.feature_RegistrationListFeature_Init",
+        "t.feature_registration_list.0001",
+        "t.feature_registration_list.0002",
+        "t.feature_registration_list.0003",
+        "c.feature_registration_list.invokes.page_admin_panel.s.feature_RegistrationListFeature_Ready.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 22,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-22",
+      "name": "Cancel succeeds then return to detail then back",
+      "semanticGoal": "取消報名成功（未走過）後回到活動詳情（未走過 return-to-detail connector），再返回列表確認名額/CTA/計數同步且不殘留取消流程狀態。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.cancel",
+        "t.feature_registration.0002",
+        "t.feature_registration.0005",
+        "c.feature_registration.invokes.page_activity_detail.s.feature_RegistrationFeature_Canceled.to.page_ActivityDetailPage_Init.cancel",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_list.s.page_ActivityDetailPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-13",
+      "name": "Admin capacity reached then close from full",
+      "semanticGoal": "活動從已發佈因報名達上限變為額滿後，管理員在額滿狀態關閉報名並回到後台，驗證狀態與計數一致且不允許新報名。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_activity_management.s.page_AdminPanelPage_Ready.to.feature_ActivityManagementFeature_Init",
+        "t.feature_activity_management.0001",
+        "t.feature_activity_management.0002",
+        "t.feature_activity_management.0003",
+        "t.feature_activity_management.0006",
+        "c.feature_activity_management.invokes.page_admin_panel.s.feature_ActivityManagementFeature_Closed.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 6,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-06",
+      "name": "My Activities unauth access then login to view",
+      "semanticGoal": "未登入存取我的活動被阻擋並導向認證，登入成功後回到我的活動並載入僅屬於當前使用者的報名清單。",
+      "edgeIds": [
+        "t.page_my_activities.0002",
+        "c.page_my_activities.invokes.page_auth.s.page_MyActivitiesPage_Forbidden.to.page_AuthPage_Init",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitLogin",
+        "t.feature_auth.0001",
+        "t.feature_auth.0003",
+        "c.feature_auth.invokes.page_my_activities.s.feature_AuthFeature_MemberDone.to.page_MyActivitiesPage_Init",
+        "t.page_my_activities.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-25",
+      "name": "Register succeeds then member view back to base",
+      "semanticGoal": "報名成功後回到活動列表，再切到會員視角檢視已報名狀態，並用「返回基底列表」（未走過）驗證視角切換不造成重複 UI 與狀態殘留。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.register",
+        "t.feature_registration.0001",
+        "t.feature_registration.0003",
+        "c.feature_registration.invokes.page_activity_list.s.feature_RegistrationFeature_Registered.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001",
+        "c.page_activity_list_member.invokes.page_activity_list.s.page_ActivityListPage_member_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-12",
+      "name": "Admin publish then close then archive",
+      "semanticGoal": "活動管理主流程：草稿->發佈->關閉報名->封存，驗證公開列表可見性與關閉後新報名被拒絕的風險路徑。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_activity_management.s.page_AdminPanelPage_Ready.to.feature_ActivityManagementFeature_Init",
+        "t.feature_activity_management.0001",
+        "t.feature_activity_management.0002",
+        "t.feature_activity_management.0005",
+        "t.feature_activity_management.0007",
+        "c.feature_activity_management.invokes.page_admin_panel.s.feature_ActivityManagementFeature_Archived.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-10",
+      "name": "Non-admin forbidden admin panel then back",
+      "semanticGoal": "非管理員存取後台被拒絕（403/Forbidden），並可回到活動列表且不殘留後台資料。",
+      "edgeIds": [
+        "t.page_admin_panel.0002",
+        "c.page_admin_panel.invokes.page_activity_list.s.page_AdminPanelPage_Forbidden.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-02",
+      "name": "Guest requires login then login fails and retries",
+      "semanticGoal": "訪客從活動詳情嘗試報名被導向登入，提交登入失敗後回到認證頁可再次嘗試。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_auth.s.page_ActivityDetailPage_Ready.to.page_AuthPage_Init",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitLogin",
+        "t.feature_auth.0001",
+        "t.feature_auth.0005",
+        "c.feature_auth.invokes.page_auth.s.feature_AuthFeature_Failed.to.page_AuthPage_Init",
+        "t.page_auth.0001"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-31",
+      "name": "MyActivities -> cancel succeeds -> sync list -> member view",
+      "semanticGoal": "從我的活動開啟詳情後在會員視角取消報名成功（未走過），同步回活動列表（未走過），再切入會員視角確認已報名標示移除與名額釋出一致。",
+      "edgeIds": [
+        "t.page_my_activities.0001",
+        "c.page_my_activities.invokes.page_activity_detail.s.page_MyActivitiesPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_detail_member.s.page_ActivityDetailPage_Ready.to.page_ActivityDetailPage_member_Init",
+        "t.page_activity_detail_member.0001",
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.cancel",
+        "t.feature_registration.0002",
+        "t.feature_registration.0005",
+        "c.feature_registration.invokes.page_activity_list.s.feature_RegistrationFeature_Canceled.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-14",
+      "name": "Admin release capacity returns to published",
+      "semanticGoal": "額滿後因取消釋出名額而回到可報名（published），確認狀態自動切換與前後端顯示一致，並返回後台。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_activity_management.s.page_AdminPanelPage_Ready.to.feature_ActivityManagementFeature_Init",
+        "t.feature_activity_management.0001",
+        "t.feature_activity_management.0002",
+        "t.feature_activity_management.0003",
+        "t.feature_activity_management.0004",
+        "c.feature_activity_management.invokes.page_admin_panel.s.feature_ActivityManagementFeature_Published.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 1,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-01",
+      "name": "Guest opens missing activity detail",
+      "semanticGoal": "以訪客身份進入活動列表後，點開不存在的活動並驗證 NotFound 與不顯示報名控制。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0002"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 21,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-21",
+      "name": "Admin view toggle back to base list",
+      "semanticGoal": "切入管理員視角後使用「返回基底活動列表」（未走過）動作，驗證離開 role-specific 視角後不殘留 admin 強調/入口狀態且列表可正常載入。",
+      "edgeIds": [
+        "c.feature_auth.invokes.page_activity_list.s.feature_AuthFeature_AdminDone.to.page_ActivityListPage_Init.admin",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_admin.s.page_ActivityListPage_Ready.to.page_ActivityListPage_admin_Init",
+        "t.page_activity_list_admin.0001",
+        "c.page_activity_list_admin.invokes.page_activity_list.s.page_ActivityListPage_admin_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-05",
+      "name": "Member cancel rejected then back to list",
+      "semanticGoal": "在會員詳情視角嘗試取消報名但被拒絕（無有效報名/截止已過/活動已過等），返回詳情後再回列表確認狀態未變更且無資料異常。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.cancel",
+        "t.feature_registration.0002",
+        "t.feature_registration.0006",
+        "c.feature_registration.invokes.page_activity_detail.s.feature_RegistrationFeature_Blocked.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_list.s.page_ActivityDetailPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 24,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-24",
+      "name": "Register succeeds then return to detail",
+      "semanticGoal": "報名成功後走「回到活動詳情」（未走過 return-to-detail after register），並切入會員詳情視角確認只呈現唯一可用操作且 CTA 狀態正確。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.register",
+        "t.feature_registration.0001",
+        "t.feature_registration.0003",
+        "c.feature_registration.invokes.page_activity_detail.s.feature_RegistrationFeature_Registered.to.page_ActivityDetailPage_Init.register",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_detail_member.s.page_ActivityDetailPage_Ready.to.page_ActivityDetailPage_member_Init",
+        "t.page_activity_detail_member.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-11",
+      "name": "Admin manage draft then archive draft",
+      "semanticGoal": "從後台進入活動管理，儲存草稿後直接封存草稿並返回後台，確認草稿不出現在公開列表且審計/狀態正確。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_activity_management.s.page_AdminPanelPage_Ready.to.feature_ActivityManagementFeature_Init",
+        "t.feature_activity_management.0001",
+        "t.feature_activity_management.0008",
+        "c.feature_activity_management.invokes.page_admin_panel.s.feature_ActivityManagementFeature_Archived.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-07",
+      "name": "My Activities open detail then return via base",
+      "semanticGoal": "從我的活動開啟已報名活動詳情，切換到會員詳情視角驗證唯一可用操作，再返回基底詳情並回到列表。",
+      "edgeIds": [
+        "t.page_my_activities.0001",
+        "c.page_my_activities.invokes.page_activity_detail.s.page_MyActivitiesPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_detail_member.s.page_ActivityDetailPage_Ready.to.page_ActivityDetailPage_member_Init",
+        "t.page_activity_detail_member.0001",
+        "c.page_activity_detail_member.invokes.page_activity_detail.s.page_ActivityDetailPage_member_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_list.s.page_ActivityDetailPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-16",
+      "name": "Member navigation loop: list -> my activities -> list -> detail -> list",
+      "semanticGoal": "會員在已認證狀態下於活動列表與我的活動間往返，再開啟活動詳情並返回列表，驗證導覽狀態不殘留與資料視圖一致。",
+      "edgeIds": [
+        "c.feature_auth.invokes.page_activity_list.s.feature_AuthFeature_MemberDone.to.page_ActivityListPage_Init.member",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001",
+        "c.page_activity_list_member.invokes.page_my_activities.s.page_ActivityListPage_member_Ready.to.page_MyActivitiesPage_Init",
+        "t.page_my_activities.0001",
+        "c.page_my_activities.invokes.page_activity_list.s.page_MyActivitiesPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_list.s.page_ActivityDetailPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-30",
+      "name": "Cancel succeeds then re-register rejected",
+      "semanticGoal": "先取消報名成功（未走過）並返回詳情（未走過），隨即嘗試再次報名但被拒絕（風險：重複/時限/狀態邊界），確認不產生錯誤資料並回到詳情狀態一致。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.cancel",
+        "t.feature_registration.0002",
+        "t.feature_registration.0005",
+        "c.feature_registration.invokes.page_activity_detail.s.feature_RegistrationFeature_Canceled.to.page_ActivityDetailPage_Init.cancel",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_detail_member.s.page_ActivityDetailPage_Ready.to.page_ActivityDetailPage_member_Init",
+        "t.page_activity_detail_member.0001",
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.register",
+        "t.feature_registration.0001",
+        "t.feature_registration.0004",
+        "c.feature_registration.invokes.page_activity_detail.s.feature_RegistrationFeature_Blocked.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-28",
+      "name": "Member loop via MyActivities then return to base",
+      "semanticGoal": "會員在活動列表與我的活動間往返後，再回到會員視角並使用未走過的「返回基底列表」動作，驗證 return target/導覽狀態不殘留且資料視圖一致。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001",
+        "c.page_activity_list_member.invokes.page_my_activities.s.page_ActivityListPage_member_Ready.to.page_MyActivitiesPage_Init",
+        "t.page_my_activities.0001",
+        "c.page_my_activities.invokes.page_activity_list.s.page_MyActivitiesPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001",
+        "c.page_activity_list_member.invokes.page_activity_list.s.page_ActivityListPage_member_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-09",
+      "name": "Admin login then open admin panel",
+      "semanticGoal": "管理員登入成功後在活動列表切到管理員視角並進入後台，驗證後台可正常載入與管理功能可見。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_auth.s.page_Entry_Init.to.page_AuthPage_Init.login",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitLogin",
+        "t.feature_auth.0001",
+        "t.feature_auth.0004",
+        "c.feature_auth.invokes.page_activity_list.s.feature_AuthFeature_AdminDone.to.page_ActivityListPage_Init.admin",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_admin.s.page_ActivityListPage_Ready.to.page_ActivityListPage_admin_Init",
+        "t.page_activity_list_admin.0001",
+        "c.page_activity_list_admin.invokes.page_admin_panel.s.page_ActivityListPage_admin_Ready.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-18",
+      "name": "Admin panel back to list then open detail",
+      "semanticGoal": "在管理員視角可進入後台後，使用後台的返回活動列表動作（未走過）離開後台，並立即開啟活動詳情確認頁面狀態切換與路由正確。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_admin.s.page_ActivityListPage_Ready.to.page_ActivityListPage_admin_Init",
+        "t.page_activity_list_admin.0001",
+        "c.page_activity_list_admin.invokes.page_admin_panel.s.page_ActivityListPage_admin_Ready.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.page_activity_list.s.page_AdminPanelPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-32",
+      "name": "Admin view return base then detail roundtrip",
+      "semanticGoal": "在管理員視角使用未走過的「返回基底列表」後立即進入活動詳情再返回列表，驗證視角切換後的路由/資料載入不受污染且返回行為正常。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_admin.s.page_ActivityListPage_Ready.to.page_ActivityListPage_admin_Init",
+        "t.page_activity_list_admin.0001",
+        "c.page_activity_list_admin.invokes.page_activity_list.s.page_ActivityListPage_admin_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001",
+        "c.page_activity_detail.invokes.page_activity_list.s.page_ActivityDetailPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 17,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-17",
+      "name": "Admin login returns to AdminPanel then exit",
+      "semanticGoal": "管理員登入成功後直接返回後台路由（驗證 return target/保護頁落地），並從後台返回活動列表確認離開後台不殘留後台內容。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_auth.s.page_Entry_Init.to.page_AuthPage_Init.login",
+        "t.page_auth.0001",
+        "c.page_auth.invokes.feature_auth.s.page_AuthPage_Ready.to.feature_AuthFeature_Init.submitLogin",
+        "t.feature_auth.0001",
+        "t.feature_auth.0004",
+        "c.feature_auth.invokes.page_admin_panel.s.feature_AuthFeature_AdminDone.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.page_activity_list.s.page_AdminPanelPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 23,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-23",
+      "name": "Cancel succeeds then sync list then open detail",
+      "semanticGoal": "取消報名成功（未走過）後直接同步回活動列表（未走過 syncListAfterCancel），再開啟詳情驗證列表與詳情對同一活動的狀態/名額顯示一致。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.cancel",
+        "t.feature_registration.0002",
+        "t.feature_registration.0005",
+        "c.feature_registration.invokes.page_activity_list.s.feature_RegistrationFeature_Canceled.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_detail.s.page_ActivityListPage_Ready.to.page_ActivityDetailPage_Init",
+        "t.page_activity_detail.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125205_h8tf44.json",
+      "sourcePathId": "path-04",
+      "name": "Member register success then badge in member list view",
+      "semanticGoal": "在會員詳情視角完成報名成功後回到活動列表，切到會員視角驗證已報名標示與狀態同步。",
+      "edgeIds": [
+        "c.page_activity_detail_member.invokes.feature_registration.s.page_ActivityDetailPage_member_Ready.to.feature_RegistrationFeature_Init.register",
+        "t.feature_registration.0001",
+        "t.feature_registration.0003",
+        "c.feature_registration.invokes.page_activity_list.s.feature_RegistrationFeature_Registered.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-26",
+      "name": "Open registration list then exit to activities",
+      "semanticGoal": "後台開啟報名名單後返回後台，再使用「返回活動列表」（未走過）離開後台，確認名單資料不外洩到公開列表流程。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_registration_list.s.page_AdminPanelPage_Ready.to.feature_RegistrationListFeature_Init",
+        "t.feature_registration_list.0001",
+        "c.feature_registration_list.invokes.page_admin_panel.s.feature_RegistrationListFeature_Ready.to.page_AdminPanelPage_Init",
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.page_activity_list.s.page_AdminPanelPage_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-20",
+      "name": "Member view toggle back to base list",
+      "semanticGoal": "切入會員視角後使用「返回基底活動列表」（未走過）動作，驗證不產生重複 CTA/導覽項且活動列表重新載入狀態正確。",
+      "edgeIds": [
+        "c.page_entry.invokes.page_activity_list.s.page_Entry_Init.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001",
+        "c.page_activity_list.invokes.page_activity_list_member.s.page_ActivityListPage_Ready.to.page_ActivityListPage_member_Init",
+        "t.page_activity_list_member.0001",
+        "c.page_activity_list_member.invokes.page_activity_list.s.page_ActivityListPage_member_Ready.to.page_ActivityListPage_Init",
+        "t.page_activity_list.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 19,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex15\\1-1\\20260401_125432_mlk2y7.json",
+      "sourcePathId": "path-19",
+      "name": "Draft save then return to AdminPanel",
+      "semanticGoal": "從後台進入活動管理後只做草稿儲存就返回後台（未走過 return connector），驗證草稿只在後台可見且公開列表不外洩。",
+      "edgeIds": [
+        "t.page_admin_panel.0001",
+        "c.page_admin_panel.invokes.feature_activity_management.s.page_AdminPanelPage_Ready.to.feature_ActivityManagementFeature_Init",
+        "t.feature_activity_management.0001",
+        "c.feature_activity_management.invokes.page_admin_panel.s.feature_ActivityManagementFeature_DraftSaved.to.page_AdminPanelPage_Init.draft",
+        "t.page_admin_panel.0001"
+      ],
+      "pathLength": 5
+    }
+  ]
+}

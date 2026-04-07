@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Next.js: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "isBackground": true,
+      "problemMatcher": "$nextjs-dev",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Next.js: build",
+      "type": "shell",
+      "command": "npm run build",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Next.js: start",
+      "type": "shell",
+      "command": "npm start",
+      "problemMatcher": []
+    },
+    {
+      "label": "Project: install",
+      "type": "shell",
+      "command": "npm install",
+      "problemMatcher": []
+    }
+  ]
+}

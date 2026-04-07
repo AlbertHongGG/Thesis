@@ -1,0 +1,642 @@
+{
+  "strategyName": "EX3",
+  "projectName": "3-1",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-2",
+      "name": "Buyer happy path: login → add to cart → checkout → pay success → orders",
+      "semanticGoal": "Cover core buyer purchase funnel including auth login, add-to-cart feature, cart, checkout, create-order payment success, payment result success, and orders list.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_signup.s.page_Entry_Init.to.page_SignupPage_Init",
+        "t.page_signup.0001",
+        "c.page_signup.invokes.page_login.s.page_SignupPage_Ready.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_catalog.s.feature_AuthLoginFeature_BuyerDone.to.page_CatalogPage_Init",
+        "t.page_catalog.0004",
+        "c.page_catalog.invokes.feature_add_cart.s.page_CatalogPage_DetailReady.to.feature_AddCartFeature_Init",
+        "t.feature_add_cart.0001",
+        "t.feature_add_cart.0002",
+        "c.feature_add_cart.invokes.page_cart.s.feature_AddCartFeature_Done.to.page_CartPage_Init",
+        "t.page_cart.0001",
+        "c.page_cart.invokes.page_checkout.s.page_CartPage_Ready.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001",
+        "c.page_checkout.invokes.feature_checkout_create_order.s.page_CheckoutPage_Ready.to.feature_CheckoutCreateOrderFeature_Init",
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0002",
+        "c.feature_checkout_create_order.invokes.page_payment_result.s.feature_CheckoutCreateOrderFeature_PaymentSucceeded.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0001",
+        "c.page_payment_result.invokes.page_orders.s.page_PaymentResultPage_Success.to.page_OrdersPage_Init",
+        "t.page_orders.0001"
+      ],
+      "pathLength": 23
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-15",
+      "name": "Seller product status change then fulfillment blocked",
+      "semanticGoal": "Cover seller product status update feature success and seller fulfillment feature rejection path for robustness.",
+      "edgeIds": [
+        "t.page_seller_console.0002",
+        "c.page_seller_console.invokes.feature_seller_product_status.s.page_SellerConsolePage_ProductsReady.to.feature_SellerProductStatusFeature_Init",
+        "t.feature_seller_product_status.0001",
+        "t.feature_seller_product_status.0002",
+        "c.feature_seller_product_status.invokes.page_seller_console.s.feature_SellerProductStatusFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0005",
+        "t.page_seller_console.0016",
+        "t.page_seller_console.0006",
+        "c.page_seller_console.invokes.feature_seller_fulfillment.s.page_SellerConsolePage_OrderDetailReady.to.feature_SellerFulfillmentFeature_Init",
+        "t.feature_seller_fulfillment.0001",
+        "t.feature_seller_fulfillment.0003",
+        "c.feature_seller_fulfillment.invokes.page_seller_console.s.feature_SellerFulfillmentFeature_Blocked.to.page_SellerConsolePage_Init"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 64,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_233052_ltww7o.json",
+      "sourcePathId": "path-64",
+      "name": "Admin console nav sweep (apps->cats->orders->disputes->refunds->analytics)",
+      "semanticGoal": "Cover multiple admin console navigation transitions (walked=false) to quickly broaden admin page-branch coverage.",
+      "edgeIds": [
+        "t.page_admin_console.0001",
+        "t.page_admin_console.0008",
+        "t.page_admin_console.0002",
+        "t.page_admin_console.0009",
+        "t.page_admin_console.0003",
+        "t.page_admin_console.0010",
+        "t.page_admin_console.0004",
+        "t.page_admin_console.0011",
+        "t.page_admin_console.0005",
+        "t.page_admin_console.0012",
+        "t.page_admin_console.0006"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-9",
+      "name": "Payment failed → retry rejected → back to checkout",
+      "semanticGoal": "Cover payment failure result page, retry feature rejected path, returning to payment result then back to checkout.",
+      "edgeIds": [
+        "c.page_cart.invokes.page_checkout.s.page_CartPage_Ready.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001",
+        "c.page_checkout.invokes.feature_checkout_create_order.s.page_CheckoutPage_Ready.to.feature_CheckoutCreateOrderFeature_Init",
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0003",
+        "c.feature_checkout_create_order.invokes.page_payment_result.s.feature_CheckoutCreateOrderFeature_PaymentFailed.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0002",
+        "c.page_payment_result.invokes.feature_payment_retry.s.page_PaymentResultPage_Failed.to.feature_PaymentRetryFeature_Init",
+        "t.feature_payment_retry.0001",
+        "t.feature_payment_retry.0003",
+        "c.feature_payment_retry.invokes.page_payment_result.s.feature_PaymentRetryFeature_Blocked.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0002",
+        "c.page_payment_result.invokes.page_checkout.s.page_PaymentResultPage_Failed.to.page_CheckoutPage_Init"
+      ],
+      "pathLength": 13
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-12",
+      "name": "Refund request blocked then return to catalog from empty orders",
+      "semanticGoal": "Cover refund request feature rejection and ensure navigation continues to other browsing entry points.",
+      "edgeIds": [
+        "t.page_orders.0004",
+        "c.page_orders.invokes.feature_refund_request.s.page_OrdersPage_SubOrderReady.to.feature_RefundRequestFeature_Init",
+        "t.feature_refund_request.0001",
+        "t.feature_refund_request.0003",
+        "c.feature_refund_request.invokes.page_orders.s.feature_RefundRequestFeature_Blocked.to.page_OrdersPage_Init",
+        "t.page_orders.0002",
+        "c.page_orders.invokes.page_catalog.s.page_OrdersPage_ListEmpty.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 16,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-16",
+      "name": "Admin reviews seller application approve; refund intervention reject",
+      "semanticGoal": "Cover admin console core actions: approve seller application and handle a refund intervention rejection path, returning to admin pages.",
+      "edgeIds": [
+        "t.page_admin_console.0001",
+        "c.page_admin_console.invokes.feature_admin_seller_application_review.s.page_AdminConsolePage_SellerApplicationsReady.to.feature_AdminSellerApplicationReviewFeature_Init",
+        "t.feature_admin_seller_application_review.0001",
+        "t.feature_admin_seller_application_review.0002",
+        "c.feature_admin_seller_application_review.invokes.page_admin_console.s.feature_AdminSellerApplicationReviewFeature_Approved.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0005",
+        "c.page_admin_console.invokes.feature_admin_refund_intervention.s.page_AdminConsolePage_RefundsReady.to.feature_AdminRefundInterventionFeature_Init",
+        "t.feature_admin_refund_intervention.0001",
+        "t.feature_admin_refund_intervention.0003",
+        "c.feature_admin_refund_intervention.invokes.page_admin_console.s.feature_AdminRefundInterventionFeature_Rejected.to.page_AdminConsolePage_Init"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-14",
+      "name": "Seller apply submit then forbidden seller route and leave",
+      "semanticGoal": "Cover buyer applying to become seller (submit application), then hit seller forbidden path and return to public catalog.",
+      "edgeIds": [
+        "t.page_seller_console.0001",
+        "c.page_seller_console.invokes.feature_seller_application_submit.s.page_SellerConsolePage_ApplyReady.to.feature_SellerApplicationSubmitFeature_Init",
+        "t.feature_seller_application_submit.0001",
+        "t.feature_seller_application_submit.0002",
+        "c.feature_seller_application_submit.invokes.page_seller_console.s.feature_SellerApplicationSubmitFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0009",
+        "c.page_seller_console.invokes.page_catalog.s.page_SellerConsolePage_Forbidden.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 19,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232811_eugbvp.json",
+      "sourcePathId": "path-19",
+      "name": "Admin login branch → manage categories feature success",
+      "semanticGoal": "Cover admin-role login completion into admin console, then enter category management feature and complete a successful category change flow.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0004",
+        "c.feature_auth_login.invokes.page_admin_console.s.feature_AuthLoginFeature_AdminDone.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0002",
+        "c.page_admin_console.invokes.feature_admin_category_manage.s.page_AdminConsolePage_CategoriesReady.to.feature_AdminCategoryManageFeature_Init",
+        "t.feature_admin_category_manage.0001",
+        "t.feature_admin_category_manage.0002",
+        "c.feature_admin_category_manage.invokes.page_admin_console.s.feature_AdminCategoryManageFeature_Done.to.page_AdminConsolePage_Init"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232811_eugbvp.json",
+      "sourcePathId": "path-25",
+      "name": "Cart remove item → cart becomes empty via CartMutateFeature",
+      "semanticGoal": "Cover cart mutation that results in empty cart and ensure cart page shows empty state afterward.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0004",
+        "c.page_catalog.invokes.page_cart.s.page_CatalogPage_DetailReady.to.page_CartPage_Init",
+        "t.page_cart.0001",
+        "c.page_cart.invokes.feature_cart_mutate.s.page_CartPage_Ready.to.feature_CartMutateFeature_Init",
+        "t.feature_cart_mutate.0001",
+        "t.feature_cart_mutate.0003",
+        "c.feature_cart_mutate.invokes.page_cart.s.feature_CartMutateFeature_Empty.to.page_CartPage_Init",
+        "t.page_cart.0002"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-11",
+      "name": "Create review success then revisit review entry",
+      "semanticGoal": "Cover review creation feature success from eligible review draft and validate navigation back to orders flows.",
+      "edgeIds": [
+        "t.page_orders.0005",
+        "c.page_orders.invokes.feature_review_create.s.page_OrdersPage_ReviewDraft.to.feature_ReviewCreateFeature_Init",
+        "t.feature_review_create.0001",
+        "t.feature_review_create.0002",
+        "c.feature_review_create.invokes.page_orders.s.feature_ReviewCreateFeature_Done.to.page_OrdersPage_Init",
+        "t.page_orders.0004",
+        "t.page_orders.0010",
+        "t.page_orders.0005"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 45,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-45",
+      "name": "Seller edit product → save rejected → back + open edit",
+      "semanticGoal": "覆蓋賣家編輯商品儲存被拒（尚未走過）並返回列表，再由商品列表進入編輯入口（尚未走過），探索錯誤分支與導覽分支。",
+      "edgeIds": [
+        "t.page_seller_console.0004",
+        "c.page_seller_console.invokes.feature_seller_product_save.s.page_SellerConsolePage_ProductEditDraft.to.feature_SellerProductSaveFeature_Init",
+        "t.feature_seller_product_save.0001",
+        "t.feature_seller_product_save.0003",
+        "c.feature_seller_product_save.invokes.page_seller_console.s.feature_SellerProductSaveFeature_Blocked.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0002",
+        "t.page_seller_console.0011"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 5,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-5",
+      "name": "Signup success then login failure returns to login",
+      "semanticGoal": "Cover signup feature success routing to login, then login attempt rejected and returns to login page.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_signup.s.page_Entry_Init.to.page_SignupPage_Init",
+        "t.page_signup.0001",
+        "c.page_signup.invokes.feature_auth_signup.s.page_SignupPage_Ready.to.feature_AuthSignupFeature_Init",
+        "t.feature_auth_signup.0001",
+        "t.feature_auth_signup.0002",
+        "c.feature_auth_signup.invokes.page_login.s.feature_AuthSignupFeature_Done.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0005",
+        "c.feature_auth_login.invokes.page_login.s.feature_AuthLoginFeature_Failed.to.page_LoginPage_Init"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 10,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-10",
+      "name": "Payment cancelled → retry started → return to checkout",
+      "semanticGoal": "Cover payment cancelled result page, retry feature success start, and return to checkout for continued payment.",
+      "edgeIds": [
+        "c.page_cart.invokes.page_checkout.s.page_CartPage_Ready.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001",
+        "c.page_checkout.invokes.feature_checkout_create_order.s.page_CheckoutPage_Ready.to.feature_CheckoutCreateOrderFeature_Init",
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0004",
+        "c.feature_checkout_create_order.invokes.page_payment_result.s.feature_CheckoutCreateOrderFeature_PaymentCancelled.to.page_PaymentResultPage_Init",
+        "t.page_payment_result.0003",
+        "c.page_payment_result.invokes.feature_payment_retry.s.page_PaymentResultPage_Cancelled.to.feature_PaymentRetryFeature_Init",
+        "t.feature_payment_retry.0001",
+        "t.feature_payment_retry.0002",
+        "c.feature_payment_retry.invokes.page_checkout.s.feature_PaymentRetryFeature_Done.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 55,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_233052_ltww7o.json",
+      "sourcePathId": "path-55",
+      "name": "Seller: open settlements and back from detail",
+      "semanticGoal": "Cover seller navigation to settlements (walked=false) and back from settlement detail (walked=false) to expand settlements branch coverage.",
+      "edgeIds": [
+        "t.page_seller_console.0002",
+        "t.page_seller_console.0013",
+        "t.page_seller_console.0007",
+        "t.page_seller_console.0019",
+        "t.page_seller_console.0008",
+        "t.page_seller_console.0021",
+        "t.page_seller_console.0007"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-13",
+      "name": "Cancel order before payment success",
+      "semanticGoal": "Cover buyer order cancellation feature success and return to orders list state.",
+      "edgeIds": [
+        "t.page_orders.0003",
+        "c.page_orders.invokes.feature_order_cancel.s.page_OrdersPage_DetailReady.to.feature_OrderCancelFeature_Init",
+        "t.feature_order_cancel.0001",
+        "t.feature_order_cancel.0002",
+        "c.feature_order_cancel.invokes.page_orders.s.feature_OrderCancelFeature_Done.to.page_OrdersPage_Init",
+        "t.page_orders.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-46",
+      "name": "Seller refund review escalate → admin analytics → leave admin",
+      "semanticGoal": "覆蓋賣家退款審核升級給管理員（整段尚未走過），並在管理分析頁離開管理區（尚未走過），串接跨 diagram 分支探索。",
+      "edgeIds": [
+        "t.page_seller_console.0006",
+        "c.page_seller_console.invokes.feature_seller_refund_review.s.page_SellerConsolePage_OrderDetailReady.to.feature_SellerRefundReviewFeature_Init",
+        "t.feature_seller_refund_review.0001",
+        "t.feature_seller_refund_review.0004",
+        "c.feature_seller_refund_review.invokes.page_admin_console.s.feature_SellerRefundReviewFeature_Escalated.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0006",
+        "c.page_admin_console.invokes.page_catalog.s.page_AdminConsolePage_AnalyticsReady.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-48",
+      "name": "Admin disputes → resolve rejected → refunds → open analytics",
+      "semanticGoal": "覆蓋糾紛解決被拒（尚未走過）後返回管理頁，並從退款頁切到分析入口（尚未走過），探索管理導覽與失敗分支。",
+      "edgeIds": [
+        "t.page_admin_console.0004",
+        "c.page_admin_console.invokes.feature_admin_dispute_resolve.s.page_AdminConsolePage_DisputesReady.to.feature_AdminDisputeResolveFeature_Init",
+        "t.feature_admin_dispute_resolve.0001",
+        "t.feature_admin_dispute_resolve.0003",
+        "c.feature_admin_dispute_resolve.invokes.page_admin_console.s.feature_AdminDisputeResolveFeature_Blocked.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0005",
+        "t.page_admin_console.0012"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-47",
+      "name": "Admin orders → intervene order applied → go disputes",
+      "semanticGoal": "覆蓋管理訂單頁進入訂單介入功能並成功套用（整段尚未走過），再切到糾紛頁入口（尚未走過）擴大管理分支覆蓋。",
+      "edgeIds": [
+        "t.page_admin_console.0003",
+        "c.page_admin_console.invokes.feature_admin_order_intervention.s.page_AdminConsolePage_OrdersReady.to.feature_AdminOrderInterventionFeature_Init",
+        "t.feature_admin_order_intervention.0001",
+        "t.feature_admin_order_intervention.0002",
+        "c.feature_admin_order_intervention.invokes.page_admin_console.s.feature_AdminOrderInterventionFeature_Done.to.page_AdminConsolePage_Init",
+        "t.page_admin_console.0004"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-44",
+      "name": "Seller create product → save success → back to products",
+      "semanticGoal": "覆蓋賣家新增商品草稿與商品儲存成功流程（皆尚未走過），驗證 seller-only 權限與資料一致性。",
+      "edgeIds": [
+        "t.page_seller_console.0003",
+        "c.page_seller_console.invokes.feature_seller_product_save.s.page_SellerConsolePage_ProductNewDraft.to.feature_SellerProductSaveFeature_Init",
+        "t.feature_seller_product_save.0001",
+        "t.feature_seller_product_save.0002",
+        "c.feature_seller_product_save.invokes.page_seller_console.s.feature_SellerProductSaveFeature_Done.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 3,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-3",
+      "name": "Catalog search empty → adjust → search ready → refine",
+      "semanticGoal": "Cover catalog search empty state handling, filter change retry, successful search results, and refine search loop.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0003",
+        "t.page_catalog.0010",
+        "t.page_catalog.0002",
+        "t.page_catalog.0008",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-8",
+      "name": "Create-order blocked by inventory/product rejection; back to checkout blocked view",
+      "semanticGoal": "Cover create-order flow rejection (inventory/product) returning to checkout and showing blocked state.",
+      "edgeIds": [
+        "c.page_cart.invokes.page_checkout.s.page_CartPage_Ready.to.page_CheckoutPage_Init",
+        "t.page_checkout.0001",
+        "c.page_checkout.invokes.feature_checkout_create_order.s.page_CheckoutPage_Ready.to.feature_CheckoutCreateOrderFeature_Init",
+        "t.feature_checkout_create_order.0001",
+        "t.feature_checkout_create_order.0005",
+        "c.feature_checkout_create_order.invokes.page_checkout.s.feature_CheckoutCreateOrderFeature_Blocked.to.page_CheckoutPage_Init",
+        "t.page_checkout.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 1,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-1",
+      "name": "Visitor add-to-cart redirects to login then back",
+      "semanticGoal": "Cover visitor flow from entry to catalog detail, attempt add-to-cart as visitor, redirect to login, then return to catalog list.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0001",
+        "t.page_catalog.0007",
+        "t.page_catalog.0004",
+        "c.page_catalog.invokes.page_login.s.page_CatalogPage_DetailReady.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.page_catalog.s.page_LoginPage_Ready.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 20,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232811_eugbvp.json",
+      "sourcePathId": "path-20",
+      "name": "Admin forbidden → leave to catalog",
+      "semanticGoal": "Cover non-admin access to admin area forbidden state and leaving forbidden page back to public catalog.",
+      "edgeIds": [
+        "t.page_admin_console.0007",
+        "c.page_admin_console.invokes.page_catalog.s.page_AdminConsolePage_Forbidden.to.page_CatalogPage_Init",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 30,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232811_eugbvp.json",
+      "sourcePathId": "path-30",
+      "name": "Orders review blocked eligibility → back to suborder",
+      "semanticGoal": "Cover review entry when not eligible (blocked) and ensure user can navigate back to suborder detail flow.",
+      "edgeIds": [
+        "t.page_orders.0006",
+        "t.page_orders.0013",
+        "t.page_orders.0004"
+      ],
+      "pathLength": 3
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 42,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-42",
+      "name": "Cart mutation rejected → back to cart",
+      "semanticGoal": "覆蓋購物車異動 quantityRejected 與 mutationBlocked（皆尚未走過），驗證數量規則/庫存阻擋時購物車不被意外改動。",
+      "edgeIds": [
+        "t.feature_cart_mutate.0001",
+        "t.feature_cart_mutate.0004",
+        "c.feature_cart_mutate.invokes.page_cart.s.feature_CartMutateFeature_Blocked.to.page_CartPage_Init",
+        "t.page_cart.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 43,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232945_wo3u2g.json",
+      "sourcePathId": "path-43",
+      "name": "Order cancel rejected → back to order detail entry",
+      "semanticGoal": "覆蓋取消訂單被拒絕（尚未走過）後返回訂單頁的 cancelBlocked（尚未走過），驗證付款後/不可取消狀態下維持原狀並有回饋。",
+      "edgeIds": [
+        "t.feature_order_cancel.0001",
+        "t.feature_order_cancel.0003",
+        "c.feature_order_cancel.invokes.page_orders.s.feature_OrderCancelFeature_Blocked.to.page_OrdersPage_Init",
+        "t.page_orders.0003"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232212_3hyf5m.json",
+      "sourcePathId": "path-4",
+      "name": "Catalog detail unavailable → back to catalog",
+      "semanticGoal": "Cover banned/missing product detail path and back navigation to catalog list.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_catalog.s.page_Entry_Init.to.page_CatalogPage_Init",
+        "t.page_catalog.0005",
+        "t.page_catalog.0012",
+        "t.page_catalog.0001"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 58,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_233052_ltww7o.json",
+      "sourcePathId": "path-58",
+      "name": "Seller refund approve then back to orders",
+      "semanticGoal": "Cover seller refund review approve outcome (walked=false) and return navigation (walked=false) to validate status updates and routing.",
+      "edgeIds": [
+        "t.page_seller_console.0006",
+        "c.page_seller_console.invokes.feature_seller_refund_review.s.page_SellerConsolePage_OrderDetailReady.to.feature_SellerRefundReviewFeature_Init",
+        "t.feature_seller_refund_review.0001",
+        "t.feature_seller_refund_review.0002",
+        "c.feature_seller_refund_review.invokes.page_seller_console.s.feature_SellerRefundReviewFeature_Approved.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0005"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 59,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_233052_ltww7o.json",
+      "sourcePathId": "path-59",
+      "name": "Seller refund reject then back to orders",
+      "semanticGoal": "Cover seller refund review reject outcome (walked=false) and return navigation (walked=false) to validate rollback to prior suborder status.",
+      "edgeIds": [
+        "t.page_seller_console.0006",
+        "c.page_seller_console.invokes.feature_seller_refund_review.s.page_SellerConsolePage_OrderDetailReady.to.feature_SellerRefundReviewFeature_Init",
+        "t.feature_seller_refund_review.0001",
+        "t.feature_seller_refund_review.0003",
+        "c.feature_seller_refund_review.invokes.page_seller_console.s.feature_SellerRefundReviewFeature_Rejected.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0005"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232811_eugbvp.json",
+      "sourcePathId": "path-31",
+      "name": "Refund request success then return to suborder detail",
+      "semanticGoal": "Cover successful refund request creation and return to the same suborder detail route with updated refund_requested state.",
+      "edgeIds": [
+        "t.page_orders.0004",
+        "c.page_orders.invokes.feature_refund_request.s.page_OrdersPage_SubOrderReady.to.feature_RefundRequestFeature_Init",
+        "t.feature_refund_request.0001",
+        "t.feature_refund_request.0002",
+        "c.feature_refund_request.invokes.page_orders.s.feature_RefundRequestFeature_Done.to.page_OrdersPage_Init",
+        "t.page_orders.0004"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 32,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_232811_eugbvp.json",
+      "sourcePathId": "path-32",
+      "name": "Review create rejected → return to review form",
+      "semanticGoal": "Cover review submission rejection path and ensure it returns to the review form route with no review persisted.",
+      "edgeIds": [
+        "t.page_orders.0005",
+        "c.page_orders.invokes.feature_review_create.s.page_OrdersPage_ReviewDraft.to.feature_ReviewCreateFeature_Init",
+        "t.feature_review_create.0001",
+        "t.feature_review_create.0003",
+        "c.feature_review_create.invokes.page_orders.s.feature_ReviewCreateFeature_Blocked.to.page_OrdersPage_Init",
+        "t.page_orders.0005"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 60,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\EX3\\3-1\\20260321_233052_ltww7o.json",
+      "sourcePathId": "path-60",
+      "name": "Seller application submit rejected",
+      "semanticGoal": "Cover seller application submission rejection branch (walked=false) and return navigation (walked=false) to ensure no application is created.",
+      "edgeIds": [
+        "t.page_seller_console.0001",
+        "c.page_seller_console.invokes.feature_seller_application_submit.s.page_SellerConsolePage_ApplyReady.to.feature_SellerApplicationSubmitFeature_Init",
+        "t.feature_seller_application_submit.0001",
+        "t.feature_seller_application_submit.0003",
+        "c.feature_seller_application_submit.invokes.page_seller_console.s.feature_SellerApplicationSubmitFeature_Blocked.to.page_SellerConsolePage_Init",
+        "t.page_seller_console.0001"
+      ],
+      "pathLength": 6
+    }
+  ]
+}

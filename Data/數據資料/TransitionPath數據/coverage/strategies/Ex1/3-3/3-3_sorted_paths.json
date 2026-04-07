@@ -1,0 +1,650 @@
+{
+  "strategyName": "Ex1",
+  "projectName": "3-3",
+  "paths": [
+    {
+      "sortedIndex": 1,
+      "pathId": "path-1",
+      "originalSequence": 47,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-47",
+      "name": "Admin Plans opens Plan Management and saves plan",
+      "semanticGoal": "Verify Platform Admin can load Admin Plans, enter plan management feature, save a plan definition, return to list, and reload successfully.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_admin_dashboard.s.feature_AuthLoginFeature_PlatformAdminAuthenticated.to.page_AdminDashboardPage_platform_admin_Init",
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0003",
+        "c.page_admin_dashboard.invokes.page_admin_plans.s.page_AdminDashboardPage_platform_admin_Ready.to.page_AdminPlansPage_platform_admin_Init",
+        "t.page_admin_plans.0002",
+        "t.page_admin_plans.0003",
+        "c.page_admin_plans.invokes.feature_plan_management.s.page_AdminPlansPage_platform_admin_Ready.to.feature_PlanManagementFeature_platform_admin_Init",
+        "t.feature_plan_management.0001",
+        "t.feature_plan_management.0002",
+        "t.feature_plan_management.0003",
+        "c.feature_plan_management.invokes.page_admin_plans.s.feature_PlanManagementFeature_platform_admin_Updated.to.page_AdminPlansPage_platform_admin_Init",
+        "t.page_admin_plans.0002",
+        "t.page_admin_plans.0003"
+      ],
+      "pathLength": 18
+    },
+    {
+      "sortedIndex": 2,
+      "pathId": "path-2",
+      "originalSequence": 31,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212520_l1d7gw.json",
+      "sourcePathId": "path-31",
+      "name": "Org Admin upgrade payment fails then reviews invoice",
+      "semanticGoal": "Verify upgrade flow handles payment failure by entering PastDueApplied and routes user to Invoices for proration invoice review.",
+      "edgeIds": [
+        "t.page_subscription.0001",
+        "t.page_subscription.0002",
+        "c.page_subscription.invokes.page_subscription_org_admin.s.page_SubscriptionPage_end_user_org_admin_Ready.to.page_SubscriptionPage_org_admin_Init",
+        "c.page_subscription_org_admin.invokes.feature_subscription_upgrade.s.page_SubscriptionPage_org_admin_Init.to.feature_SubscriptionUpgradeFeature_org_admin_Init",
+        "t.feature_subscription_upgrade.0001",
+        "t.feature_subscription_upgrade.0002",
+        "t.feature_subscription_upgrade.0004",
+        "c.feature_subscription_upgrade.invokes.page_invoices.s.feature_SubscriptionUpgradeFeature_org_admin_PastDueApplied.to.page_InvoicesPage_end_user_org_admin_Init",
+        "t.page_invoices.0001",
+        "t.page_invoices.0002"
+      ],
+      "pathLength": 10
+    },
+    {
+      "sortedIndex": 3,
+      "pathId": "path-3",
+      "originalSequence": 13,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-13",
+      "name": "Org Admin manages members (apply then return)",
+      "semanticGoal": "Verify Org Admin can enter Members, start member management, apply a change, and return to Members page entry state.",
+      "edgeIds": [
+        "c.page_app_dashboard.invokes.page_app_dashboard_org_admin.s.page_AppDashboardPage_end_user_org_admin_Ready.to.page_AppDashboardPage_org_admin_Init",
+        "c.page_app_dashboard_org_admin.invokes.page_members.s.page_AppDashboardPage_org_admin_Init.to.page_MembersPage_org_admin_Init",
+        "t.page_members.0002",
+        "t.page_members.0003",
+        "c.page_members.invokes.feature_member_management.s.page_MembersPage_org_admin_Ready.to.feature_MemberManagementFeature_org_admin_Init",
+        "t.feature_member_management.0001",
+        "t.feature_member_management.0002",
+        "t.feature_member_management.0003",
+        "c.feature_member_management.invokes.page_members.s.feature_MemberManagementFeature_org_admin_Updated.to.page_MembersPage_org_admin_Init"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 4,
+      "pathId": "path-4",
+      "originalSequence": 46,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-46",
+      "name": "Risk override forces Suspended then risk queue reloads",
+      "semanticGoal": "Verify Platform Admin can load Risk Accounts, enter override flow, force Suspended, return to queue, and reload list to Ready.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_admin_dashboard.s.feature_AuthLoginFeature_PlatformAdminAuthenticated.to.page_AdminDashboardPage_platform_admin_Init",
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0003",
+        "c.page_admin_dashboard.invokes.page_admin_risk_accounts.s.page_AdminDashboardPage_platform_admin_Ready.to.page_AdminRiskAccountsPage.platform_admin.Init",
+        "t.page_admin_risk_accounts.0002",
+        "t.page_admin_risk_accounts.0003",
+        "c.page_admin_risk_accounts.invokes.feature_risk_override.s.page_AdminRiskAccountsPage_platform_admin_Ready.to.feature_RiskOverrideFeature_platform_admin_Init",
+        "t.feature_risk_override.0001",
+        "t.feature_risk_override.0002",
+        "c.feature_risk_override.invokes.page_admin_risk_accounts.s.feature_RiskOverrideFeature_platform_admin_ForcedSuspended.to.page_AdminRiskAccountsPage_platform_admin_Init",
+        "t.page_admin_risk_accounts.0002",
+        "t.page_admin_risk_accounts.0003"
+      ],
+      "pathLength": 17
+    },
+    {
+      "sortedIndex": 5,
+      "pathId": "path-5",
+      "originalSequence": 12,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-12",
+      "name": "Org Admin manages payment method (save then return)",
+      "semanticGoal": "Verify Org Admin can enter dashboard delta, reach Payment Methods, start manage flow, save, and return to the page entry state.",
+      "edgeIds": [
+        "c.page_app_dashboard.invokes.page_app_dashboard_org_admin.s.page_AppDashboardPage_end_user_org_admin_Ready.to.page_AppDashboardPage_org_admin_Init",
+        "c.page_app_dashboard_org_admin.invokes.page_payment_methods.s.page_AppDashboardPage_org_admin_Init.to.page_PaymentMethodsPage_org_admin_Init",
+        "t.page_payment_methods.0002",
+        "t.page_payment_methods.0003",
+        "c.page_payment_methods.invokes.feature_payment_method_manage.s.page_PaymentMethodsPage_org_admin_Ready.to.feature_PaymentMethodManageFeature_org_admin_Init",
+        "t.feature_payment_method_manage.0001",
+        "t.feature_payment_method_manage.0002",
+        "t.feature_payment_method_manage.0003",
+        "c.feature_payment_method_manage.invokes.page_payment_methods.s.feature_PaymentMethodManageFeature_org_admin_Saved.to.page_PaymentMethodsPage_org_admin_Init"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 6,
+      "pathId": "path-6",
+      "originalSequence": 25,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212520_l1d7gw.json",
+      "sourcePathId": "path-25",
+      "name": "Usage opens invoices then returns to dashboard from empty",
+      "semanticGoal": "Verify Usage can navigate to Invoices, render Empty state, and return to Dashboard safely.",
+      "edgeIds": [
+        "t.page_usage.0001",
+        "t.page_usage.0002",
+        "c.page_usage.invokes.page_invoices.s.page_UsagePage_end_user_org_admin_Ready.to.page_InvoicesPage_end_user_org_admin_Init",
+        "t.page_invoices.0001",
+        "t.page_invoices.0003",
+        "c.page_invoices.invokes.page_app_dashboard.s.page_InvoicesPage_end_user_org_admin_Empty.to.page_AppDashboardPage_end_user_org_admin_Init",
+        "t.page_app_dashboard.0001",
+        "t.page_app_dashboard.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 7,
+      "pathId": "path-7",
+      "originalSequence": 44,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-44",
+      "name": "Audit Log loads then query filters applied and return",
+      "semanticGoal": "Verify Platform Admin can load Audit Log, enter audit query feature, apply filters, and return to Audit Log entry state.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_admin_dashboard.s.feature_AuthLoginFeature_PlatformAdminAuthenticated.to.page_AdminDashboardPage_platform_admin_Init",
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0003",
+        "c.page_admin_dashboard.invokes.page_admin_audit_log.s.page_AdminDashboardPage_platform_admin_Ready.to.page_AdminAuditLogPage.platform_admin.Init",
+        "t.page_admin_audit_log.0002",
+        "t.page_admin_audit_log.0003",
+        "c.page_admin_audit_log.invokes.feature_audit_log_query.s.page_AdminAuditLogPage_platform_admin_Ready.to.feature_AuditLogQueryFeature_platform_admin_Init",
+        "t.feature_audit_log_query.0001",
+        "t.feature_audit_log_query.0002",
+        "c.feature_audit_log_query.invokes.page_admin_audit_log.s.feature_AuditLogQueryFeature_platform_admin_Results.to.page_AdminAuditLogPage_platform_admin_Init"
+      ],
+      "pathLength": 15
+    },
+    {
+      "sortedIndex": 8,
+      "pathId": "path-8",
+      "originalSequence": 18,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212520_l1d7gw.json",
+      "sourcePathId": "path-18",
+      "name": "Pricing to sign-up then back to pricing",
+      "semanticGoal": "Verify Pricing loads to Ready, guest can open Sign Up, and can return to Pricing and reload plans.",
+      "edgeIds": [
+        "t.page_pricing.0001",
+        "t.page_pricing.0002",
+        "c.page_pricing.invokes.page_sign_up.s.page_PricingPage_guest_Ready.to.page_SignUpPage_guest_Init",
+        "t.page_sign_up.0001",
+        "c.page_sign_up.invokes.page_pricing.s.page_SignUpPage_guest_Ready.to.page_PricingPage_guest_Init",
+        "t.page_pricing.0001",
+        "t.page_pricing.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 9,
+      "pathId": "path-9",
+      "originalSequence": 63,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213645_g900z1.json",
+      "sourcePathId": "path-62",
+      "name": "Admin Subscriptions load error then retry succeeds",
+      "semanticGoal": "Verify Admin Subscriptions handles fetch failure by entering Error and retry returns to Ready.",
+      "edgeIds": [
+        "t.page_admin_subscriptions.0002",
+        "t.page_admin_subscriptions.0005",
+        "t.page_admin_subscriptions.0006",
+        "t.page_admin_subscriptions.0002",
+        "t.page_admin_subscriptions.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 10,
+      "pathId": "path-10",
+      "originalSequence": 4,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-4",
+      "name": "Guest completes sign-up and enters app",
+      "semanticGoal": "Verify sign-up submission provisions initial resources and then navigates into the authenticated App Dashboard entry state.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_sign_up.s.page_Entry_Init.to.page_SignUpPage_guest_Init",
+        "t.page_sign_up.0001",
+        "c.page_sign_up.invokes.feature_auth_sign_up.s.page_SignUpPage_guest_Ready.to.feature_AuthSignUpFeature_guest_Init",
+        "t.feature_auth_sign_up.0001",
+        "t.feature_auth_sign_up.0002",
+        "c.feature_auth_sign_up.invokes.page_app_dashboard.s.feature_AuthSignUpFeature_guest_Provisioned.to.page_AppDashboardPage_end_user_org_admin_Init"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 11,
+      "pathId": "path-11",
+      "originalSequence": 11,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-11",
+      "name": "Switch organization then reload usage",
+      "semanticGoal": "Verify organization switch flow applies a new org context and returns to Usage with data loaded for that organization.",
+      "edgeIds": [
+        "c.page_app_dashboard.invokes.feature_organization_switch.s.page_AppDashboardPage_end_user_org_admin_Ready.to.feature_OrganizationSwitchFeature_end_user_org_admin_Init",
+        "t.feature_organization_switch.0001",
+        "t.feature_organization_switch.0002",
+        "c.feature_organization_switch.invokes.page_usage.s.feature_OrganizationSwitchFeature_end_user_org_admin_Applied.to.page_UsagePage_end_user_org_admin_Init",
+        "t.page_usage.0001",
+        "t.page_usage.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 12,
+      "pathId": "path-12",
+      "originalSequence": 15,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-15",
+      "name": "Org Admin schedules downgrade then checks usage risk",
+      "semanticGoal": "Verify Org Admin can schedule a downgrade for next cycle and then navigate to Usage to review over-limit risk context.",
+      "edgeIds": [
+        "c.page_subscription.invokes.page_subscription_org_admin.s.page_SubscriptionPage_end_user_org_admin_Ready.to.page_SubscriptionPage_org_admin_Init",
+        "c.page_subscription_org_admin.invokes.feature_subscription_downgrade.s.page_SubscriptionPage_org_admin_Init.to.feature_SubscriptionDowngradeFeature_org_admin_Init",
+        "t.feature_subscription_downgrade.0001",
+        "t.feature_subscription_downgrade.0002",
+        "c.feature_subscription_downgrade.invokes.page_usage.s.feature_SubscriptionDowngradeFeature_org_admin_PendingChangeScheduled.to.page_UsagePage_end_user_org_admin_Init",
+        "t.page_usage.0001",
+        "t.page_usage.0002"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 13,
+      "pathId": "path-13",
+      "originalSequence": 36,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-36",
+      "name": "Org Admin cancels subscription then reloads subscription page",
+      "semanticGoal": "Verify Org Admin can complete subscription cancellation flow and return to Subscription page which loads successfully afterward.",
+      "edgeIds": [
+        "t.page_subscription.0001",
+        "t.page_subscription.0002",
+        "c.page_subscription.invokes.page_subscription_org_admin.s.page_SubscriptionPage_end_user_org_admin_Ready.to.page_SubscriptionPage_org_admin_Init",
+        "c.page_subscription_org_admin.invokes.feature_subscription_cancel.s.page_SubscriptionPage_org_admin_Init.to.feature_SubscriptionCancelFeature_org_admin_Init",
+        "t.feature_subscription_cancel.0001",
+        "t.feature_subscription_cancel.0002",
+        "c.feature_subscription_cancel.invokes.page_subscription.s.feature_SubscriptionCancelFeature_org_admin_Canceled.to.page_SubscriptionPage_end_user_org_admin_Init",
+        "t.page_subscription.0001",
+        "t.page_subscription.0002"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 14,
+      "pathId": "path-14",
+      "originalSequence": 42,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-42",
+      "name": "Platform admin opens Revenue Metrics then returns to Admin Dashboard",
+      "semanticGoal": "Verify Platform Admin can navigate to Revenue Metrics, load metrics successfully, and return to Admin Dashboard.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_admin_dashboard.s.feature_AuthLoginFeature_PlatformAdminAuthenticated.to.page_AdminDashboardPage_platform_admin_Init",
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0003",
+        "c.page_admin_dashboard.invokes.page_admin_revenue_metrics.s.page_AdminDashboardPage_platform_admin_Ready.to.page_AdminRevenueMetricsPage_platform_admin_Init",
+        "t.page_admin_revenue_metrics.0002",
+        "t.page_admin_revenue_metrics.0003",
+        "c.page_admin_revenue_metrics.invokes.page_admin_dashboard.s.page_AdminRevenueMetricsPage_platform_admin_Ready.to.page_AdminDashboardPage.platform_admin.Init"
+      ],
+      "pathLength": 12
+    },
+    {
+      "sortedIndex": 15,
+      "pathId": "path-15",
+      "originalSequence": 51,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213645_g900z1.json",
+      "sourcePathId": "path-50",
+      "name": "Org member login with dashboard retry from error",
+      "semanticGoal": "Verify org-member login path reaches Dashboard, handles summary fetch failure, and retry succeeds to Ready.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0002",
+        "c.feature_auth_login.invokes.page_app_dashboard.s.feature_AuthLoginFeature_MemberAuthenticated.to.page_AppDashboardPage_end_user_org_admin_Init",
+        "t.page_app_dashboard.0001",
+        "t.page_app_dashboard.0003",
+        "t.page_app_dashboard.0004",
+        "t.page_app_dashboard.0001",
+        "t.page_app_dashboard.0002"
+      ],
+      "pathLength": 11
+    },
+    {
+      "sortedIndex": 16,
+      "pathId": "path-16",
+      "originalSequence": 2,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-2",
+      "name": "Pricing load fails then retry succeeds",
+      "semanticGoal": "Verify Pricing handles plan-fetch failure, shows Error, and retry returns to Init and can load to Ready.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_pricing.s.page_Entry_Init.to.page_PricingPage_guest_Init",
+        "t.page_pricing.0001",
+        "t.page_pricing.0003",
+        "t.page_pricing.0004",
+        "t.page_pricing.0001",
+        "t.page_pricing.0002"
+      ],
+      "pathLength": 6
+    },
+    {
+      "sortedIndex": 17,
+      "pathId": "path-17",
+      "originalSequence": 7,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-7",
+      "name": "Usage empty state then review plan limits",
+      "semanticGoal": "Verify Usage can render Empty for a period and user can navigate to Subscription to review plan limits.",
+      "edgeIds": [
+        "t.page_app_dashboard.0001",
+        "t.page_app_dashboard.0002",
+        "c.page_app_dashboard.invokes.page_usage.s.page_AppDashboardPage_end_user_org_admin_Ready.to.page_UsagePage_end_user_org_admin_Init",
+        "t.page_usage.0001",
+        "t.page_usage.0003",
+        "c.page_usage.invokes.page_subscription.s.page_UsagePage_end_user_org_admin_Empty.to.page_SubscriptionPage_end_user_org_admin_Init",
+        "t.page_subscription.0001",
+        "t.page_subscription.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 18,
+      "pathId": "path-18",
+      "originalSequence": 48,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-48",
+      "name": "Admin Subscriptions empty results then review plans",
+      "semanticGoal": "Verify Platform Admin can reach Admin Subscriptions, get empty match state, then navigate to Admin Plans and load plan list.",
+      "edgeIds": [
+        "c.page_entry.invokes.page_login.s.page_Entry_Init.to.page_LoginPage_Init",
+        "t.page_login.0001",
+        "c.page_login.invokes.feature_auth_login.s.page_LoginPage_Ready.to.feature_AuthLoginFeature_Init",
+        "t.feature_auth_login.0001",
+        "t.feature_auth_login.0003",
+        "c.feature_auth_login.invokes.page_admin_dashboard.s.feature_AuthLoginFeature_PlatformAdminAuthenticated.to.page_AdminDashboardPage_platform_admin_Init",
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0003",
+        "c.page_admin_dashboard.invokes.page_admin_subscriptions.s.page_AdminDashboardPage_platform_admin_Ready.to.page_AdminSubscriptionsPage_platform_admin_Init",
+        "t.page_admin_subscriptions.0002",
+        "t.page_admin_subscriptions.0004",
+        "c.page_admin_subscriptions.invokes.page_admin_plans.s.page_AdminSubscriptionsPage_platform_admin_Empty.to.page_AdminPlansPage.platform_admin.Init",
+        "t.page_admin_plans.0002",
+        "t.page_admin_plans.0003"
+      ],
+      "pathLength": 14
+    },
+    {
+      "sortedIndex": 19,
+      "pathId": "path-19",
+      "originalSequence": 41,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-41",
+      "name": "Admin Dashboard access denied then back to Pricing",
+      "semanticGoal": "Verify non-Platform Admin access to /admin is denied and user can safely return to public Pricing and load plans.",
+      "edgeIds": [
+        "t.page_admin_dashboard.0001",
+        "c.page_admin_dashboard.invokes.page_pricing.s.page_AdminDashboardPage_platform_admin_AccessDenied.to.page_PricingPage_guest_Init",
+        "t.page_pricing.0001",
+        "t.page_pricing.0002"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 20,
+      "pathId": "path-20",
+      "originalSequence": 28,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212520_l1d7gw.json",
+      "sourcePathId": "path-28",
+      "name": "Members denies non-Org Admin then returns to dashboard",
+      "semanticGoal": "Verify members management route enforces Org Admin authorization via AccessDenied and allows safe return to Dashboard.",
+      "edgeIds": [
+        "t.page_members.0001",
+        "c.page_members.invokes.page_app_dashboard.s.page_MembersPage_org_admin_AccessDenied.to.page_AppDashboardPage_end_user_org_admin_Init",
+        "t.page_app_dashboard.0001",
+        "t.page_app_dashboard.0002"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 21,
+      "pathId": "path-21",
+      "originalSequence": 27,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212520_l1d7gw.json",
+      "sourcePathId": "path-27",
+      "name": "Payment Methods denies non-Org Admin then returns to dashboard",
+      "semanticGoal": "Verify payment methods route enforces Org Admin authorization via AccessDenied and allows safe return to Dashboard.",
+      "edgeIds": [
+        "t.page_payment_methods.0001",
+        "c.page_payment_methods.invokes.page_app_dashboard.s.page_PaymentMethodsPage_org_admin_AccessDenied.to.page_AppDashboardPage_end_user_org_admin_Init",
+        "t.page_app_dashboard.0001",
+        "t.page_app_dashboard.0002"
+      ],
+      "pathLength": 4
+    },
+    {
+      "sortedIndex": 22,
+      "pathId": "path-22",
+      "originalSequence": 62,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213645_g900z1.json",
+      "sourcePathId": "path-61",
+      "name": "Admin Plans empty then create first plan",
+      "semanticGoal": "Verify Admin Plans handles empty plan catalog and can start plan creation flow, save, return to list, and reload successfully.",
+      "edgeIds": [
+        "t.page_admin_plans.0002",
+        "t.page_admin_plans.0004",
+        "c.page_admin_plans.invokes.feature_plan_management.s.page_AdminPlansPage_platform_admin_Empty.to.feature_PlanManagementFeature_platform_admin_Init",
+        "t.feature_plan_management.0001",
+        "t.feature_plan_management.0002",
+        "t.feature_plan_management.0003",
+        "c.feature_plan_management.invokes.page_admin_plans.s.feature_PlanManagementFeature_platform_admin_Updated.to.page_AdminPlansPage_platform_admin_Init",
+        "t.page_admin_plans.0002",
+        "t.page_admin_plans.0003"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 23,
+      "pathId": "path-23",
+      "originalSequence": 39,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-39",
+      "name": "Members empty then invite flow applies change and returns",
+      "semanticGoal": "Verify Members page empty state can start member-management flow, apply a change, return to Members, and load list to Ready.",
+      "edgeIds": [
+        "t.page_members.0002",
+        "t.page_members.0004",
+        "c.page_members.invokes.feature_member_management.s.page_MembersPage_org_admin_Empty.to.feature_MemberManagementFeature_org_admin_Init",
+        "t.feature_member_management.0001",
+        "t.feature_member_management.0002",
+        "t.feature_member_management.0003",
+        "c.feature_member_management.invokes.page_members.s.feature_MemberManagementFeature_org_admin_Updated.to.page_MembersPage_org_admin_Init",
+        "t.page_members.0002",
+        "t.page_members.0003"
+      ],
+      "pathLength": 9
+    },
+    {
+      "sortedIndex": 24,
+      "pathId": "path-24",
+      "originalSequence": 37,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-37",
+      "name": "Payment Methods empty then add first method and save",
+      "semanticGoal": "Verify Org Admin sees Payment Methods empty state, can start add-first flow, save a method, and return to Payment Methods entry.",
+      "edgeIds": [
+        "t.page_payment_methods.0002",
+        "t.page_payment_methods.0004",
+        "c.page_payment_methods.invokes.feature_payment_method_manage.s.page_PaymentMethodsPage_org_admin_Empty.to.feature_PaymentMethodManageFeature_org_admin_Init",
+        "t.feature_payment_method_manage.0001",
+        "t.feature_payment_method_manage.0002",
+        "t.feature_payment_method_manage.0003",
+        "c.feature_payment_method_manage.invokes.page_payment_methods.s.feature_PaymentMethodManageFeature_org_admin_Saved.to.page_PaymentMethodsPage_org_admin_Init"
+      ],
+      "pathLength": 7
+    },
+    {
+      "sortedIndex": 25,
+      "pathId": "path-25",
+      "originalSequence": 61,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213645_g900z1.json",
+      "sourcePathId": "path-60",
+      "name": "Admin Dashboard overview error then retry succeeds",
+      "semanticGoal": "Verify Admin Dashboard handles overview fetch failure by entering Error and retry returns to Loading then Ready.",
+      "edgeIds": [
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0004",
+        "t.page_admin_dashboard.0005",
+        "t.page_admin_dashboard.0002",
+        "t.page_admin_dashboard.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 26,
+      "pathId": "path-26",
+      "originalSequence": 26,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212520_l1d7gw.json",
+      "sourcePathId": "path-26",
+      "name": "Invoices load error then retry succeeds",
+      "semanticGoal": "Verify invoice list handles fetch failure, shows Error, and retry returns to Ready.",
+      "edgeIds": [
+        "t.page_invoices.0001",
+        "t.page_invoices.0004",
+        "t.page_invoices.0005",
+        "t.page_invoices.0001",
+        "t.page_invoices.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 27,
+      "pathId": "path-27",
+      "originalSequence": 40,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-40",
+      "name": "Members load fails then retry succeeds",
+      "semanticGoal": "Verify Members handles fetch failure, shows Error, and retry returns to a successful Ready state.",
+      "edgeIds": [
+        "t.page_members.0002",
+        "t.page_members.0005",
+        "t.page_members.0006",
+        "t.page_members.0002",
+        "t.page_members.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 28,
+      "pathId": "path-28",
+      "originalSequence": 38,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213145_npc1gc.json",
+      "sourcePathId": "path-38",
+      "name": "Payment Methods load fails then retry succeeds",
+      "semanticGoal": "Verify Payment Methods handles fetch failure, shows Error, and retry returns to a successful Ready state.",
+      "edgeIds": [
+        "t.page_payment_methods.0002",
+        "t.page_payment_methods.0005",
+        "t.page_payment_methods.0006",
+        "t.page_payment_methods.0002",
+        "t.page_payment_methods.0003"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 29,
+      "pathId": "path-29",
+      "originalSequence": 8,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-8",
+      "name": "Subscription load error then retry succeeds",
+      "semanticGoal": "Verify Subscription handles fetch failure, shows Error, and retry returns to a successful Ready state.",
+      "edgeIds": [
+        "t.page_subscription.0001",
+        "t.page_subscription.0003",
+        "t.page_subscription.0004",
+        "t.page_subscription.0001",
+        "t.page_subscription.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 30,
+      "pathId": "path-30",
+      "originalSequence": 9,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-9",
+      "name": "Usage load error then retry succeeds",
+      "semanticGoal": "Verify Usage handles fetch failure, shows Error, and retry can load to Ready without duplicating requests.",
+      "edgeIds": [
+        "t.page_usage.0001",
+        "t.page_usage.0004",
+        "t.page_usage.0005",
+        "t.page_usage.0001",
+        "t.page_usage.0002"
+      ],
+      "pathLength": 5
+    },
+    {
+      "sortedIndex": 31,
+      "pathId": "path-31",
+      "originalSequence": 14,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_212250_ot62mm.json",
+      "sourcePathId": "path-14",
+      "name": "Org Admin upgrades subscription with successful payment",
+      "semanticGoal": "Verify Org Admin can start upgrade flow, create a proration invoice, complete payment, and return to Subscription showing upgraded Active state.",
+      "edgeIds": [
+        "c.page_subscription.invokes.page_subscription_org_admin.s.page_SubscriptionPage_end_user_org_admin_Ready.to.page_SubscriptionPage_org_admin_Init",
+        "c.page_subscription_org_admin.invokes.feature_subscription_upgrade.s.page_SubscriptionPage_org_admin_Init.to.feature_SubscriptionUpgradeFeature_org_admin_Init",
+        "t.feature_subscription_upgrade.0001",
+        "t.feature_subscription_upgrade.0002",
+        "t.feature_subscription_upgrade.0003",
+        "c.feature_subscription_upgrade.invokes.page_subscription.s.feature_SubscriptionUpgradeFeature_org_admin_ActiveApplied.to.page_SubscriptionPage_end_user_org_admin_Init",
+        "t.page_subscription.0001",
+        "t.page_subscription.0002"
+      ],
+      "pathLength": 8
+    },
+    {
+      "sortedIndex": 32,
+      "pathId": "path-32",
+      "originalSequence": 64,
+      "sourceFile": "C:\\Users\\JasonHong\\Desktop\\specKit\\project\\PathCoverage\\path\\Ex1\\3-3\\20260321_213645_g900z1.json",
+      "sourcePathId": "path-63",
+      "name": "Risk override force Expired then return and reload queue",
+      "semanticGoal": "Verify Platform Admin can force an account to Expired via Risk Override flow, return to risk queue, and reload list successfully.",
+      "edgeIds": [
+        "t.page_admin_risk_accounts.0002",
+        "t.page_admin_risk_accounts.0003",
+        "c.page_admin_risk_accounts.invokes.feature_risk_override.s.page_AdminRiskAccountsPage_platform_admin_Ready.to.feature_RiskOverrideFeature_platform_admin_Init",
+        "t.feature_risk_override.0001",
+        "t.feature_risk_override.0003",
+        "c.feature_risk_override.invokes.page_admin_risk_accounts.s.feature_RiskOverrideFeature_platform_admin_ForcedExpired.to.page_AdminRiskAccountsPage_platform_admin_Init",
+        "t.page_admin_risk_accounts.0002",
+        "t.page_admin_risk_accounts.0003"
+      ],
+      "pathLength": 8
+    }
+  ]
+}
