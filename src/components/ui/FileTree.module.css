@@ -72,6 +72,19 @@
   overflow: hidden;
 }
 
+.nodeItem.highlighted {
+  background-color: rgba(37, 99, 235, 0.1);
+  border: 1px solid var(--accent-primary);
+  border-radius: 4px;
+  animation: pulseHighlight 2s ease-in-out infinite;
+}
+
+@keyframes pulseHighlight {
+  0% { background-color: rgba(37, 99, 235, 0.05); }
+  50% { background-color: rgba(37, 99, 235, 0.15); }
+  100% { background-color: rgba(37, 99, 235, 0.05); }
+}
+
 .empty {
   padding: var(--space-4);
   color: var(--text-muted);

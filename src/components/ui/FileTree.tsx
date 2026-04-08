@@ -46,19 +46,28 @@ export function buildTree(files: ExtendedFile[]): TreeNode {
 
 const getFileIcon = (name: string) => {
   if (name.match(/\.(png|jpe?g|gif|svg|webp)$/i)) return <ImageIcon size={16} className={styles.iconImage} />;
-  if (name.match(/\.(pdf|txt|docx|doc)$/i)) return <FileText size={16} className={styles.iconDoc} />;
+  if (name.match(/\.(pdf|txt|docx|doc|json)$/i)) return <FileText size={16} className={styles.iconDoc} />;
   return <File size={16} className={styles.iconDefault} />;
 };
 
 type TreeNodeRendererProps = {
   node: TreeNode;
   level?: number;
+  highlightedPath?: string | null;
   onDelete?: (path: string) => void;
 };
 
-const TreeNodeRenderer = ({ node, level = 0, onDelete }: TreeNodeRendererProps) => {
-  // Folders are CLOSED by default now (isOpen = false)
-  const [isOpen, setIsOpen] = useState(false);
+const TreeNodeRenderer = ({ node, level = 0, highlightedPath, onDelete }: TreeNodeRendererProps) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  // Auto-expand if highlightedPath is a child of this node
+  React.useEffect(() => {
+    if (highlightedPath && !node.isFile && node.path) {
+      if (highlightedPath.startsWith(node.path + '/')) {
+        setIsOpen(true);
+      }
+    }
+  }, [highlightedPath, node.path, node.isFile]);
   const childrenNodes = node.children ? Object.values(node.children).sort((a, b) => {
       if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
       return a.name.localeCompare(b.name);
@@ -73,7 +82,7 @@ const TreeNodeRenderer = ({ node, level = 0, onDelete }: TreeNodeRendererProps) 
     return (
       <div className={styles.treeRoot}>
         {childrenNodes.map((child, idx) => (
-          <TreeNodeRenderer key={idx} node={child} level={0} onDelete={onDelete} />
+          <TreeNodeRenderer key={idx} node={child} level={0} highlightedPath={highlightedPath} onDelete={onDelete} />
         ))}
       </div>
     );
@@ -81,7 +90,7 @@ const TreeNodeRenderer = ({ node, level = 0, onDelete }: TreeNodeRendererProps) 
 
   if (node.isFile) {
     return (
-      <div className={styles.nodeItem}>
+      <div className={`${styles.nodeItem} ${highlightedPath === node.path ? styles.highlighted : ''}`}>
         <div style={{ marginLeft: `${level * 16}px`, display: 'flex', alignItems: 'center', flex: 1 }}>
             {getFileIcon(node.name)}
             <span className={styles.nodeName}>{node.name}</span>
@@ -96,7 +105,7 @@ const TreeNodeRenderer = ({ node, level = 0, onDelete }: TreeNodeRendererProps) 
   return (
     <div className={styles.folderNode}>
       <div
-        className={styles.nodeItem}
+        className={`${styles.nodeItem} ${highlightedPath === node.path ? styles.highlighted : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         style={{ paddingLeft: '12px' }}
       >
@@ -122,7 +131,7 @@ const TreeNodeRenderer = ({ node, level = 0, onDelete }: TreeNodeRendererProps) 
             className={styles.childrenContainer}
           >
             {childrenNodes.map((child, idx) => (
-              <TreeNodeRenderer key={idx} node={child} level={level + 1} onDelete={onDelete} />
+              <TreeNodeRenderer key={idx} node={child} level={level + 1} highlightedPath={highlightedPath} onDelete={onDelete} />
             ))}
           </motion.div>
         )}
@@ -133,12 +142,14 @@ const TreeNodeRenderer = ({ node, level = 0, onDelete }: TreeNodeRendererProps) 
 
 export const FileTree = ({ 
   files, 
-  onDelete 
+  onDelete,
+  highlightedPath
 }: { 
   files: ExtendedFile[]; 
   onDelete?: (path: string) => void;
+  highlightedPath?: string | null;
 }) => {
   if (!files || files.length === 0) return <div className={styles.empty}>Empty selection</div>;
   const tree = buildTree(files);
-  return <div className={styles.container}><TreeNodeRenderer node={tree} onDelete={onDelete} /></div>;
+  return <div className={styles.container}><TreeNodeRenderer node={tree} highlightedPath={highlightedPath} onDelete={onDelete} /></div>;
 };

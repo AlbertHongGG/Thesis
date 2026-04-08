@@ -7,11 +7,19 @@ import { FileTree } from '@/components/ui/FileTree';
 import { Button } from '@/components/ui/Button';
 import styles from './page.module.css';
 
+interface LogItem {
+  type: 'info' | 'success' | 'error' | 'step';
+  message: string;
+  path?: string;
+  duration?: number;
+}
+
 export default function DataWorkbench() {
   const [files, setFiles] = useState<ExtendedFile[]>([]);
   const [processMode, setProcessMode] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [logs, setLogs] = useState<LogItem[]>([]);
+  const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
   const globalContextRef = useRef<string>('');
 
   // Sorting logic: documents first, images later
@@ -21,6 +29,14 @@ export default function DataWorkbench() {
     return [...docs, ...imgs];
   }, [files]);
 
+  const getDisplayPath = (fullPath: string) => {
+    const parts = fullPath.split('/');
+    if (parts.length > 1) {
+      return `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
+    }
+    return fullPath;
+  };
+
   useEffect(() => {
     let ignore = false;
 
@@ -28,43 +44,65 @@ export default function DataWorkbench() {
       if (processMode !== 'playing' || ignore) return;
       if (currentIndex >= sortedFiles.length) {
         setProcessMode('idle');
-        setLogs(prev => [...prev, '✅ All files processed successfully.']);
+        setLogs(prev => [...prev, { type: 'success', message: '✅ All files processed successfully.' }]);
         return;
       }
 
       const file = sortedFiles[currentIndex];
-      setLogs(prev => [...prev, `⏳ Processing [${currentIndex + 1}/${sortedFiles.length}]: ${file.name}...`]);
+      const fullPath = file.path || file.name;
+      const displayPath = getDisplayPath(fullPath);
+      
+      setLogs(prev => [...prev, { 
+        type: 'step', 
+        message: `⏳ Processing [${currentIndex + 1}/${sortedFiles.length}]: ${displayPath}...`,
+        path: fullPath
+      }]);
+
+      const startTime = performance.now();
 
       try {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('globalContext', globalContextRef.current);
         
-        // Let's await API response
         const res = await fetch('/api/ingest', { method: 'POST', body: formData });
         const data = await res.json();
         
+        const duration = ((performance.now() - startTime) / 1000).toFixed(1);
+
         if (!ignore) {
             if (data.success) {
-               setLogs(prev => [...prev, `✨ Completed: ${file.name} - ${data.result.type === 'document' ? `(${data.result.chunks} Vector Chunks)` : `(Image Analyzed)`}`]);
+               setLogs(prev => [...prev, {
+                 type: 'success',
+                 message: `✨ Completed: ${displayPath} - ${data.result.type === 'document' ? `(${data.result.chunks} Chunks)` : `(Image Analyzed)`}`,
+                 path: fullPath,
+                 duration: parseFloat(duration)
+               }]);
                if (data.result.summary) {
                   globalContextRef.current += '\n' + data.result.summary;
                }
             } else {
-               setLogs(prev => [...prev, `❌ Error [${file.name}]: ${data.error}`]);
+               setLogs(prev => [...prev, { 
+                 type: 'error', 
+                 message: `❌ Error [${displayPath}]: ${data.error}`, 
+                 path: fullPath 
+               }]);
             }
             setCurrentIndex(prev => prev + 1);
         }
       } catch (err: any) {
         if (!ignore) {
-            setLogs(prev => [...prev, `❌ Network Error [${file.name}]: ${err.message}`]);
+            setLogs(prev => [...prev, { 
+              type: 'error', 
+              message: `❌ Network Error [${displayPath}]: ${err.message}`, 
+              path: fullPath 
+            }]);
             setCurrentIndex(prev => prev + 1);
         }
       }
     };
 
     if (processMode === 'playing') {
-      // Add a slight delay for UI fluidity
       const timer = setTimeout(() => {
         processNext();
       }, 500);
@@ -75,6 +113,7 @@ export default function DataWorkbench() {
   const handleDelete = (path: string) => {
     setFiles(prev => prev.filter(f => !(f.path || f.name).startsWith(path)));
     if (processMode !== 'idle') setProcessMode('idle');
+    if (highlightedPath?.startsWith(path)) setHighlightedPath(null);
   };
 
   const handleDrop = (newFiles: ExtendedFile[]) => {
@@ -93,16 +132,23 @@ export default function DataWorkbench() {
     setProcessMode('playing');
   };
 
-  const handlePause = () => {
-    setProcessMode('paused');
-  };
+  const handlePause = () => setProcessMode('paused');
 
   const handleNext = async () => {
     if (currentIndex >= sortedFiles.length) return;
     setProcessMode('paused');
     
     const file = sortedFiles[currentIndex];
-    setLogs(prev => [...prev, `⏳ [Manual-Step] Processing [${currentIndex + 1}/${sortedFiles.length}]: ${file.name}...`]);
+    const fullPath = file.path || file.name;
+    const displayPath = getDisplayPath(fullPath);
+    
+    setLogs(prev => [...prev, { 
+      type: 'step', 
+      message: `⏳ [Manual] Processing: ${displayPath}...`,
+      path: fullPath
+    }]);
+
+    const startTime = performance.now();
     try {
         const formData = new FormData();
         formData.append('file', file);
@@ -110,18 +156,24 @@ export default function DataWorkbench() {
         
         const res = await fetch('/api/ingest', { method: 'POST', body: formData });
         const data = await res.json();
-        
+        const duration = ((performance.now() - startTime) / 1000).toFixed(1);
+
         if (data.success) {
-           setLogs(prev => [...prev, `✨ Completed: ${file.name} - ${data.result.type === 'document' ? `(${data.result.chunks} Vector Chunks)` : `(Image Analyzed)`}`]);
+           setLogs(prev => [...prev, {
+             type: 'success',
+             message: `✨ Completed: ${displayPath}`,
+             path: fullPath,
+             duration: parseFloat(duration)
+           }]);
            if (data.result.summary) {
               globalContextRef.current += '\n' + data.result.summary;
            }
         } else {
-           setLogs(prev => [...prev, `❌ Error [${file.name}]: ${data.error}`]);
+           setLogs(prev => [...prev, { type: 'error', message: `❌ Error: ${data.error}`, path: fullPath }]);
         }
         setCurrentIndex(prev => prev + 1);
     } catch (err: any) {
-        setLogs(prev => [...prev, `❌ Network Error: ${err.message}`]);
+        setLogs(prev => [...prev, { type: 'error', message: `❌ Network Error`, path: fullPath }]);
         setCurrentIndex(prev => prev + 1);
     }
   };
@@ -160,9 +212,9 @@ export default function DataWorkbench() {
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <h3 className={styles.sidebarSectionTitle} style={{ margin: 0 }}>Files ({files.length})</h3>
-                <Button variant="ghost" onClick={() => { setFiles([]); setLogs([]); setCurrentIndex(0); setProcessMode('idle'); globalContextRef.current=''; }} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
+                <Button variant="ghost" onClick={() => { setFiles([]); setLogs([]); setCurrentIndex(0); setProcessMode('idle'); globalContextRef.current=''; setHighlightedPath(null); }} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
               </div>
-              <FileTree files={files} onDelete={handleDelete} />
+              <FileTree files={files} onDelete={handleDelete} highlightedPath={highlightedPath} />
             </div>
           )}
         </aside>
@@ -190,8 +242,28 @@ export default function DataWorkbench() {
                  <div style={{ color: 'var(--text-muted)' }}>Upload files and press Start to begin RAG extraction step-by-step.</div>
                ) : (
                  logs.map((log, i) => (
-                   <div key={i} style={{ color: log.includes('✅') ? '#10b981' : log.includes('❌') ? '#ef4444' : log.includes('✨') ? 'var(--accent-primary)' : 'var(--text-secondary)', padding: '6px 10px', background: 'var(--bg-primary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                     {log}
+                   <div 
+                    key={i} 
+                    onClick={() => log.path && setHighlightedPath(log.path)}
+                    style={{ 
+                      color: log.type === 'success' ? '#10b981' : log.type === 'error' ? '#ef4444' : log.type === 'step' ? 'var(--accent-primary)' : 'var(--text-secondary)', 
+                      padding: '8px 12px', 
+                      background: 'var(--bg-primary)', 
+                      borderRadius: '8px', 
+                      border: '1px solid var(--border-color)',
+                      cursor: log.path ? 'pointer' : 'default',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => log.path && (e.currentTarget.style.borderColor = 'var(--accent-primary)')}
+                    onMouseLeave={(e) => log.path && (e.currentTarget.style.borderColor = 'var(--border-color)')}
+                   >
+                     <span>{log.message}</span>
+                     {log.duration !== undefined && (
+                       <span style={{ fontSize: '0.75rem', opacity: 0.7, background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: '4px' }}>{log.duration}s</span>
+                     )}
                    </div>
                  ))
                )}

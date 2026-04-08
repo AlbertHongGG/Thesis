@@ -107,7 +107,7 @@ export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false }:
       <div className={styles.title}>{isCompact ? 'Drop more files' : 'Click or drag to drop files here'}</div>
       {!isCompact && (
         <div className={styles.description}>
-          Supports PDF, DOCX, TXT and Image files for RAG vectorization.
+          Supports PDF, DOCX, TXT, JSON and Image files for RAG vectorization.
         </div>
       )}
     </motion.div>
