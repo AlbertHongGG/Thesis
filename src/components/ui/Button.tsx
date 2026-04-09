@@ -5,7 +5,8 @@ import { motion, HTMLMotionProps } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import styles from './Button.module.css';
 
-interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'ref'> {
+interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'ref' | 'children'> {
+  children?: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'ghost';
   isLoading?: boolean;
 }

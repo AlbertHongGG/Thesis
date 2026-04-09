@@ -1,4 +1,4 @@
-import { AIProvider } from './types';
+import { AIProvider } from '../types';
 
 export class OllamaProvider implements AIProvider {
   name = 'Ollama';
@@ -9,9 +9,18 @@ export class OllamaProvider implements AIProvider {
 
   constructor() {
     this.baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-    this.textModel = process.env.OLLAMA_TEXT_MODEL || 'qwen2.5';
-    this.visionModel = process.env.OLLAMA_VISION_MODEL || 'qwen2-vl';
-    this.embeddingModel = process.env.OLLAMA_EMBEDDING_MODEL || 'nomic-embed-text';
+    if (!process.env.OLLAMA_TEXT_MODEL) {
+      throw new Error('OLLAMA_TEXT_MODEL is required');
+    }
+    if (!process.env.OLLAMA_VISION_MODEL) {
+      throw new Error('OLLAMA_VISION_MODEL is required');
+    }
+    if (!process.env.OLLAMA_EMBEDDING_MODEL) {
+      throw new Error('OLLAMA_EMBEDDING_MODEL is required');
+    }
+    this.textModel = process.env.OLLAMA_TEXT_MODEL
+    this.visionModel = process.env.OLLAMA_VISION_MODEL;
+    this.embeddingModel = process.env.OLLAMA_EMBEDDING_MODEL;
   }
 
   async generateText(prompt: string, systemPrompt?: string): Promise<string> {

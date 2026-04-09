@@ -91,13 +91,13 @@ const TreeNodeRenderer = ({ node, level = 0, highlightedPath, onDelete }: TreeNo
   if (node.isFile) {
     return (
       <div className={`${styles.nodeItem} ${highlightedPath === node.path ? styles.highlighted : ''}`}>
-        <div style={{ marginLeft: `${level * 16}px`, display: 'flex', alignItems: 'center', flex: 1 }}>
+        <div className={styles.nodeMain} style={{ marginLeft: `${level * 16}px` }}>
             {getFileIcon(node.name)}
             <span className={styles.nodeName}>{node.name}</span>
         </div>
-        <div className={styles.deleteBtn} onClick={handleDeleteClick}>
+        <button type="button" className={styles.deleteBtn} onClick={handleDeleteClick} aria-label={`Delete ${node.name}`}>
           <Trash2 size={14} />
-        </div>
+        </button>
       </div>
     );
   }
@@ -109,16 +109,16 @@ const TreeNodeRenderer = ({ node, level = 0, highlightedPath, onDelete }: TreeNo
         onClick={() => setIsOpen(!isOpen)}
         style={{ paddingLeft: '12px' }}
       >
-        <div style={{ marginLeft: `${level * 16}px`, display: 'flex', alignItems: 'center', flex: 1 }}>
+        <div className={styles.nodeMain} style={{ marginLeft: `${level * 16}px` }}>
             <span className={styles.chevron}>
                 {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </span>
             <Folder size={16} className={styles.iconFolder} />
             <span className={styles.nodeName}>{node.name}</span>
         </div>
-        <div className={styles.deleteBtn} onClick={handleDeleteClick}>
+        <button type="button" className={styles.deleteBtn} onClick={handleDeleteClick} aria-label={`Delete ${node.name}`}>
           <Trash2 size={14} />
-        </div>
+        </button>
       </div>
       
       <AnimatePresence initial={false}>
