@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   AlertCircle,
   Box,
@@ -63,6 +65,7 @@ interface FileProcessEntry {
 }
 
 const IMAGE_PATTERN = /\.(png|jpe?g|gif|webp)$/i;
+const MARKDOWN_STEP_PREFIX = '完整圖片分析描述：';
 
 function getDisplayPath(fullPath: string) {
   const parts = fullPath.split('/');
@@ -88,6 +91,14 @@ function getStepStatusLabel(status: StepStatus) {
   if (status === 'running') return '執行中';
   if (status === 'error') return '失敗';
   return '完成';
+}
+
+function getMarkdownStepContent(message: string) {
+  if (!message.startsWith(MARKDOWN_STEP_PREFIX)) {
+    return null;
+  }
+
+  return message.slice(MARKDOWN_STEP_PREFIX.length).trim();
 }
 
 export default function DataWorkbench() {
@@ -565,10 +576,24 @@ export default function DataWorkbench() {
                               {entry.steps.map(step => {
                                 const stepEnd = step.completedAt ?? now;
                                 const stepDuration = formatDuration(stepEnd - step.startedAt);
+                                const markdownContent = getMarkdownStepContent(step.message);
 
                                 return (
                                   <div key={`${entry.path}-${step.id}`} className={styles.processStepItem}>
-                                    <div className={styles.processStepMessage}>{step.message}</div>
+                                    <div className={styles.processStepContent}>
+                                      {markdownContent ? (
+                                        <div className={styles.processStepMarkdownCard}>
+                                          <div className={styles.processStepMarkdownTitle}>完整圖片分析描述</div>
+                                          <div className={styles.processStepMarkdown}>
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                              {markdownContent}
+                                            </ReactMarkdown>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className={styles.processStepMessage}>{step.message}</div>
+                                      )}
+                                    </div>
                                     <div className={styles.processStepMeta}>
                                       <span className={`${styles.processStepStatus} ${styles[`processStep${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`]}`}>
                                         {getStepStatusLabel(step.status)}

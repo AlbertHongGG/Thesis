@@ -279,6 +279,11 @@
   background: var(--bg-secondary);
 }
 
+.processStepContent {
+  flex: 1;
+  min-width: 0;
+}
+
 .processStepMessage {
   font-family: monospace;
   font-size: 0.9rem;
@@ -286,6 +291,111 @@
   color: var(--text-secondary);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.processStepMarkdownCard {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent), var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.95rem 1rem;
+}
+
+.processStepMarkdownTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.8rem;
+}
+
+.processStepMarkdown {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.processStepMarkdown > *:first-child {
+  margin-top: 0;
+}
+
+.processStepMarkdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.processStepMarkdown h1,
+.processStepMarkdown h2,
+.processStepMarkdown h3,
+.processStepMarkdown h4 {
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 1.2rem 0 0.65rem;
+}
+
+.processStepMarkdown h1 {
+  font-size: 1.2rem;
+}
+
+.processStepMarkdown h2 {
+  font-size: 1.08rem;
+}
+
+.processStepMarkdown h3,
+.processStepMarkdown h4 {
+  font-size: 0.98rem;
+}
+
+.processStepMarkdown p,
+.processStepMarkdown ul,
+.processStepMarkdown ol,
+.processStepMarkdown blockquote,
+.processStepMarkdown pre {
+  margin: 0 0 0.9rem;
+}
+
+.processStepMarkdown ul,
+.processStepMarkdown ol {
+  padding-left: 1.35rem;
+}
+
+.processStepMarkdown li {
+  margin: 0.22rem 0;
+}
+
+.processStepMarkdown strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.processStepMarkdown em {
+  color: var(--text-secondary);
+}
+
+.processStepMarkdown code {
+  font-family: monospace;
+  font-size: 0.88em;
+  background: rgba(148, 163, 184, 0.14);
+  border-radius: 6px;
+  padding: 0.1rem 0.35rem;
+}
+
+.processStepMarkdown pre {
+  background: rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.8rem 0.9rem;
+  overflow-x: auto;
+}
+
+.processStepMarkdown pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.processStepMarkdown blockquote {
+  border-left: 3px solid var(--accent-primary);
+  padding-left: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .processStepMeta {
