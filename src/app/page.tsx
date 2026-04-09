@@ -12,17 +12,31 @@ import {
   Cpu,
   Database,
   FileText,
+  FolderClock,
   Image as ImageIcon,
   LoaderCircle,
   Play,
+  RotateCcw,
   Settings,
   SkipForward,
   Sparkles,
   Square,
+  Trash2,
 } from 'lucide-react';
 import { DropZone, ExtendedFile } from '@/components/ui/DropZone';
 import { FileTree } from '@/components/ui/FileTree';
 import { Button } from '@/components/ui/Button';
+import {
+  canUseSessionPersistence,
+  clearStoredSession,
+  loadRestorableSession,
+  type PersistedFileProcessEntry,
+  type PersistedFileRecord,
+  type PersistedProcessStepEntry,
+  type PersistedSessionSnapshot,
+  saveSessionSnapshot,
+  syncSessionFiles,
+} from '@/lib/storage/sessionStore';
 import styles from './page.module.css';
 
 interface ProcessStep {
@@ -44,6 +58,7 @@ type StreamEvent =
 
 type FileProcessStatus = 'idle' | 'processing' | 'completed' | 'error';
 type StepStatus = 'running' | 'completed' | 'error';
+type PersistencePhase = 'checking' | 'prompt' | 'ready';
 
 interface ProcessStepEntry {
   id: number;
@@ -64,6 +79,11 @@ interface FileProcessEntry {
   errorMessage?: string;
 }
 
+interface RestorePromptState {
+  snapshot: PersistedSessionSnapshot;
+  files: PersistedFileRecord[];
+}
+
 const IMAGE_PATTERN = /\.(png|jpe?g|gif|webp)$/i;
 const MARKDOWN_STEP_PREFIX = '完整圖片分析描述：';
 
@@ -78,6 +98,16 @@ function getDisplayPath(fullPath: string) {
 function formatDuration(milliseconds: number) {
   const safeMilliseconds = Number.isFinite(milliseconds) ? Math.max(0, milliseconds) : 0;
   return `${(safeMilliseconds / 1000).toFixed(1)}s`;
+}
+
+function formatSavedAt(timestamp: number) {
+  return new Intl.DateTimeFormat('zh-TW', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(timestamp);
 }
 
 function getStatusLabel(status: FileProcessStatus) {
@@ -101,6 +131,100 @@ function getMarkdownStepContent(message: string) {
   return message.slice(MARKDOWN_STEP_PREFIX.length).trim();
 }
 
+function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
+  const file = new File([record.blob], record.name, {
+    type: record.type,
+    lastModified: record.lastModified,
+  }) as ExtendedFile;
+
+  file.path = record.path;
+  return file;
+}
+
+function serializeResult(result?: IngestResult) {
+  if (!result) return undefined;
+
+  return {
+    type: result.type,
+    chunks: result.chunks,
+    summary: result.summary,
+    description: result.description,
+  } satisfies IngestResult;
+}
+
+function serializeSteps(steps: ProcessStepEntry[]): PersistedProcessStepEntry[] {
+  return steps.map(step => ({
+    id: step.id,
+    message: step.message,
+    status: step.status,
+    startedAt: step.startedAt,
+    completedAt: step.completedAt,
+  }));
+}
+
+function serializeEntry(entry: FileProcessEntry): PersistedFileProcessEntry {
+  return {
+    path: entry.path,
+    displayPath: entry.displayPath,
+    status: entry.status,
+    steps: serializeSteps(entry.steps),
+    startedAt: entry.startedAt,
+    completedAt: entry.completedAt,
+    result: serializeResult(entry.result),
+    errorMessage: entry.errorMessage,
+  };
+}
+
+function normalizeRestoredEntry(entry: PersistedFileProcessEntry): FileProcessEntry {
+  const restoredAt = Date.now();
+  const normalizedSteps: ProcessStepEntry[] = entry.steps.map(step => ({
+    ...step,
+    status: step.status === 'running' ? 'completed' : step.status,
+    completedAt: step.completedAt ?? restoredAt,
+  }));
+
+  if (entry.status === 'processing') {
+    normalizedSteps.push({
+      id: normalizedSteps.length + 1,
+      message: '上次執行中斷，等待重新執行。',
+      status: 'error',
+      startedAt: restoredAt,
+      completedAt: restoredAt,
+    });
+  }
+
+  return {
+    path: entry.path,
+    displayPath: entry.displayPath,
+    status: entry.status === 'processing' ? 'error' : entry.status,
+    steps: normalizedSteps,
+    startedAt: entry.startedAt,
+    completedAt: entry.completedAt,
+    result: entry.result,
+    errorMessage: entry.status === 'processing'
+      ? '上次執行中斷，可直接 Resume 繼續。'
+      : entry.errorMessage,
+  };
+}
+
+function buildPersistedFileRecord(file: ExtendedFile): PersistedFileRecord {
+  return {
+    path: file.path || file.name,
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    lastModified: file.lastModified,
+    blob: file,
+  };
+}
+
+function countRunnablePaths(snapshot: PersistedSessionSnapshot) {
+  return snapshot.fileOrder.filter(path => {
+    const entry = snapshot.processEntries[path];
+    return (entry?.status ?? 'idle') !== 'completed';
+  }).length;
+}
+
 export default function DataWorkbench() {
   const [files, setFiles] = useState<ExtendedFile[]>([]);
   const [processMode, setProcessMode] = useState<'idle' | 'playing' | 'paused'>('idle');
@@ -109,7 +233,11 @@ export default function DataWorkbench() {
   const [processEntries, setProcessEntries] = useState<Record<string, FileProcessEntry>>({});
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
   const [now, setNow] = useState(() => Date.now());
+  const [globalContextValue, setGlobalContextValue] = useState('');
+  const [persistencePhase, setPersistencePhase] = useState<PersistencePhase>('checking');
+  const [restorePrompt, setRestorePrompt] = useState<RestorePromptState | null>(null);
   const globalContextRef = useRef<string>('');
+  const lastPersistedFileSignatureRef = useRef('');
 
   const sortedFiles = useMemo(() => {
     const docs = files.filter(file => !IMAGE_PATTERN.test(file.name));
@@ -122,6 +250,49 @@ export default function DataWorkbench() {
     [processEntries],
   );
 
+  const buildInitialEntry = useCallback((fullPath: string): FileProcessEntry => ({
+    path: fullPath,
+    displayPath: getDisplayPath(fullPath),
+    status: 'idle',
+    steps: [],
+  }), []);
+
+  const allPaths = useMemo(
+    () => sortedFiles.map(file => file.path || file.name),
+    [sortedFiles],
+  );
+
+  const resumablePaths = useMemo(
+    () => allPaths.filter(path => (processEntries[path]?.status ?? 'idle') !== 'completed'),
+    [allPaths, processEntries],
+  );
+
+  const sessionEntries = useMemo(() => {
+    const nextEntries: Record<string, PersistedFileProcessEntry> = {};
+
+    for (const path of allPaths) {
+      nextEntries[path] = serializeEntry(processEntries[path] ?? buildInitialEntry(path));
+    }
+
+    return nextEntries;
+  }, [allPaths, buildInitialEntry, processEntries]);
+
+  const sessionFileSignature = useMemo(
+    () => sortedFiles.map(file => `${file.path || file.name}:${file.size}:${file.lastModified}`).join('|'),
+    [sortedFiles],
+  );
+
+  const nextRunnableIndex = useMemo(
+    () => sortedFiles.findIndex(file => (processEntries[file.path || file.name]?.status ?? 'idle') !== 'completed'),
+    [processEntries, sortedFiles],
+  );
+
+  const appendGlobalContext = useCallback((text: string) => {
+    if (!text.trim()) return;
+    globalContextRef.current += `\n${text}`;
+    setGlobalContextValue(globalContextRef.current);
+  }, []);
+
   useEffect(() => {
     if (!hasActiveProcessing) return;
 
@@ -132,12 +303,85 @@ export default function DataWorkbench() {
     return () => window.clearInterval(timer);
   }, [hasActiveProcessing]);
 
-  const buildInitialEntry = useCallback((fullPath: string): FileProcessEntry => ({
-    path: fullPath,
-    displayPath: getDisplayPath(fullPath),
-    status: 'idle',
-    steps: [],
-  }), []);
+  useEffect(() => {
+    let ignore = false;
+
+    const hydrateSession = async () => {
+      if (!canUseSessionPersistence()) {
+        if (!ignore) {
+          setPersistencePhase('ready');
+        }
+        return;
+      }
+
+      try {
+        const restorableSession = await loadRestorableSession();
+
+        if (ignore) return;
+
+        if (restorableSession && restorableSession.files.length > 0) {
+          setRestorePrompt({
+            snapshot: restorableSession.snapshot,
+            files: restorableSession.files,
+          });
+          setPersistencePhase('prompt');
+        } else {
+          setPersistencePhase('ready');
+        }
+      } catch (error) {
+        console.error('Failed to hydrate stored session:', error);
+        if (!ignore) {
+          setPersistencePhase('ready');
+        }
+      }
+    };
+
+    void hydrateSession();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (persistencePhase !== 'ready' || !canUseSessionPersistence()) {
+      return;
+    }
+
+    if (allPaths.length === 0) {
+      void clearStoredSession();
+      return;
+    }
+
+    void saveSessionSnapshot({
+      globalContext: globalContextValue,
+      fileOrder: allPaths,
+      processEntries: sessionEntries,
+    }).catch(error => {
+      console.error('Failed to save session snapshot:', error);
+    });
+  }, [allPaths, globalContextValue, persistencePhase, sessionEntries]);
+
+  useEffect(() => {
+    if (persistencePhase !== 'ready' || !canUseSessionPersistence()) {
+      return;
+    }
+
+    if (sessionFileSignature === lastPersistedFileSignatureRef.current) {
+      return;
+    }
+
+    lastPersistedFileSignatureRef.current = sessionFileSignature;
+
+    if (sortedFiles.length === 0) {
+      void clearStoredSession();
+      return;
+    }
+
+    void syncSessionFiles(sortedFiles.map(buildPersistedFileRecord)).catch(error => {
+      console.error('Failed to sync session files:', error);
+    });
+  }, [persistencePhase, sessionFileSignature, sortedFiles]);
 
   const ensureEntry = useCallback((fullPath: string) => {
     setProcessEntries(prev => {
@@ -360,10 +604,10 @@ export default function DataWorkbench() {
       const result = await processStreamResponse(res, fullPath);
 
       if (result.summary) {
-        globalContextRef.current += `\n${result.summary}`;
+        appendGlobalContext(result.summary);
       }
       if (result.description) {
-        globalContextRef.current += `\n${result.description}`;
+        appendGlobalContext(result.description);
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
@@ -371,7 +615,7 @@ export default function DataWorkbench() {
     } finally {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [ensureEntry, failProcessingEntry, processStreamResponse, startProcessingEntry]);
+  }, [appendGlobalContext, ensureEntry, failProcessingEntry, processStreamResponse, startProcessingEntry]);
 
   useEffect(() => {
     let ignore = false;
@@ -398,7 +642,15 @@ export default function DataWorkbench() {
     }
   }, [currentIndex, processFile, processMode, sortedFiles]);
 
-  const handleDelete = (path: string) => {
+  const handleDelete = async (path: string) => {
+    if (persistencePhase === 'prompt' && canUseSessionPersistence()) {
+      await clearStoredSession().catch(error => {
+        console.error('Failed to clear stored session before delete:', error);
+      });
+      setRestorePrompt(null);
+      setPersistencePhase('ready');
+    }
+
     setFiles(prev => prev.filter(file => !(file.path || file.name).startsWith(path)));
     setProcessEntries(prev => {
       const nextEntries = { ...prev };
@@ -422,7 +674,17 @@ export default function DataWorkbench() {
     if (highlightedPath?.startsWith(path)) setHighlightedPath(null);
   };
 
-  const handleDrop = (newFiles: ExtendedFile[]) => {
+  const handleDrop = async (newFiles: ExtendedFile[]) => {
+    if (persistencePhase === 'prompt' && canUseSessionPersistence()) {
+      await clearStoredSession().catch(error => {
+        console.error('Failed to clear stored session before starting a new queue:', error);
+      });
+      setRestorePrompt(null);
+      setPersistencePhase('ready');
+      globalContextRef.current = '';
+      setGlobalContextValue('');
+    }
+
     setFiles(prev => {
       const existingPaths = prev.map(file => file.path || file.name);
       const filteredNew = newFiles.filter(file => !existingPaths.includes(file.path || file.name));
@@ -446,6 +708,7 @@ export default function DataWorkbench() {
     if (currentIndex >= sortedFiles.length) {
       setCurrentIndex(0);
       globalContextRef.current = '';
+      setGlobalContextValue('');
       resetProcessEntries(sortedFiles);
     }
     setProcessMode('playing');
@@ -459,7 +722,7 @@ export default function DataWorkbench() {
     await processFile(sortedFiles[currentIndex]);
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
     setFiles([]);
     setProcessEntries({});
     setExpandedPaths({});
@@ -467,6 +730,52 @@ export default function DataWorkbench() {
     setProcessMode('idle');
     setHighlightedPath(null);
     globalContextRef.current = '';
+    setGlobalContextValue('');
+    setRestorePrompt(null);
+    setPersistencePhase('ready');
+    lastPersistedFileSignatureRef.current = '';
+
+    if (canUseSessionPersistence()) {
+      await clearStoredSession().catch(error => {
+        console.error('Failed to clear stored session:', error);
+      });
+    }
+  };
+
+  const handleRestoreSession = () => {
+    if (!restorePrompt) return;
+
+    const restoredFiles = restorePrompt.files.map(rebuildExtendedFile);
+    const restoredEntries: Record<string, FileProcessEntry> = {};
+
+    for (const path of restorePrompt.snapshot.fileOrder) {
+      const entry = restorePrompt.snapshot.processEntries[path];
+      if (entry) {
+        restoredEntries[path] = normalizeRestoredEntry(entry);
+      } else {
+        restoredEntries[path] = buildInitialEntry(path);
+      }
+    }
+
+    setFiles(restoredFiles);
+    setProcessEntries(restoredEntries);
+    setExpandedPaths({});
+    const restoredNextRunnableIndex = restorePrompt.snapshot.fileOrder.findIndex(path => {
+      const entry = restoredEntries[path];
+      return (entry?.status ?? 'idle') !== 'completed';
+    });
+    setCurrentIndex(restoredNextRunnableIndex === -1 ? restorePrompt.snapshot.fileOrder.length : restoredNextRunnableIndex);
+    setProcessMode('idle');
+    setHighlightedPath(null);
+    globalContextRef.current = restorePrompt.snapshot.globalContext;
+    setGlobalContextValue(restorePrompt.snapshot.globalContext);
+    setRestorePrompt(null);
+    setPersistencePhase('ready');
+    lastPersistedFileSignatureRef.current = '';
+  };
+
+  const handleDiscardStoredSession = async () => {
+    await handleClear();
   };
 
   const toggleExpanded = (fullPath: string) => {
@@ -506,15 +815,15 @@ export default function DataWorkbench() {
 
       <div className={styles.mainWrapper}>
         <aside className={styles.sidebarContainer}>
-          <DropZone onDrop={handleDrop} isCompact={files.length > 0} />
+          <DropZone onDrop={files => void handleDrop(files)} isCompact={files.length > 0} />
 
           {files.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <h3 className={styles.sidebarSectionTitle} style={{ margin: 0 }}>Files ({files.length})</h3>
-                <Button variant="ghost" onClick={handleClear} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
+                <Button variant="ghost" onClick={() => void handleClear()} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
               </div>
-              <FileTree files={files} onDelete={handleDelete} highlightedPath={highlightedPath} />
+              <FileTree files={files} onDelete={path => void handleDelete(path)} highlightedPath={highlightedPath} />
             </div>
           )}
         </aside>
@@ -531,14 +840,40 @@ export default function DataWorkbench() {
                   ) : (
                     <Button variant="primary" onClick={handlePlay}><Play size={14} /> {currentIndex > 0 && currentIndex < sortedFiles.length ? 'Resume' : 'Start Auto'}</Button>
                   )}
-                  <Button variant="secondary" onClick={handleNext} disabled={processMode === 'playing'}><SkipForward size={14} /> Next Step</Button>
+                  <Button variant="secondary" onClick={() => void handleNext()} disabled={processMode === 'playing'}><SkipForward size={14} /> Next Step</Button>
                 </div>
               )}
             </div>
 
+            {persistencePhase === 'prompt' && restorePrompt && (
+              <div className={styles.resumeBanner}>
+                <div className={styles.resumeBannerIcon}>
+                  <FolderClock size={20} />
+                </div>
+                <div className={styles.resumeBannerContent}>
+                  <div className={styles.resumeBannerTitle}>發現上次未完成的處理紀錄</div>
+                  <div className={styles.resumeBannerText}>
+                    已保存 {restorePrompt.files.length} 個檔案的執行紀錄。上次保存時間：{formatSavedAt(restorePrompt.snapshot.savedAt)}。其中 {countRunnablePaths(restorePrompt.snapshot) > 0 ? `${countRunnablePaths(restorePrompt.snapshot)} 個檔案可直接接續` : '所有檔案都已完成，可保留紀錄或重新開始'}。
+                  </div>
+                </div>
+                <div className={styles.resumeBannerActions}>
+                  <Button variant="primary" onClick={handleRestoreSession}><RotateCcw size={14} /> 恢復接續</Button>
+                  <Button variant="secondary" onClick={() => void handleDiscardStoredSession()}><Trash2 size={14} /> 清空紀錄</Button>
+                </div>
+              </div>
+            )}
+
+            {persistencePhase === 'ready' && sortedFiles.length > 0 && (
+              <div className={styles.persistenceSummary}>
+                目前已保存 {sortedFiles.length} 個檔案的執行紀錄，其中 {resumablePaths.length} 個仍可接續處理。
+              </div>
+            )}
+
             <div className={styles.processAccordionList}>
               {orderedEntries.length === 0 ? (
-                <div className={styles.processEmptyState}>Upload files and press Start to begin RAG extraction step-by-step.</div>
+                <div className={styles.processEmptyState}>
+                  {persistencePhase === 'checking' ? 'Checking previous session...' : 'Upload files and press Start to begin RAG extraction step-by-step.'}
+                </div>
               ) : (
                 orderedEntries.map(entry => {
                   const isExpanded = !!expandedPaths[entry.path];
@@ -553,7 +888,13 @@ export default function DataWorkbench() {
                             <div className={styles.processCardTitle}>{entry.displayPath}</div>
                             <div className={styles.processCardMetaRow}>
                               <span className={`${styles.processStatusBadge} ${styles[`processStatus${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`]}`}>
-                                {entry.status === 'processing' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : entry.status === 'completed' ? <CheckCircle2 size={14} /> : entry.status === 'error' ? <AlertCircle size={14} /> : <Clock3 size={14} />}
+                                {entry.status === 'processing'
+                                  ? <LoaderCircle size={14} className={styles.spinningIcon} />
+                                  : entry.status === 'completed'
+                                    ? <CheckCircle2 size={14} />
+                                    : entry.status === 'error'
+                                      ? <AlertCircle size={14} />
+                                      : <Clock3 size={14} />}
                                 {getStatusLabel(entry.status)}
                               </span>
                               {entry.errorMessage && <span className={styles.processErrorText}>{entry.errorMessage}</span>}

@@ -121,6 +121,62 @@
   gap: 0.75rem;
 }
 
+.resumeBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 30%, var(--border-color));
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.08), transparent), var(--bg-primary);
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.resumeBannerIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.resumeBannerContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.resumeBannerTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.resumeBannerText,
+.persistenceSummary {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.resumeBannerActions {
+  display: flex;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.persistenceSummary {
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  background: var(--bg-primary);
+  margin-bottom: 1rem;
+}
+
 .processEmptyState,
 .processEmptyInner {
   color: var(--text-muted);
@@ -442,6 +498,15 @@
 }
 
 @media (max-width: 900px) {
+  .resumeBanner {
+    flex-direction: column;
+  }
+
+  .resumeBannerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
   .processCardHeader,
   .processStepItem {
     flex-direction: column;
