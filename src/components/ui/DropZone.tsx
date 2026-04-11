@@ -9,6 +9,20 @@ export interface ExtendedFile extends File {
   path?: string;
 }
 
+type FileSystemEntryLike = {
+  isFile: boolean;
+  isDirectory: boolean;
+  name: string;
+  file?: (callback: (file: File) => void) => void;
+  createReader?: () => {
+    readEntries: (callback: (entries: FileSystemEntryLike[]) => void) => void;
+  };
+};
+
+type DataTransferItemWithEntry = DataTransferItem & {
+  webkitGetAsEntry?: () => FileSystemEntryLike | null;
+};
+
 interface DropZoneProps {
   onDrop: (files: ExtendedFile[]) => void;
   accept?: string;
@@ -30,19 +44,20 @@ export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false }:
     }
   };
 
-  const getFilesFromEntry = async (entry: any, path = ''): Promise<ExtendedFile[]> => {
-    if (entry.isFile) {
+  const getFilesFromEntry = async (entry: FileSystemEntryLike, path = ''): Promise<ExtendedFile[]> => {
+    if (entry.isFile && entry.file) {
+      const readFile = entry.file.bind(entry);
       return new Promise((resolve) => {
-        entry.file((file: File) => {
+        readFile((file: File) => {
           const extendedFile = file as ExtendedFile;
           extendedFile.path = path + file.name;
           resolve([extendedFile]);
         });
       });
-    } else if (entry.isDirectory) {
+    } else if (entry.isDirectory && entry.createReader) {
       const dirReader = entry.createReader();
       return new Promise((resolve) => {
-        dirReader.readEntries(async (entries: any[]) => {
+        dirReader.readEntries(async (entries: FileSystemEntryLike[]) => {
           const promises = entries.map(e => getFilesFromEntry(e, path + entry.name + '/'));
           const files = await Promise.all(promises);
           resolve(files.flat());
@@ -59,7 +74,7 @@ export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false }:
     
     if (e.dataTransfer.items) {
       const promises = Array.from(e.dataTransfer.items)
-        .map(item => item.webkitGetAsEntry())
+        .map(item => (item as DataTransferItemWithEntry).webkitGetAsEntry?.() ?? null)
         .filter(entry => entry !== null)
         .map(entry => getFilesFromEntry(entry));
         

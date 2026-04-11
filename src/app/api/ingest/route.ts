@@ -2,22 +2,17 @@ import { NextResponse } from 'next/server';
 import { getAIProvider } from '@/ai';
 import { chunkText } from '@/lib/rag/chunker';
 import { parseDocument } from '@/lib/rag/parser';
+import type { IngestResult, PreviewChunk, PreviewKind } from '@/lib/workbench/types';
 
 type ProcessStep = {
   message: string;
 };
 
-type IngestResult = {
+type StreamedIngestResult = IngestResult & {
   filename: string;
   status: 'processed';
   dbWritten: boolean;
   processSteps: ProcessStep[];
-  type?: 'image' | 'document';
-  descriptionSnippet?: string;
-  description?: string;
-  contextApplied?: boolean;
-  chunks?: number;
-  summary?: string;
 };
 
 type StreamEvent =
@@ -27,6 +22,31 @@ type StreamEvent =
 
 function buildPreview(text: string, maxLength = 80) {
   return text.replace(/\s+/g, ' ').trim().slice(0, maxLength);
+}
+
+function buildParsedPreview(text: string, maxLength = 4000) {
+  const normalized = text.trim();
+
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength)}\n\n...已截斷，僅保留前 ${maxLength.toLocaleString('zh-TW')} 個字元。`;
+}
+
+function buildChunkPreviews(chunks: string[], maxChunks = 5): PreviewChunk[] {
+  return chunks.slice(0, maxChunks).map((chunk, index) => ({
+    index,
+    preview: buildPreview(chunk, 180),
+    charCount: chunk.length,
+  }));
+}
+
+function getPreviewKind(filename: string): PreviewKind {
+  if (filename.match(/\.(png|jpe?g|gif|webp|svg)$/i)) return 'image';
+  if (filename.match(/\.(txt|csv|md|json)$/i)) return 'text';
+  if (filename.match(/\.(pdf|docx)$/i)) return 'parsed-text';
+  return 'unsupported';
 }
 
 function getErrorMessage(error: unknown) {
@@ -55,7 +75,14 @@ export async function POST(req: Request) {
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
         const processSteps: ProcessStep[] = [];
-        const result: IngestResult = { filename: file.name, status: 'processed', dbWritten: dbWriteEnabled, processSteps };
+        const result: StreamedIngestResult = {
+          filename: file.name,
+          status: 'processed',
+          dbWritten: dbWriteEnabled,
+          processSteps,
+          type: isImage ? 'image' : 'document',
+          previewKind: getPreviewKind(file.name),
+        };
 
         const sendEvent = (event: StreamEvent) => {
           controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
@@ -81,7 +108,7 @@ export async function POST(req: Request) {
             pushStep('已送出到 Ollama 視覺模型，等待圖片分析結果。');
 
             const description = await aiProvider.analyzeImage(`data:${mimeType};base64,${base64}`, visionPrompt);
-            pushStep(`完整圖片分析描述：${description}`);
+            pushStep('圖片分析完成，已取得詳細描述。');
             pushStep('開始將圖片分析描述轉成向量。');
 
             const embedding = await aiProvider.createEmbedding(description);
@@ -141,6 +168,8 @@ export async function POST(req: Request) {
             result.type = 'document';
             result.chunks = embeddedChunks;
             result.summary = extractedSummary;
+            result.parsedTextPreview = buildParsedPreview(parsedText);
+            result.chunkPreviews = buildChunkPreviews(chunks);
           }
 
           sendEvent({ type: 'result', result });

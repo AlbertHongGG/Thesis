@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import {
   AlertCircle,
   Box,
@@ -24,7 +22,9 @@ import {
   Trash2,
 } from 'lucide-react';
 import { DropZone, ExtendedFile } from '@/components/ui/DropZone';
+import { FilePreviewModal } from '@/components/ui/FilePreviewModal';
 import { FileTree } from '@/components/ui/FileTree';
+import { ProcessTimeline } from '@/components/ui/ProcessTimeline';
 import { Button } from '@/components/ui/Button';
 import {
   canUseSessionPersistence,
@@ -37,99 +37,23 @@ import {
   saveSessionSnapshot,
   syncSessionFiles,
 } from '@/lib/storage/sessionStore';
+import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
+import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
+import type { FileProcessEntry, FileProcessStatus, IngestResult, ProcessStepEntry } from '@/lib/workbench/types';
+import { useLiveNow } from '@/lib/workbench/useLiveNow';
 import styles from './page.module.css';
-
-interface ProcessStep {
-  message: string;
-}
-
-interface IngestResult {
-  type: 'document' | 'image';
-  chunks?: number;
-  summary?: string;
-  processSteps?: ProcessStep[];
-  description?: string;
-}
 
 type StreamEvent =
   | { type: 'step'; message: string }
   | { type: 'result'; result: IngestResult }
   | { type: 'error'; error: string };
-
-type FileProcessStatus = 'idle' | 'processing' | 'completed' | 'error';
-type StepStatus = 'running' | 'completed' | 'error';
 type PersistencePhase = 'checking' | 'prompt' | 'ready';
-
-interface ProcessStepEntry {
-  id: number;
-  message: string;
-  status: StepStatus;
-  startedAt: number;
-  completedAt?: number;
-}
-
-interface FileProcessEntry {
-  path: string;
-  displayPath: string;
-  status: FileProcessStatus;
-  steps: ProcessStepEntry[];
-  startedAt?: number;
-  completedAt?: number;
-  result?: IngestResult;
-  errorMessage?: string;
-}
 
 interface RestorePromptState {
   snapshot: PersistedSessionSnapshot;
   files: PersistedFileRecord[];
 }
 
-const IMAGE_PATTERN = /\.(png|jpe?g|gif|webp)$/i;
-const MARKDOWN_STEP_PREFIX = '完整圖片分析描述：';
-
-function getDisplayPath(fullPath: string) {
-  const parts = fullPath.split('/');
-  if (parts.length > 1) {
-    return `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
-  }
-  return fullPath;
-}
-
-function formatDuration(milliseconds: number) {
-  const safeMilliseconds = Number.isFinite(milliseconds) ? Math.max(0, milliseconds) : 0;
-  return `${(safeMilliseconds / 1000).toFixed(1)}s`;
-}
-
-function formatSavedAt(timestamp: number) {
-  return new Intl.DateTimeFormat('zh-TW', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(timestamp);
-}
-
-function getStatusLabel(status: FileProcessStatus) {
-  if (status === 'processing') return '處理中';
-  if (status === 'completed') return '已完成';
-  if (status === 'error') return '失敗';
-  return '待處理';
-}
-
-function getStepStatusLabel(status: StepStatus) {
-  if (status === 'running') return '執行中';
-  if (status === 'error') return '失敗';
-  return '完成';
-}
-
-function getMarkdownStepContent(message: string) {
-  if (!message.startsWith(MARKDOWN_STEP_PREFIX)) {
-    return null;
-  }
-
-  return message.slice(MARKDOWN_STEP_PREFIX.length).trim();
-}
 
 function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
   const file = new File([record.blob], record.name, {
@@ -146,9 +70,14 @@ function serializeResult(result?: IngestResult) {
 
   return {
     type: result.type,
+    previewKind: result.previewKind,
     chunks: result.chunks,
     summary: result.summary,
     description: result.description,
+    descriptionSnippet: result.descriptionSnippet,
+    contextApplied: result.contextApplied,
+    parsedTextPreview: result.parsedTextPreview,
+    chunkPreviews: result.chunkPreviews,
   } satisfies IngestResult;
 }
 
@@ -225,14 +154,25 @@ function countRunnablePaths(snapshot: PersistedSessionSnapshot) {
   }).length;
 }
 
+const ProcessDurationValue = React.memo(({ entry }: { entry: FileProcessEntry }) => {
+  const liveNow = useLiveNow(entry.status === 'processing');
+
+  if (!entry.startedAt) {
+    return <strong className={styles.processDurationValue}>0.0s</strong>;
+  }
+
+  const duration = formatDuration((entry.completedAt ?? liveNow) - entry.startedAt);
+  return <strong className={styles.processDurationValue}>{duration}</strong>;
+});
+
 export default function DataWorkbench() {
   const [files, setFiles] = useState<ExtendedFile[]>([]);
   const [processMode, setProcessMode] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
+  const [selectedPreviewPath, setSelectedPreviewPath] = useState<string | null>(null);
   const [processEntries, setProcessEntries] = useState<Record<string, FileProcessEntry>>({});
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
-  const [now, setNow] = useState(() => Date.now());
   const [globalContextValue, setGlobalContextValue] = useState('');
   const [persistencePhase, setPersistencePhase] = useState<PersistencePhase>('checking');
   const [restorePrompt, setRestorePrompt] = useState<RestorePromptState | null>(null);
@@ -240,14 +180,14 @@ export default function DataWorkbench() {
   const lastPersistedFileSignatureRef = useRef('');
 
   const sortedFiles = useMemo(() => {
-    const docs = files.filter(file => !IMAGE_PATTERN.test(file.name));
-    const imgs = files.filter(file => IMAGE_PATTERN.test(file.name));
+    const docs = files.filter(file => !IMAGE_FILE_PATTERN.test(file.name));
+    const imgs = files.filter(file => IMAGE_FILE_PATTERN.test(file.name));
     return [...docs, ...imgs];
   }, [files]);
 
-  const hasActiveProcessing = useMemo(
-    () => Object.values(processEntries).some(entry => entry.status === 'processing'),
-    [processEntries],
+  const selectedPreviewFile = useMemo(
+    () => sortedFiles.find(file => (file.path || file.name) === selectedPreviewPath) ?? null,
+    [selectedPreviewPath, sortedFiles],
   );
 
   const buildInitialEntry = useCallback((fullPath: string): FileProcessEntry => ({
@@ -256,6 +196,11 @@ export default function DataWorkbench() {
     status: 'idle',
     steps: [],
   }), []);
+
+  const selectedPreviewEntry = useMemo(() => {
+    if (!selectedPreviewPath) return null;
+    return processEntries[selectedPreviewPath] ?? buildInitialEntry(selectedPreviewPath);
+  }, [buildInitialEntry, processEntries, selectedPreviewPath]);
 
   const allPaths = useMemo(
     () => sortedFiles.map(file => file.path || file.name),
@@ -282,26 +227,21 @@ export default function DataWorkbench() {
     [sortedFiles],
   );
 
-  const nextRunnableIndex = useMemo(
-    () => sortedFiles.findIndex(file => (processEntries[file.path || file.name]?.status ?? 'idle') !== 'completed'),
-    [processEntries, sortedFiles],
-  );
+  const fileStatuses = useMemo(() => {
+    const nextStatuses: Record<string, FileProcessStatus | undefined> = {};
+
+    for (const path of allPaths) {
+      nextStatuses[path] = processEntries[path]?.status;
+    }
+
+    return nextStatuses;
+  }, [allPaths, processEntries]);
 
   const appendGlobalContext = useCallback((text: string) => {
     if (!text.trim()) return;
     globalContextRef.current += `\n${text}`;
     setGlobalContextValue(globalContextRef.current);
   }, []);
-
-  useEffect(() => {
-    if (!hasActiveProcessing) return;
-
-    const timer = window.setInterval(() => {
-      setNow(Date.now());
-    }, 200);
-
-    return () => window.clearInterval(timer);
-  }, [hasActiveProcessing]);
 
   useEffect(() => {
     let ignore = false;
@@ -382,6 +322,15 @@ export default function DataWorkbench() {
       console.error('Failed to sync session files:', error);
     });
   }, [persistencePhase, sessionFileSignature, sortedFiles]);
+
+  useEffect(() => {
+    if (!selectedPreviewPath) return;
+
+    const previewStillExists = sortedFiles.some(file => (file.path || file.name) === selectedPreviewPath);
+    if (!previewStillExists) {
+      setSelectedPreviewPath(null);
+    }
+  }, [selectedPreviewPath, sortedFiles]);
 
   const ensureEntry = useCallback((fullPath: string) => {
     setProcessEntries(prev => {
@@ -672,6 +621,7 @@ export default function DataWorkbench() {
     });
     if (processMode !== 'idle') setProcessMode('idle');
     if (highlightedPath?.startsWith(path)) setHighlightedPath(null);
+    if (selectedPreviewPath?.startsWith(path)) setSelectedPreviewPath(null);
   };
 
   const handleDrop = async (newFiles: ExtendedFile[]) => {
@@ -729,6 +679,7 @@ export default function DataWorkbench() {
     setCurrentIndex(0);
     setProcessMode('idle');
     setHighlightedPath(null);
+    setSelectedPreviewPath(null);
     globalContextRef.current = '';
     setGlobalContextValue('');
     setRestorePrompt(null);
@@ -767,6 +718,7 @@ export default function DataWorkbench() {
     setCurrentIndex(restoredNextRunnableIndex === -1 ? restorePrompt.snapshot.fileOrder.length : restoredNextRunnableIndex);
     setProcessMode('idle');
     setHighlightedPath(null);
+    setSelectedPreviewPath(null);
     globalContextRef.current = restorePrompt.snapshot.globalContext;
     setGlobalContextValue(restorePrompt.snapshot.globalContext);
     setRestorePrompt(null);
@@ -785,6 +737,10 @@ export default function DataWorkbench() {
     }));
     setHighlightedPath(fullPath);
   };
+
+  const handleSelectPreview = useCallback((fullPath: string) => {
+    setSelectedPreviewPath(fullPath);
+  }, []);
 
   const orderedEntries = sortedFiles.map(file => {
     const fullPath = file.path || file.name;
@@ -823,7 +779,14 @@ export default function DataWorkbench() {
                 <h3 className={styles.sidebarSectionTitle} style={{ margin: 0 }}>Files ({files.length})</h3>
                 <Button variant="ghost" onClick={() => void handleClear()} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
               </div>
-              <FileTree files={files} onDelete={path => void handleDelete(path)} highlightedPath={highlightedPath} />
+              <FileTree
+                files={files}
+                onDelete={path => void handleDelete(path)}
+                highlightedPath={highlightedPath}
+                selectedPath={selectedPreviewPath}
+                statuses={fileStatuses}
+                onSelectFile={node => handleSelectPreview(node.path)}
+              />
             </div>
           )}
         </aside>
@@ -877,7 +840,6 @@ export default function DataWorkbench() {
               ) : (
                 orderedEntries.map(entry => {
                   const isExpanded = !!expandedPaths[entry.path];
-                  const headerDuration = entry.startedAt ? formatDuration((entry.completedAt ?? now) - entry.startedAt) : '0.0s';
 
                   return (
                     <section key={entry.path} className={`${styles.processCard} ${styles[`processCard${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] || ''}`}>
@@ -904,48 +866,13 @@ export default function DataWorkbench() {
 
                         <div className={styles.processCardHeaderRight}>
                           <span className={styles.processDurationLabel}>{entry.status === 'completed' ? '總時間' : '經過時間'}</span>
-                          <strong className={styles.processDurationValue}>{headerDuration}</strong>
+                          <ProcessDurationValue entry={entry} />
                         </div>
                       </button>
 
                       {isExpanded && (
                         <div className={styles.processCardBody}>
-                          {entry.steps.length === 0 ? (
-                            <div className={styles.processEmptyInner}>尚未開始處理這個檔案。</div>
-                          ) : (
-                            <div className={styles.processStepList}>
-                              {entry.steps.map(step => {
-                                const stepEnd = step.completedAt ?? now;
-                                const stepDuration = formatDuration(stepEnd - step.startedAt);
-                                const markdownContent = getMarkdownStepContent(step.message);
-
-                                return (
-                                  <div key={`${entry.path}-${step.id}`} className={styles.processStepItem}>
-                                    <div className={styles.processStepContent}>
-                                      {markdownContent ? (
-                                        <div className={styles.processStepMarkdownCard}>
-                                          <div className={styles.processStepMarkdownTitle}>完整圖片分析描述</div>
-                                          <div className={styles.processStepMarkdown}>
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                              {markdownContent}
-                                            </ReactMarkdown>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className={styles.processStepMessage}>{step.message}</div>
-                                      )}
-                                    </div>
-                                    <div className={styles.processStepMeta}>
-                                      <span className={`${styles.processStepStatus} ${styles[`processStep${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`]}`}>
-                                        {getStepStatusLabel(step.status)}
-                                      </span>
-                                      <span className={styles.processStepDuration}>{stepDuration}</span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
+                          <ProcessTimeline entry={entry} showStructuredOutput />
                         </div>
                       )}
                     </section>
@@ -956,6 +883,13 @@ export default function DataWorkbench() {
           </div>
         </main>
       </div>
+
+      <FilePreviewModal
+        isOpen={!!selectedPreviewFile && !!selectedPreviewEntry}
+        file={selectedPreviewFile}
+        entry={selectedPreviewEntry}
+        onClose={() => setSelectedPreviewPath(null)}
+      />
     </div>
   );
 }

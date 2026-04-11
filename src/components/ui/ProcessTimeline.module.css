@@ -1,0 +1,257 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.outputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.outputCard {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  padding: 0.95rem 1rem;
+}
+
+.outputHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.outputTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.outputMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  color: var(--accent-primary);
+}
+
+.outputText {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.markdown {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.markdown > *:first-child {
+  margin-top: 0;
+}
+
+.markdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 1.2rem 0 0.65rem;
+}
+
+.markdown p,
+.markdown ul,
+.markdown ol,
+.markdown blockquote,
+.markdown pre {
+  margin: 0 0 0.9rem;
+}
+
+.markdown ul,
+.markdown ol {
+  padding-left: 1.35rem;
+}
+
+.markdown li {
+  margin: 0.22rem 0;
+}
+
+.markdown strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.markdown code {
+  font-family: monospace;
+  font-size: 0.88em;
+  background: rgba(148, 163, 184, 0.14);
+  border-radius: 6px;
+  padding: 0.1rem 0.35rem;
+}
+
+.markdown pre {
+  background: rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.8rem 0.9rem;
+  overflow-x: auto;
+}
+
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown blockquote {
+  border-left: 3px solid var(--accent-primary);
+  padding-left: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.chunkList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.chunkItem {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  padding: 0.75rem 0.85rem;
+}
+
+.chunkLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.chunkPreview {
+  font-family: monospace;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.stepItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+  background: var(--bg-secondary);
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepMessage {
+  font-family: monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.stepMeta {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.stepStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.stepRunning {
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  color: var(--accent-primary);
+}
+
+.stepCompleted {
+  background: color-mix(in srgb, #10b981 12%, transparent);
+  color: #10b981;
+}
+
+.stepError {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color: #ef4444;
+}
+
+.stepDuration {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.empty {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.spinningIcon {
+  animation: processSpin 0.9s linear infinite;
+}
+
+@keyframes processSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .stepItem {
+    flex-direction: column;
+  }
+
+  .stepMeta {
+    align-items: flex-start;
+  }
+}

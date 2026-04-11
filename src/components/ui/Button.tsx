@@ -21,7 +21,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 }, ref) => {
   return (
     <motion.button 
-      ref={ref as any}
+      ref={ref}
       whileTap={!disabled && !isLoading ? { scale: 0.96 } : {}}
       className={`${styles.button} ${styles[variant]} ${className}`}
       disabled={disabled || isLoading}

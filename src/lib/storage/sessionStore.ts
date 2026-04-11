@@ -1,3 +1,5 @@
+import type { IngestResult } from '@/lib/workbench/types';
+
 const DB_NAME = 'thesis-rag-workbench';
 const DB_VERSION = 1;
 const SESSION_STORE = 'session';
@@ -12,12 +14,7 @@ export type PersistedProcessStepEntry = {
   completedAt?: number;
 };
 
-export type PersistedIngestResult = {
-  type: 'document' | 'image';
-  chunks?: number;
-  summary?: string;
-  description?: string;
-};
+export type PersistedIngestResult = IngestResult;
 
 export type PersistedFileProcessEntry = {
   path: string;
