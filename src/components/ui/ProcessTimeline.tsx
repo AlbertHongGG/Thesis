@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { AlertCircle, CheckCircle2, Clock3, FileText, Image as ImageIcon, LoaderCircle, Rows3 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle, CheckCircle2, Clock3, FileText, Image as ImageIcon, LoaderCircle, Rows3, Check } from 'lucide-react';
 import { formatDuration, getStepStatusLabel } from '@/lib/workbench/formatting';
 import type { FileProcessEntry } from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
@@ -15,6 +16,23 @@ interface ProcessTimelineProps {
   showStructuredOutput?: boolean;
 }
 
+const StepLiveDuration = ({ startedAt, completedAt, status }: { startedAt: number; completedAt: number | null; status: string }) => {
+  const isRunning = status === 'running';
+  const liveNow = useLiveNow(isRunning);
+  
+  const stepDuration = useMemo(() => {
+    const stepEnd = completedAt ?? liveNow;
+    return formatDuration(stepEnd - startedAt);
+  }, [completedAt, liveNow, startedAt]);
+
+  return (
+    <span className={styles.stepDuration}>
+      {isRunning ? <Clock3 size={12} style={{ verticalAlign: 'text-bottom', marginRight: 4 }} className={styles.spinningIcon} /> : null}
+      {stepDuration}
+    </span>
+  );
+};
+
 const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => {
   const result = entry.result;
 
@@ -25,10 +43,10 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
   return (
     <div className={styles.outputGroup}>
       {result.type === 'image' && result.description && (
-        <section className={styles.outputCard}>
+        <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
-              <ImageIcon size={16} />
+              <ImageIcon size={16} className={styles.headerIcon} />
               圖片分析結果
             </div>
             {result.contextApplied && <div className={styles.outputMeta}>含文件上下文</div>}
@@ -36,51 +54,52 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
           <div className={styles.markdown}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.description}</ReactMarkdown>
           </div>
-        </section>
+        </motion.section>
       )}
 
       {result.type === 'document' && result.summary && (
-        <section className={styles.outputCard}>
+        <motion.section className={styles.outputCard} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
-              <FileText size={16} />
+              <FileText size={16} className={styles.headerIcon} />
               文件摘要
             </div>
             {typeof result.chunks === 'number' && <div className={styles.outputMeta}>{result.chunks} chunks</div>}
           </div>
           <div className={styles.outputText}>{result.summary}</div>
-        </section>
+        </motion.section>
       )}
 
       {result.type === 'document' && result.parsedTextPreview && (
-        <section className={styles.outputCard}>
+        <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
-              <Rows3 size={16} />
+              <Rows3 size={16} className={styles.headerIcon} />
               解析內容預覽
             </div>
           </div>
           <div className={styles.outputText}>{result.parsedTextPreview}</div>
-        </section>
+        </motion.section>
       )}
 
       {result.type === 'document' && result.chunkPreviews && result.chunkPreviews.length > 0 && (
-        <section className={styles.outputCard}>
+        <motion.section className={styles.outputCard} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
-              <Rows3 size={16} />
+              <Rows3 size={16} className={styles.headerIcon} />
               Chunk 預覽
             </div>
           </div>
           <div className={styles.chunkList}>
-            {result.chunkPreviews.map(chunk => (
-              <div key={`${entry.path}-chunk-${chunk.index}`} className={styles.chunkItem}>
-                <div className={styles.chunkLabel}>Chunk {chunk.index + 1} · {chunk.charCount} chars</div>
+            {result.chunkPreviews.map((chunk, idx) => (
+              <motion.div key={`${entry.path}-chunk-${chunk.index}`} className={styles.chunkItem}
+                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(idx * 0.05, 0.5) }}>
+                <div className={styles.chunkLabel}>Chunk {chunk.index + 1} · <span className={styles.charCountBadge}>{chunk.charCount} chars</span></div>
                 <div className={styles.chunkPreview}>{chunk.preview}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
       )}
     </div>
   );
@@ -91,8 +110,6 @@ export const ProcessTimeline = ({
   emptyMessage = '尚未開始處理這個檔案。',
   showStructuredOutput = true,
 }: ProcessTimelineProps) => {
-  const liveNow = useLiveNow(entry.status === 'processing' || entry.steps.some(step => step.status === 'running'));
-  const currentNow = entry.status === 'processing' ? liveNow : (entry.completedAt ?? liveNow);
 
   return (
     <div className={styles.container}>
@@ -102,32 +119,39 @@ export const ProcessTimeline = ({
         <div className={styles.empty}>{emptyMessage}</div>
       ) : (
         <div className={styles.stepList}>
-          {entry.steps.map(step => {
-            const stepEnd = step.completedAt ?? currentNow;
-            const stepDuration = formatDuration(stepEnd - step.startedAt);
+          <AnimatePresence>
+            {entry.steps.map((step, idx) => {
+              const isRunning = step.status === 'running';
 
-            return (
-              <div key={`${entry.path}-${step.id}`} className={styles.stepItem}>
-                <div className={styles.stepContent}>
-                  <div className={styles.stepMessage}>{step.message}</div>
-                </div>
-                <div className={styles.stepMeta}>
-                  <span className={`${styles.stepStatus} ${styles[`step${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`]}`}>
-                    {step.status === 'running'
-                      ? <LoaderCircle size={14} className={styles.spinningIcon} />
-                      : step.status === 'completed'
-                        ? <CheckCircle2 size={14} />
-                        : <AlertCircle size={14} />}
-                    {getStepStatusLabel(step.status)}
-                  </span>
-                  <span className={styles.stepDuration}>
-                    {step.status === 'running' ? <Clock3 size={12} style={{ verticalAlign: 'text-bottom', marginRight: 4 }} /> : null}
-                    {stepDuration}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+              return (
+                <motion.div 
+                  key={`${entry.path}-${step.id}`} 
+                  className={`${styles.stepItem} ${isRunning ? styles.stepItemRunning : ''}`}
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 400, delay: Math.min(0.04 * idx, 0.2) }}
+                  layout
+                >
+                  <div className={styles.stepContent}>
+                    <div className={styles.stepIconWrapper}>
+                      {step.status === 'running'
+                        ? <LoaderCircle size={16} className={styles.spinningIconMain} />
+                        : step.status === 'completed'
+                          ? <Check size={16} className={styles.successIcon} />
+                          : <AlertCircle size={16} className={styles.errorIcon} />}
+                    </div>
+                    <div className={styles.stepMessage}>{step.message}</div>
+                  </div>
+                  <div className={styles.stepMeta}>
+                    <span className={`${styles.stepStatus} ${styles[`step${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`]}`}>
+                      {getStepStatusLabel(step.status)}
+                    </span>
+                    <StepLiveDuration startedAt={step.startedAt} completedAt={step.completedAt} status={step.status} />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
     </div>

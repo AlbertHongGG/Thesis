@@ -17,12 +17,13 @@
 .modal {
   background: var(--bg-secondary);
   border: var(--glass-border);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); /* lighter shadow */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  /* lighter shadow */
   border-radius: 16px;
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -46,7 +47,8 @@
 }
 
 .closeButton:hover {
-  background: rgba(0, 0, 0, 0.05); /* darker for hover in light mode */
+  background: rgba(0, 0, 0, 0.05);
+  /* darker for hover in light mode */
   color: var(--text-primary);
 }
 
@@ -64,6 +66,10 @@
 .content {
   padding: var(--space-6);
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .footer {
