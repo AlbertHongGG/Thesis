@@ -869,7 +869,7 @@ export default function DataWorkbench() {
           <div className={styles.badgesRow} style={{ marginTop: 0 }}>
             <div className={styles.badge}><Cpu size={14} /> <b>qwen3.5:27b</b></div>
             <div className={styles.badge}><ImageIcon size={14} /> <b>qwen3-vl:32b</b></div>
-            <div className={styles.badge}><Box size={14} /> <b>pgvector</b></div>
+            <div className={styles.badge}><Box size={14} /> <b>embeddings</b></div>
           </div>
         </div>
 

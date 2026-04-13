@@ -1,0 +1,54 @@
+import fs from 'node:fs';
+import process from 'node:process';
+import pg from 'pg';
+import { loadDotEnv } from './load-env.mjs';
+
+loadDotEnv();
+
+const SCHEMA_FILE_PATH = new URL('../supabase/rag_schema.sql', import.meta.url);
+
+function printLine(status, label, detail) {
+  console.log(`[${status}] ${label}: ${detail}`);
+}
+
+function buildClient() {
+  const dbUrl = process.env.SUPABASE_DB_URL ?? '';
+  const isLocalDatabase = dbUrl.includes('@127.0.0.1:') || dbUrl.includes('@localhost:');
+
+  return new pg.Client({
+    connectionString: dbUrl,
+    ssl: isLocalDatabase ? false : { rejectUnauthorized: false },
+    connectionTimeoutMillis: 10000,
+  });
+}
+
+async function main() {
+  const dbUrl = process.env.SUPABASE_DB_URL ?? '';
+  if (!dbUrl.trim()) {
+    printLine('FAIL', '缺少環境變數', 'SUPABASE_DB_URL');
+    process.exitCode = 1;
+    return;
+  }
+
+  const schemaSql = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
+  const client = buildClient();
+
+  try {
+    await client.connect();
+    printLine('OK', '資料庫連線', '已成功連線到目標資料庫');
+    await client.query(schemaSql);
+    printLine('OK', 'Schema 套用', 'rag_schema.sql 已成功執行');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    printLine('FAIL', 'Schema 套用', message);
+    process.exitCode = 1;
+  } finally {
+    await client.end().catch(() => undefined);
+  }
+}
+
+main().catch(error => {
+  const message = error instanceof Error ? error.message : String(error);
+  printLine('FAIL', '未預期錯誤', message);
+  process.exitCode = 1;
+});

@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { IngestRepository, PersistDocumentParams, PersistImageParams } from './repository';
 
-function toVectorLiteral(embedding: number[]) {
-  return `[${embedding.map(value => Number(value.toFixed(8))).join(',')}]`;
+function normalizeEmbedding(embedding: number[]) {
+  return embedding.map(value => Number(value.toFixed(8)));
 }
 
 export class SupabaseIngestRepository implements IngestRepository {
@@ -25,7 +25,7 @@ export class SupabaseIngestRepository implements IngestRepository {
       metadata: {
         prompt_variant: params.promptVariant,
         embedding_dimensions: params.embeddingVector.length,
-        embedding_vector: toVectorLiteral(params.embeddingVector),
+        embedding_vector: normalizeEmbedding(params.embeddingVector),
       },
     });
 
@@ -72,7 +72,7 @@ export class SupabaseIngestRepository implements IngestRepository {
         keywords: chunk.keywords,
         bridging_context: chunk.bridgingContext,
         related_chunks: chunk.relatedChunks,
-        embedding: chunk.embedding ? toVectorLiteral(chunk.embedding) : null,
+        embedding: chunk.embedding ? normalizeEmbedding(chunk.embedding) : null,
         embedding_dimensions: chunk.embedding?.length ?? null,
         word_count: chunk.wordCount,
         char_count: chunk.charCount,

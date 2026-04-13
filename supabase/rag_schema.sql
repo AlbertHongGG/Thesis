@@ -1,5 +1,3 @@
-create extension if not exists vector;
-
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -38,7 +36,7 @@ create table if not exists public.rag_document_chunks (
   keywords jsonb not null default '[]'::jsonb,
   bridging_context text,
   related_chunks jsonb not null default '[]'::jsonb,
-  embedding vector,
+  embedding jsonb,
   embedding_dimensions integer,
   word_count integer not null default 0,
   char_count integer not null default 0,
