@@ -72,4 +72,14 @@ ingest prompt 已經從 workflow 拆開，位於：
 
 ## Supabase Schema
 
-`supabase/rag_schema.sql` 已移除 runtime/provider/model provenance 欄位，改回 feature-centric schema。若你要讓資料庫結構同步，請重新套用 schema migration。
+`npm run setup:supabase` 會一次套用：
+
+- `supabase/rag_schema.sql`
+- `supabase/add_vector_search.sql`
+
+`npm run test:supabase` 會檢查：
+
+- Supabase HTTP API 是否可用
+- PostgreSQL 是否可連線
+- `knowledge_bases`、`knowledge_profiles`、`rag_documents`、`rag_document_chunks` 是否存在
+- `match_rag_chunks` RPC 是否存在

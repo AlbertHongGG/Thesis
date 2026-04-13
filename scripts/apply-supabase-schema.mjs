@@ -6,6 +6,7 @@ import { loadDotEnv } from './load-env.mjs';
 loadDotEnv();
 
 const SCHEMA_FILE_PATH = new URL('../supabase/rag_schema.sql', import.meta.url);
+const VECTOR_SQL_FILE_PATH = new URL('../supabase/add_vector_search.sql', import.meta.url);
 
 function printLine(status, label, detail) {
   console.log(`[${status}] ${label}: ${detail}`);
@@ -31,6 +32,7 @@ async function main() {
   }
 
   const schemaSql = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
+  const vectorSql = fs.readFileSync(VECTOR_SQL_FILE_PATH, 'utf8');
   const client = buildClient();
 
   try {
@@ -38,6 +40,8 @@ async function main() {
     printLine('OK', '資料庫連線', '已成功連線到目標資料庫');
     await client.query(schemaSql);
     printLine('OK', 'Schema 套用', 'rag_schema.sql 已成功執行');
+    await client.query(vectorSql);
+    printLine('OK', '向量搜尋初始化', 'add_vector_search.sql 已成功執行');
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     printLine('FAIL', 'Schema 套用', message);

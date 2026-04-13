@@ -23,6 +23,9 @@ import {
 } from 'lucide-react';
 import { DropZone, ExtendedFile } from '@/components/ui/DropZone';
 import { FilePreviewModal } from '@/components/ui/FilePreviewModal';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Modal } from '@/components/ui/Modal';
 import { FileTree } from '@/components/ui/FileTree';
 import { ProcessTimeline } from '@/components/ui/ProcessTimeline';
 import { RagQueryPanel } from '@/components/ui/RagQueryPanel';
@@ -243,6 +246,7 @@ export default function DataWorkbench() {
   const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
   const [persistencePhase, setPersistencePhase] = useState<PersistencePhase>('checking');
   const [restorePrompt, setRestorePrompt] = useState<RestorePromptState | null>(null);
+  const [isKnowledgeBaseModalOpen, setIsKnowledgeBaseModalOpen] = useState(false);
   const lastPersistedFileSignatureRef = useRef('');
 
   const activeKnowledgeBase = useMemo(
@@ -1058,7 +1062,9 @@ export default function DataWorkbench() {
         </div>
 
         <nav className={styles.navMenu}>
-          <Button variant="secondary"><Database size={16} /> Data Source</Button>
+          <Button variant="secondary" onClick={() => setIsKnowledgeBaseModalOpen(true)}>
+            <Database size={16} /> Knowledge Base
+          </Button>
           <Button variant="ghost"><FileText size={16} /> Writing Desk</Button>
           <Button variant="ghost"><Settings size={16} /> Settings</Button>
         </nav>
@@ -1091,8 +1097,15 @@ export default function DataWorkbench() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>RAG Knowledge Extraction Engine</h3>
-                <div style={{ marginTop: '0.35rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                <div style={{ marginTop: '0.35rem', fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   Active KB: {activeKnowledgeBase?.name || 'Loading knowledge base...'}
+                  <button 
+                    onClick={() => setIsKnowledgeBaseModalOpen(true)} 
+                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px', borderRadius: '4px' }}
+                    title="Manage Knowledge Base"
+                  >
+                    <Settings size={14} />
+                  </button>
                 </div>
               </div>
 
@@ -1108,86 +1121,89 @@ export default function DataWorkbench() {
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
-              <div style={{ border: '1px solid var(--border-color)', borderRadius: '16px', padding: '0.9rem 1rem', background: 'rgba(255,255,255,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.65rem' }}>
-                  <div style={{ fontSize: '0.82rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Knowledge Base</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    {activeKnowledgeBase ? `${activeKnowledgeBase.sourceCount} sources · ${activeKnowledgeBase.chunkCount} chunks` : 'No KB loaded'}
+            <Modal
+              isOpen={isKnowledgeBaseModalOpen}
+              onClose={() => setIsKnowledgeBaseModalOpen(false)}
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Database size={20} className="text-secondary" />
+                  <span>Knowledge Base Management</span>
+                </div>
+              }
+              maxWidth="650px"
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Current Status</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
+                      {activeKnowledgeBase ? `${activeKnowledgeBase.sourceCount} sources · ${activeKnowledgeBase.chunkCount} chunks` : 'No KB loaded'}
+                    </span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <select
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>Select Knowledge Base</label>
+                  <Select
                     value={activeKnowledgeBaseId ?? ''}
-                    onChange={event => setActiveKnowledgeBaseId(event.target.value)}
-                    style={{
-                      minWidth: '220px',
-                      padding: '0.6rem 0.75rem',
-                      borderRadius: '12px',
-                      border: '1px solid var(--border-color)',
-                      background: 'rgba(0,0,0,0.22)',
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    {knowledgeBases.map(knowledgeBase => (
-                      <option key={knowledgeBase.id} value={knowledgeBase.id}>
-                        {knowledgeBase.name}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    value={newKnowledgeBaseName}
-                    onChange={event => setNewKnowledgeBaseName(event.target.value)}
-                    placeholder="Create new knowledge base..."
-                    style={{
-                      minWidth: '220px',
-                      flex: 1,
-                      padding: '0.6rem 0.75rem',
-                      borderRadius: '12px',
-                      border: '1px solid var(--border-color)',
-                      background: 'rgba(0,0,0,0.18)',
-                      color: 'var(--text-primary)',
-                    }}
+                    onChange={val => setActiveKnowledgeBaseId(val)}
+                    options={knowledgeBases.map(kb => ({ value: kb.id, label: kb.name }))}
+                    placeholder="Loading..."
                   />
-                  <Button variant="secondary" onClick={() => void createKnowledgeBase()} disabled={isCreatingKnowledgeBase || !newKnowledgeBaseName.trim()}>
-                    {isCreatingKnowledgeBase ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Database size={14} />} New KB
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => void runKnowledgeBaseMaintenance('rebuild-profile')}
-                    disabled={!activeKnowledgeBaseId || maintenanceState !== null}
-                  >
-                    {maintenanceState?.action === 'rebuild-profile' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <RotateCcw size={14} />} Rebuild Profile
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => void runKnowledgeBaseMaintenance('reindex')}
-                    disabled={!activeKnowledgeBaseId || maintenanceState !== null}
-                  >
-                    {maintenanceState?.action === 'reindex' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Box size={14} />} Reindex KB
-                  </Button>
-                  <Button variant="ghost" onClick={() => void deleteActiveKnowledgeBase()} disabled={knowledgeBases.length <= 1 || !activeKnowledgeBaseId}>
-                    <Trash2 size={14} /> Delete KB
-                  </Button>
                 </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>Create New</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <Input
+                        value={newKnowledgeBaseName}
+                        onChange={event => setNewKnowledgeBaseName(event.target.value)}
+                        placeholder="New knowledge base name..."
+                      />
+                    </div>
+                    <Button variant="secondary" onClick={() => void createKnowledgeBase()} disabled={isCreatingKnowledgeBase || !newKnowledgeBaseName.trim()}>
+                      {isCreatingKnowledgeBase ? <LoaderCircle size={16} className={styles.spinningIcon} /> : <Database size={16} />} Create
+                    </Button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem' }}>
+                  <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>Maintenance Actions</label>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => void runKnowledgeBaseMaintenance('rebuild-profile')}
+                      disabled={!activeKnowledgeBaseId || maintenanceState !== null}
+                    >
+                      {maintenanceState?.action === 'rebuild-profile' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <RotateCcw size={14} />} Rebuild Profile
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => void runKnowledgeBaseMaintenance('reindex')}
+                      disabled={!activeKnowledgeBaseId || maintenanceState !== null}
+                    >
+                      {maintenanceState?.action === 'reindex' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Box size={14} />} Reindex KB
+                    </Button>
+                    <Button variant="ghost" onClick={() => void deleteActiveKnowledgeBase()} disabled={knowledgeBases.length <= 1 || !activeKnowledgeBaseId}>
+                      <Trash2 size={14} /> Delete KB
+                    </Button>
+                  </div>
+                </div>
+
                 {activeKnowledgeBase?.description && (
-                  <div style={{ marginTop: '0.65rem', fontSize: '0.88rem', color: 'var(--text-muted)' }}>{activeKnowledgeBase.description}</div>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '8px', lineHeight: 1.5 }}>
+                    {activeKnowledgeBase.description}
+                  </div>
                 )}
                 {maintenanceMessage && (
-                  <div style={{ marginTop: '0.65rem', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{maintenanceMessage}</div>
+                  <div style={{ marginTop: '0.25rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{maintenanceMessage}</div>
                 )}
                 {knowledgeBaseError && (
-                  <div style={{ marginTop: '0.65rem', fontSize: '0.88rem', color: 'var(--accent-red)' }}>{knowledgeBaseError}</div>
+                  <div style={{ marginTop: '0.25rem', fontSize: '0.9rem', color: 'var(--accent-red)' }}>{knowledgeBaseError}</div>
                 )}
               </div>
-
-              <div style={{ border: '1px solid var(--border-color)', borderRadius: '16px', padding: '0.9rem 1rem', background: 'rgba(255,255,255,0.04)' }}>
-                <div style={{ fontSize: '0.82rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.65rem' }}>Workflow</div>
-                <div style={{ fontSize: '0.92rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>
-                  文件會先進入目前選定的知識庫，更新領域摘要與 chunk 向量；圖片則會先讀取該知識庫摘要，再檢索最相關片段做 hybrid 分析。
-                </div>
-              </div>
-            </div>
+            </Modal>
 
             {persistencePhase === 'prompt' && restorePrompt && (
               <div className={styles.resumeBanner}>

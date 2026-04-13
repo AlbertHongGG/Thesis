@@ -4,7 +4,7 @@ import pg from 'pg';
 import { loadDotEnv } from './load-env.mjs';
 
 const REQUIRED_ENV_NAMES = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE', 'SUPABASE_DB_URL'];
-const REQUIRED_TABLES = ['rag_documents', 'rag_document_chunks'];
+const REQUIRED_TABLES = ['knowledge_bases', 'knowledge_profiles', 'rag_documents', 'rag_document_chunks'];
 
 loadDotEnv();
 
@@ -77,15 +77,32 @@ async function testDatabase() {
       [REQUIRED_TABLES],
     );
 
+    const functionResult = await client.query(
+      `select oid::regprocedure::text as signature
+       from pg_proc
+       where proname = 'match_rag_chunks'
+         and oid::regprocedure::text = 'match_rag_chunks(vector,uuid,double precision,integer,text[])'`,
+    );
+
     const existingTables = new Set(result.rows.map(row => row.table_name));
     const missingTables = REQUIRED_TABLES.filter(tableName => !existingTables.has(tableName));
 
     if (missingTables.length === 0) {
-      printLine('OK', '資料表', 'rag_documents 與 rag_document_chunks 都存在');
+      printLine('OK', '資料表', 'knowledge_bases、knowledge_profiles、rag_documents 與 rag_document_chunks 都存在');
+    } else {
+      printLine('WARN', '資料表', `缺少：${missingTables.join(', ')}`);
+    }
+
+    if ((functionResult.rowCount ?? 0) >= 1) {
+      printLine('OK', '向量搜尋函式', 'KB-aware match_rag_chunks 已存在');
+    } else {
+      printLine('WARN', '向量搜尋函式', '缺少 KB-aware match_rag_chunks');
+    }
+
+    if (missingTables.length === 0 && (functionResult.rowCount ?? 0) >= 1) {
       return { dbReachable: true, schemaReady: true };
     }
 
-    printLine('WARN', '資料表', `缺少：${missingTables.join(', ')}`);
     return { dbReachable: true, schemaReady: false };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

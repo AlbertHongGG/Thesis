@@ -9,10 +9,7 @@ alter table public.rag_document_chunks
     end
   );
 
-create index if not exists rag_document_chunks_embedding_idx
-  on public.rag_document_chunks
-  using ivfflat (embedding vector_cosine_ops)
-  with (lists = 100);
+drop function if exists public.match_rag_chunks(vector, double precision, integer);
 
 create or replace function public.match_rag_chunks (
   query_embedding vector,
@@ -47,7 +44,7 @@ as $$
     chunks.summary,
     chunks.keywords,
     chunks.bridging_context,
-    1 - (chunks.embedding <=> query_embedding) as similarity
+    1 - (chunks.embedding operator(extensions.<=>) query_embedding) as similarity
   from public.rag_document_chunks chunks
   join public.rag_documents docs on docs.id = chunks.document_id
   where chunks.knowledge_base_id = kb_id
@@ -56,7 +53,7 @@ as $$
     and chunks.status = 'ready'
     and docs.ingest_status = 'ready'
     and (source_types is null or docs.source_type = any(source_types))
-    and 1 - (chunks.embedding <=> query_embedding) > match_threshold
-  order by chunks.embedding <=> query_embedding
+    and 1 - (chunks.embedding operator(extensions.<=>) query_embedding) > match_threshold
+  order by chunks.embedding operator(extensions.<=>) query_embedding
   limit match_count;
 $$;
