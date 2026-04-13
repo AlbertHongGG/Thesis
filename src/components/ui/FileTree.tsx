@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  AlertCircle, CheckCircle2, ChevronRight, ChevronDown, 
+  AlertCircle, CheckCircle2, ChevronRight,
   Clock3, File, FileText, Folder, Image as ImageIcon, 
   LoaderCircle, Trash2
 } from 'lucide-react';
@@ -98,6 +98,7 @@ const StatusIcon = React.memo(({ status }: { status: FileProcessStatus | undefin
     default: return <Clock3 size={14} className={`${styles.statusIcon} ${styles.colorIdle}`} strokeWidth={2.5} />;
   }
 });
+StatusIcon.displayName = 'StatusIcon';
 
 type FileLeafProps = {
   node: TreeNode;
@@ -157,6 +158,7 @@ const FileLeaf = React.memo(({ node, level, status, isHighlighted, isSelected, o
     </motion.div>
   );
 });
+FileLeaf.displayName = 'FileLeaf';
 
 type FolderNodeProps = {
   node: TreeNode;
@@ -171,14 +173,8 @@ type FolderNodeProps = {
 
 const FolderBranch = ({ node, level, highlightedPath, selectedPath, statuses, folderStats, onSelectFile, onDelete }: FolderNodeProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (highlightedPath && !node.isFile && node.path) {
-      if (highlightedPath.startsWith(node.path + '/')) {
-        setIsOpen(true);
-      }
-    }
-  }, [highlightedPath, node.path, node.isFile]);
+  const isForcedOpen = Boolean(highlightedPath && !node.isFile && node.path && highlightedPath.startsWith(node.path + '/'));
+  const isExpanded = isOpen || isForcedOpen;
 
   const childrenNodes = useMemo(() => (node.children ? Object.values(node.children).sort((a, b) => {
     if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
@@ -211,13 +207,13 @@ const FolderBranch = ({ node, level, highlightedPath, selectedPath, statuses, fo
         <div className={`${styles.nodeItem} ${styles.folderItem}`} style={{ paddingLeft: `${level * 16 + 8}px` }}>
           <div className={styles.nodeContent}>
              <motion.div 
-               animate={{ rotate: isOpen ? 90 : 0 }} 
+               animate={{ rotate: isExpanded ? 90 : 0 }} 
                transition={{ type: "spring", stiffness: 300, damping: 20 }}
                className={styles.chevron}
              >
                <ChevronRight size={14} strokeWidth={2.5} />
              </motion.div>
-            <Folder size={15} className={`${styles.iconFolder} ${isOpen ? styles.iconFolderOpen : ''}`} strokeWidth={2.2} fill="currentColor" fillOpacity={isOpen ? 0.2 : 0.1} />
+            <Folder size={15} className={`${styles.iconFolder} ${isExpanded ? styles.iconFolderOpen : ''}`} strokeWidth={2.2} fill="currentColor" fillOpacity={isExpanded ? 0.2 : 0.1} />
             <span className={styles.nodeName}>{node.name}</span>
           </div>
           
@@ -244,7 +240,7 @@ const FolderBranch = ({ node, level, highlightedPath, selectedPath, statuses, fo
       </div>
 
       <AnimatePresence initial={false}>
-        {isOpen && (
+        {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1, transition: { height: { type: "spring", stiffness: 400, damping: 35 }, opacity: { duration: 0.2 } } }}
@@ -300,18 +296,6 @@ export const FileTree = ({
   statuses?: Record<string, FileProcessStatus | undefined>;
   onSelectFile?: (node: TreeNode) => void;
 }) => {
-  if (!files || files.length === 0) {
-    return (
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className={styles.empty}
-      >
-        <File size={24} className={styles.emptyIcon} strokeWidth={1.5} />
-        <span>No files selected</span>
-      </motion.div>
-    );
-  }
-
   const tree = useMemo(() => buildTree(files), [files]);
   
   const folderStats = useMemo(() => {
@@ -327,6 +311,18 @@ export const FileTree = ({
       return a.name.localeCompare(b.name);
     });
   }, [tree.children]);
+
+  if (!files || files.length === 0) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className={styles.empty}
+      >
+        <File size={24} className={styles.emptyIcon} strokeWidth={1.5} />
+        <span>No files selected</span>
+      </motion.div>
+    );
+  }
 
   return (
     <div className={styles.container}>

@@ -10,7 +10,9 @@ export class CopilotProvider implements AIProvider {
     this.token = process.env.GITHUB_TOKEN || '';
   }
 
-  async generateText(prompt: string, systemPrompt?: string): Promise<string> {
+  async generateText(_prompt: string, _systemPrompt?: string): Promise<string> {
+    void _prompt;
+    void _systemPrompt;
     // Placeholder for actual Github Copilot SDK implementation
     // This will be fully implemented in the "Thesis Writing Workspace" phase
     console.log(`[Copilot] Generating text with model ${this.model}`);
@@ -19,11 +21,14 @@ export class CopilotProvider implements AIProvider {
     return Promise.resolve(`(Copilot SDK response pending implementation for writing phase)`);
   }
 
-  async analyzeImage(base64Image: string, prompt?: string): Promise<string> {
+  async analyzeImage(_base64Image: string, _prompt?: string): Promise<string> {
+    void _base64Image;
+    void _prompt;
     throw new Error('CopilotProvider does not currently support image analysis natively in this abstraction.');
   }
 
-  async createEmbedding(text: string): Promise<number[]> {
+  async createEmbedding(_text: string): Promise<number[]> {
+     void _text;
      throw new Error('CopilotProvider does not currently support embedding generation in this abstraction.');
   }
 }

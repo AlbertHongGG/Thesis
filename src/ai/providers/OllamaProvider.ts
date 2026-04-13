@@ -6,6 +6,7 @@ export class OllamaProvider implements AIProvider {
   private textModel: string;
   private visionModel: string;
   private embeddingModel: string;
+  private timeoutMs: number;
 
   constructor() {
     this.baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
@@ -21,66 +22,80 @@ export class OllamaProvider implements AIProvider {
     this.textModel = process.env.OLLAMA_TEXT_MODEL
     this.visionModel = process.env.OLLAMA_VISION_MODEL;
     this.embeddingModel = process.env.OLLAMA_EMBEDDING_MODEL;
+    this.timeoutMs = Number(process.env.OLLAMA_TIMEOUT_MS || 120000);
+  }
+
+  private async requestJson<T>(path: string, body: Record<string, unknown>, failureLabel: string): Promise<T> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    try {
+      const response = await fetch(`${this.baseUrl}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`${failureLabel} failed: ${response.status} ${response.statusText}`);
+      }
+
+      return await response.json() as T;
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error(`${failureLabel} timed out after ${this.timeoutMs}ms`);
+      }
+
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   async generateText(prompt: string, systemPrompt?: string): Promise<string> {
-    const response = await fetch(`${this.baseUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const data = await this.requestJson<{ response: string }>(
+      '/api/generate',
+      {
         model: this.textModel,
         prompt,
         system: systemPrompt,
         stream: false,
-      }),
-    });
-    
-    if (!response.ok) {
-        throw new Error(`Ollama text generation failed: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
+      },
+      'Ollama text generation',
+    );
+
     return data.response;
   }
 
   async analyzeImage(base64Image: string, prompt: string = 'Describe this image in detail'): Promise<string> {
     // Remove data:image/...;base64, prefix if present
     const cleanBase64 = base64Image.replace(/^data:image\/\w+;base64,/, '');
-    
-    const response = await fetch(`${this.baseUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+
+    const data = await this.requestJson<{ response: string }>(
+      '/api/generate',
+      {
         model: this.visionModel,
-        prompt: prompt,
+        prompt,
         images: [cleanBase64],
         stream: false,
-      }),
-    });
-    
-    if (!response.ok) {
-        throw new Error(`Ollama vision analysis failed: ${response.statusText}`);
-    }
+      },
+      'Ollama vision analysis',
+    );
 
-    const data = await response.json();
     return data.response;
   }
 
   async createEmbedding(text: string): Promise<number[]> {
-    const response = await fetch(`${this.baseUrl}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const data = await this.requestJson<{ embedding: number[] }>(
+      '/api/embeddings',
+      {
         model: this.embeddingModel,
         prompt: text,
-      }),
-    });
-    
-    if (!response.ok) {
-        throw new Error(`Ollama embedding generation failed: ${response.statusText}`);
-    }
+      },
+      'Ollama embedding generation',
+    );
 
-    const data = await response.json();
     return data.embedding;
   }
 }

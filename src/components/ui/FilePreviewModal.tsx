@@ -77,7 +77,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
       }
 
       if (previewKind === 'parsed-text') {
-        const parsedTextPreview = entry?.result?.parsedTextPreview;
+        const parsedTextPreview = entry?.result?.type === 'document' ? entry.result.parsedTextPreview : undefined;
         if (parsedTextPreview) {
           setPreviewState({ status: 'ready', kind: 'parsed-text', content: parsedTextPreview, metaLabel: '解析後內容預覽' });
           return;
@@ -103,7 +103,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [entry?.result?.parsedTextPreview, entry?.status, file, isOpen]);
+  }, [entry?.result, entry?.status, file, isOpen]);
 
   const headerStatusClass = entry ? styles[`status${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] : styles.statusIdle;
 
@@ -125,7 +125,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
             {getStatusLabel(entry.status)}
           </span>
           {entry.steps.length ? <span className={styles.metaBadge}>{entry.steps.length} 個步驟</span> : null}
-          {entry.startedAt ? <LiveDurationBadge startedAt={entry.startedAt} completedAt={entry.completedAt} status={entry.status} /> : null}
+          {entry.startedAt ? <LiveDurationBadge startedAt={entry.startedAt} completedAt={entry.completedAt ?? null} status={entry.status} /> : null}
         </div>
       )}
     </div>
@@ -185,12 +185,12 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
                 <div className={styles.sectionHeaderAlt}>
                   <div className={styles.sectionTitle}>
                     <Rows3 size={16} className={styles.sectionIcon} />
-                    處理歷程與輸出
+                    處理歷程與語意輸出
                   </div>
                   <div className={styles.metaList}>
                     {entry.result?.previewKind && <span className={styles.metaBadge}>{entry.result.previewKind}</span>}
                     {entry.result?.type === 'image' && entry.result.contextApplied && <span className={styles.metaBadgeTheme}>含文件脈絡</span>}
-                    {typeof entry.result?.chunks === 'number' && <span className={styles.metaBadgeOrange}>{entry.result.chunks} chunks</span>}
+                    {entry.result?.type === 'document' && <span className={styles.metaBadgeOrange}>{entry.result.chunkCount} chunks</span>}
                   </div>
                 </div>
                 <div className={styles.sectionBodyAlt}>

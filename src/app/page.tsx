@@ -39,12 +39,29 @@ import {
 } from '@/lib/storage/sessionStore';
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
-import type { FileProcessEntry, FileProcessStatus, IngestResult, ProcessStepEntry } from '@/lib/workbench/types';
+import type {
+  DocumentChunkAnalysis,
+  DocumentIngestResult,
+  FileProcessEntry,
+  FileProcessStatus,
+  IngestResult,
+  ProcessStepEntry,
+} from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
 import styles from './page.module.css';
 
 type StreamEvent =
   | { type: 'step'; message: string }
+  | {
+      type: 'chunk';
+      chunk: DocumentChunkAnalysis;
+      documentId: string;
+      chunkCount: number;
+      totalCharCount: number;
+      parsedTextPreview: string;
+      previewKind: DocumentIngestResult['previewKind'];
+      progress: { current: number; total: number };
+    }
   | { type: 'result'; result: IngestResult }
   | { type: 'error'; error: string };
 type PersistencePhase = 'checking' | 'prompt' | 'ready';
@@ -53,6 +70,8 @@ interface RestorePromptState {
   snapshot: PersistedSessionSnapshot;
   files: PersistedFileRecord[];
 }
+
+const MAX_GLOBAL_CONTEXT_CHARS = 10000;
 
 
 function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
@@ -65,20 +84,133 @@ function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
   return file;
 }
 
+function cloneChunkAnalysis(chunk: DocumentChunkAnalysis): DocumentChunkAnalysis {
+  return {
+    ...chunk,
+    keywords: [...chunk.keywords],
+    relatedChunks: chunk.relatedChunks.map(relation => ({ ...relation })),
+  };
+}
+
 function serializeResult(result?: IngestResult) {
   if (!result) return undefined;
 
+  if (result.type === 'image') {
+    return { ...result } satisfies IngestResult;
+  }
+
   return {
-    type: result.type,
-    previewKind: result.previewKind,
-    chunks: result.chunks,
-    summary: result.summary,
-    description: result.description,
-    descriptionSnippet: result.descriptionSnippet,
-    contextApplied: result.contextApplied,
-    parsedTextPreview: result.parsedTextPreview,
-    chunkPreviews: result.chunkPreviews,
+    ...result,
+    chunkAnalyses: result.chunkAnalyses.map(cloneChunkAnalysis),
   } satisfies IngestResult;
+}
+
+function normalizeLegacyChunk(preview: unknown, index: number, documentId: string): DocumentChunkAnalysis | null {
+  if (!preview || typeof preview !== 'object') {
+    return null;
+  }
+
+  const candidate = preview as {
+    preview?: unknown;
+    charCount?: unknown;
+    index?: unknown;
+  };
+  const chunkIndex = typeof candidate.index === 'number' ? candidate.index : index;
+  const chunkPreview = typeof candidate.preview === 'string' ? candidate.preview : '';
+
+  if (!chunkPreview) {
+    return null;
+  }
+
+  return {
+    id: `${documentId}:legacy:${chunkIndex + 1}`,
+    index: chunkIndex,
+    text: chunkPreview,
+    preview: chunkPreview,
+    charCount: typeof candidate.charCount === 'number' ? candidate.charCount : chunkPreview.length,
+    wordCount: chunkPreview.trim().split(/\s+/).filter(Boolean).length,
+    startOffset: 0,
+    endOffset: typeof candidate.charCount === 'number' ? candidate.charCount : chunkPreview.length,
+    summary: chunkPreview,
+    keywords: [],
+    bridgingContext: '',
+    relatedChunks: [],
+    status: 'ready',
+  };
+}
+
+function normalizeRestoredResult(result?: IngestResult) {
+  if (!result) {
+    return undefined;
+  }
+
+  if (result.type === 'image') {
+    return { ...result } satisfies IngestResult;
+  }
+
+  const candidate = result as DocumentIngestResult & {
+    documentId?: string;
+    chunkCount?: number;
+    totalCharCount?: number;
+    chunkAnalyses?: unknown;
+    chunks?: unknown;
+    chunkPreviews?: unknown;
+  };
+  const documentId = typeof candidate.documentId === 'string' ? candidate.documentId : `restored-${Date.now()}`;
+  const chunkAnalyses = Array.isArray(candidate.chunkAnalyses)
+    ? candidate.chunkAnalyses.map(chunk => cloneChunkAnalysis(chunk as DocumentChunkAnalysis))
+    : Array.isArray(candidate.chunkPreviews)
+      ? candidate.chunkPreviews
+          .map((preview, index) => normalizeLegacyChunk(preview, index, documentId))
+          .filter((chunk): chunk is DocumentChunkAnalysis => chunk !== null)
+      : [];
+
+  return {
+    type: 'document',
+    previewKind: candidate.previewKind,
+    documentId,
+    chunkCount: typeof candidate.chunkCount === 'number'
+      ? candidate.chunkCount
+      : typeof candidate.chunks === 'number'
+        ? candidate.chunks
+        : chunkAnalyses.length,
+    totalCharCount: typeof candidate.totalCharCount === 'number'
+      ? candidate.totalCharCount
+      : typeof candidate.parsedTextPreview === 'string'
+        ? candidate.parsedTextPreview.length
+        : 0,
+    processingDurationMs: candidate.processingDurationMs,
+    summary: candidate.summary,
+    parsedTextPreview: candidate.parsedTextPreview,
+    chunkAnalyses,
+    contextApplied: candidate.contextApplied,
+    dbWritten: candidate.dbWritten,
+  } satisfies DocumentIngestResult;
+}
+
+function clampGlobalContext(text: string, maxLength = MAX_GLOBAL_CONTEXT_CHARS) {
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return text.slice(-maxLength);
+}
+
+function buildResultContextSnippet(result: IngestResult) {
+  if (result.type === 'image') {
+    return result.description?.trim() || result.descriptionSnippet?.trim() || '';
+  }
+
+  const semanticHighlights = result.chunkAnalyses
+    .filter(chunk => chunk.summary.trim().length > 0)
+    .slice(0, 4)
+    .map(chunk => {
+      const keywords = chunk.keywords.length > 0 ? ` 關鍵詞：${chunk.keywords.join('、')}` : '';
+      return `Chunk ${chunk.index + 1}: ${chunk.summary}${keywords}`;
+    })
+    .join('\n');
+
+  return [result.summary?.trim() || '', semanticHighlights].filter(Boolean).join('\n');
 }
 
 function serializeSteps(steps: ProcessStepEntry[]): PersistedProcessStepEntry[] {
@@ -129,7 +261,7 @@ function normalizeRestoredEntry(entry: PersistedFileProcessEntry): FileProcessEn
     steps: normalizedSteps,
     startedAt: entry.startedAt,
     completedAt: entry.completedAt,
-    result: entry.result,
+    result: normalizeRestoredResult(entry.result),
     errorMessage: entry.status === 'processing'
       ? '上次執行中斷，可直接 Resume 繼續。'
       : entry.errorMessage,
@@ -164,6 +296,7 @@ const ProcessDurationValue = React.memo(({ entry }: { entry: FileProcessEntry })
   const duration = formatDuration((entry.completedAt ?? liveNow) - entry.startedAt);
   return <strong className={styles.processDurationValue}>{duration}</strong>;
 });
+ProcessDurationValue.displayName = 'ProcessDurationValue';
 
 export default function DataWorkbench() {
   const [files, setFiles] = useState<ExtendedFile[]>([]);
@@ -238,9 +371,16 @@ export default function DataWorkbench() {
   }, [allPaths, processEntries]);
 
   const appendGlobalContext = useCallback((text: string) => {
-    if (!text.trim()) return;
-    globalContextRef.current += `\n${text}`;
-    setGlobalContextValue(globalContextRef.current);
+    const trimmed = text.trim();
+
+    if (!trimmed) return;
+
+    const nextValue = clampGlobalContext(
+      [globalContextRef.current.trim(), trimmed].filter(Boolean).join('\n'),
+    );
+
+    globalContextRef.current = nextValue;
+    setGlobalContextValue(nextValue);
   }, []);
 
   useEffect(() => {
@@ -395,6 +535,53 @@ export default function DataWorkbench() {
     });
   }, [buildInitialEntry]);
 
+  const mergeChunkResult = useCallback((fullPath: string, event: Extract<StreamEvent, { type: 'chunk' }>) => {
+    setProcessEntries(prev => {
+      const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
+      const documentResult = existing.result?.type === 'document'
+        ? existing.result
+        : {
+            type: 'document',
+            previewKind: event.previewKind,
+            documentId: event.documentId,
+            chunkCount: event.chunkCount,
+            totalCharCount: event.totalCharCount,
+            parsedTextPreview: event.parsedTextPreview,
+            chunkAnalyses: [],
+          } satisfies DocumentIngestResult;
+
+      const nextChunkAnalyses = [...documentResult.chunkAnalyses];
+      const existingChunkIndex = nextChunkAnalyses.findIndex(chunk => chunk.id === event.chunk.id);
+
+      if (existingChunkIndex === -1) {
+        nextChunkAnalyses.push(cloneChunkAnalysis(event.chunk));
+      } else {
+        nextChunkAnalyses[existingChunkIndex] = cloneChunkAnalysis(event.chunk);
+      }
+
+      nextChunkAnalyses.sort((left, right) => left.index - right.index);
+
+      return {
+        ...prev,
+        [fullPath]: {
+          ...existing,
+          status: 'processing',
+          startedAt: existing.startedAt ?? Date.now(),
+          completedAt: undefined,
+          result: {
+            ...documentResult,
+            previewKind: event.previewKind,
+            documentId: event.documentId,
+            chunkCount: event.chunkCount,
+            totalCharCount: event.totalCharCount,
+            parsedTextPreview: event.parsedTextPreview,
+            chunkAnalyses: nextChunkAnalyses,
+          },
+        },
+      };
+    });
+  }, [buildInitialEntry]);
+
   const completeProcessingEntry = useCallback((fullPath: string, result: IngestResult) => {
     const completedAt = Date.now();
 
@@ -507,6 +694,11 @@ export default function DataWorkbench() {
           continue;
         }
 
+        if (event.type === 'chunk') {
+          mergeChunkResult(fullPath, event);
+          continue;
+        }
+
         if (event.type === 'error') {
           throw new Error(event.error);
         }
@@ -522,6 +714,8 @@ export default function DataWorkbench() {
 
       if (event.type === 'step') {
         appendProcessStep(fullPath, event.message);
+      } else if (event.type === 'chunk') {
+        mergeChunkResult(fullPath, event);
       } else if (event.type === 'error') {
         throw new Error(event.error);
       } else {
@@ -535,7 +729,7 @@ export default function DataWorkbench() {
 
     completeProcessingEntry(fullPath, finalResult);
     return finalResult;
-  }, [appendProcessStep, completeProcessingEntry]);
+  }, [appendProcessStep, completeProcessingEntry, mergeChunkResult]);
 
   const processFile = useCallback(async (file: ExtendedFile) => {
     const fullPath = file.path || file.name;
@@ -552,12 +746,7 @@ export default function DataWorkbench() {
       const res = await fetch('/api/ingest', { method: 'POST', body: formData });
       const result = await processStreamResponse(res, fullPath);
 
-      if (result.summary) {
-        appendGlobalContext(result.summary);
-      }
-      if (result.description) {
-        appendGlobalContext(result.description);
-      }
+      appendGlobalContext(buildResultContextSnippet(result));
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       failProcessingEntry(fullPath, message);

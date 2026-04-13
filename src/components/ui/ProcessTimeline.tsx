@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, CheckCircle2, Clock3, FileText, Image as ImageIcon, LoaderCircle, Rows3, Check } from 'lucide-react';
+import { AlertCircle, Clock3, FileText, Image as ImageIcon, Link2, LoaderCircle, Rows3, Tag, Check } from 'lucide-react';
 import { formatDuration, getStepStatusLabel } from '@/lib/workbench/formatting';
 import type { FileProcessEntry } from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
@@ -64,38 +64,64 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
               <FileText size={16} className={styles.headerIcon} />
               文件摘要
             </div>
-            {typeof result.chunks === 'number' && <div className={styles.outputMeta}>{result.chunks} chunks</div>}
+            <div className={styles.outputMeta}>{result.chunkCount} chunks</div>
           </div>
           <div className={styles.outputText}>{result.summary}</div>
         </motion.section>
       )}
 
-      {result.type === 'document' && result.parsedTextPreview && (
+      {result.type === 'document' && result.chunkAnalyses.length > 0 && (
         <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
               <Rows3 size={16} className={styles.headerIcon} />
-              解析內容預覽
+              Chunk 語意分析
             </div>
-          </div>
-          <div className={styles.outputText}>{result.parsedTextPreview}</div>
-        </motion.section>
-      )}
-
-      {result.type === 'document' && result.chunkPreviews && result.chunkPreviews.length > 0 && (
-        <motion.section className={styles.outputCard} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <div className={styles.outputHeader}>
-            <div className={styles.outputTitle}>
-              <Rows3 size={16} className={styles.headerIcon} />
-              Chunk 預覽
-            </div>
+            <div className={styles.outputMeta}>{result.chunkAnalyses.length}/{result.chunkCount}</div>
           </div>
           <div className={styles.chunkList}>
-            {result.chunkPreviews.map((chunk, idx) => (
+            {result.chunkAnalyses.map((chunk, idx) => (
               <motion.div key={`${entry.path}-chunk-${chunk.index}`} className={styles.chunkItem}
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(idx * 0.05, 0.5) }}>
-                <div className={styles.chunkLabel}>Chunk {chunk.index + 1} · <span className={styles.charCountBadge}>{chunk.charCount} chars</span></div>
+                <div className={styles.chunkLabel}>
+                  Chunk {chunk.index + 1}
+                  <span className={styles.charCountBadge}>{chunk.charCount} chars</span>
+                  <span className={`${styles.chunkStatusBadge} ${chunk.status === 'error' ? styles.chunkStatusError : styles.chunkStatusReady}`}>
+                    {chunk.status === 'error' ? '分析失敗' : '分析完成'}
+                  </span>
+                </div>
+                <div className={styles.chunkSummary}>{chunk.summary}</div>
                 <div className={styles.chunkPreview}>{chunk.preview}</div>
+                {chunk.keywords.length > 0 && (
+                  <div className={styles.chunkMetaRow}>
+                    <div className={styles.chunkMetaTitle}><Tag size={13} /> 關鍵詞</div>
+                    <div className={styles.chunkTokenList}>
+                      {chunk.keywords.map(keyword => (
+                        <span key={`${chunk.id}-${keyword}`} className={styles.chunkToken}>{keyword}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {chunk.bridgingContext && (
+                  <div className={styles.chunkMetaRow}>
+                    <div className={styles.chunkMetaTitle}><Rows3 size={13} /> 相鄰脈絡</div>
+                    <div className={styles.chunkMetaText}>{chunk.bridgingContext}</div>
+                  </div>
+                )}
+                {chunk.relatedChunks.length > 0 && (
+                  <div className={styles.chunkMetaRow}>
+                    <div className={styles.chunkMetaTitle}><Link2 size={13} /> 關聯 Chunk</div>
+                    <div className={styles.chunkRelationList}>
+                      {chunk.relatedChunks.map(relation => (
+                        <div key={`${chunk.id}-${relation.chunkId}`} className={styles.chunkRelationItem}>
+                          <span className={styles.chunkRelationLabel}>{relation.label}</span>
+                          <span className={styles.chunkRelationScore}>{relation.score.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {chunk.errorMessage && <div className={styles.chunkError}>{chunk.errorMessage}</div>}
               </motion.div>
             ))}
           </div>
@@ -104,6 +130,7 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
     </div>
   );
 });
+StructuredOutput.displayName = 'StructuredOutput';
 
 export const ProcessTimeline = ({
   entry,
@@ -146,7 +173,7 @@ export const ProcessTimeline = ({
                     <span className={`${styles.stepStatus} ${styles[`step${step.status.charAt(0).toUpperCase()}${step.status.slice(1)}`]}`}>
                       {getStepStatusLabel(step.status)}
                     </span>
-                    <StepLiveDuration startedAt={step.startedAt} completedAt={step.completedAt} status={step.status} />
+                    <StepLiveDuration startedAt={step.startedAt} completedAt={step.completedAt ?? null} status={step.status} />
                   </div>
                 </motion.div>
               );
