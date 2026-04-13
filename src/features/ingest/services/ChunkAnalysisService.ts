@@ -19,6 +19,7 @@ export class ChunkAnalysisService {
     previousChunk?: TextChunk;
     nextChunk?: TextChunk;
     globalContext: string;
+    documentOverview: string;
   }): Promise<ChunkAnalysisServiceResult> {
     const raw = await this.runtime.generateText({
       systemPrompt: this.prompt.systemPrompt,

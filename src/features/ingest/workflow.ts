@@ -14,6 +14,7 @@ import type { IngestPrompts } from './prompts';
 import { buildChunkRelations } from './relations';
 import type { IngestRepository, PersistableDocumentChunk } from './repository';
 import { ChunkAnalysisService } from './services/ChunkAnalysisService';
+import { DocumentOverviewService } from './services/DocumentOverviewService';
 import { DocumentSummaryService } from './services/DocumentSummaryService';
 import { ImageAnalysisService } from './services/ImageAnalysisService';
 import { buildParsedPreview, buildPreview } from './text';
@@ -52,7 +53,17 @@ function buildChunkId(documentId: string, index: number) {
   return `${documentId}:chunk:${index + 1}`;
 }
 
+function buildChunkEmbeddingText(documentOverview: string, summary: string, chunk: TextChunk, keywords: string[]) {
+  return [
+    documentOverview.trim() ? `文件總覽：${documentOverview.trim()}` : '',
+    summary.trim() ? `當前 chunk 摘要：${summary.trim()}` : '',
+    keywords.length > 0 ? `關鍵詞：${keywords.join('、')}` : '',
+    `原始 chunk 內容：${chunk.text}`,
+  ].filter(Boolean).join('\n');
+}
+
 export class IngestWorkflow {
+  private readonly overviewService: DocumentOverviewService;
   private readonly chunkAnalysisService: ChunkAnalysisService;
   private readonly summaryService: DocumentSummaryService;
   private readonly imageAnalysisService: ImageAnalysisService;
@@ -60,6 +71,7 @@ export class IngestWorkflow {
   private readonly createId: () => string;
 
   constructor(private readonly options: IngestWorkflowOptions) {
+    this.overviewService = new DocumentOverviewService(options.runtime, options.prompts.documentOverview);
     this.chunkAnalysisService = new ChunkAnalysisService(options.runtime, options.prompts.chunkAnalysis);
     this.summaryService = new DocumentSummaryService(options.runtime, options.prompts.documentSummary);
     this.imageAnalysisService = new ImageAnalysisService(options.runtime, options.prompts.imageAnalysis);
@@ -187,21 +199,30 @@ export class IngestWorkflow {
     const parsedTextPreview = buildParsedPreview(parsedText);
     this.emitStep(emit, `文件已依語意邊界切成 ${chunks.length} 個 chunks（目標 500 words，重疊 100 words）。`);
 
+    this.emitStep(emit, '先建立文件總覽，讓後續 chunk 分析具備整體脈絡。');
+    const documentOverview = await this.overviewService.summarize(
+      input.file.name,
+      chunks,
+      parsedTextPreview,
+      input.globalContext,
+    );
+
     const enrichedChunks: EnrichedChunk[] = [];
 
     for (const chunk of chunks) {
       this.emitStep(emit, `分析第 ${chunk.index + 1}/${chunks.length} 個 chunk，建立摘要與向量。`);
 
       try {
-        const [analysis, embedding] = await Promise.all([
-          this.chunkAnalysisService.analyze({
-            chunk,
-            previousChunk: chunks[chunk.index - 1],
-            nextChunk: chunks[chunk.index + 1],
-            globalContext: input.globalContext,
-          }),
-          this.options.runtime.createEmbedding({ text: chunk.text }),
-        ]);
+        const analysis = await this.chunkAnalysisService.analyze({
+          chunk,
+          previousChunk: chunks[chunk.index - 1],
+          nextChunk: chunks[chunk.index + 1],
+          globalContext: input.globalContext,
+          documentOverview,
+        });
+        const embedding = await this.options.runtime.createEmbedding({
+          text: buildChunkEmbeddingText(documentOverview, analysis.summary, chunk, analysis.keywords),
+        });
 
         const enrichedChunk: EnrichedChunk = {
           ...this.buildBaseChunk(documentId, chunk),
@@ -257,6 +278,7 @@ export class IngestWorkflow {
       input.file.name,
       chunksWithRelations.map(chunk => this.stripChunkEmbedding(chunk)),
       input.globalContext,
+      documentOverview,
     );
 
     const result: DocumentIngestResult = {
