@@ -83,6 +83,7 @@ export class OllamaRuntime implements AIRuntime {
       {
         model,
         prompt: request.prompt,
+        system: request.systemPrompt,
         images: [cleanBase64],
         stream: false,
       },

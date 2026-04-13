@@ -10,6 +10,7 @@ export class ImageAnalysisService {
   async analyze(imageDataUrl: string, globalContext: string) {
     return this.runtime.analyzeImage({
       imageDataUrl,
+      systemPrompt: this.prompt.systemPrompt,
       prompt: this.prompt.buildPrompt({ globalContext }),
     });
   }

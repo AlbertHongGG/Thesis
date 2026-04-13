@@ -121,19 +121,25 @@ export class CopilotRuntime implements AIRuntime {
 
   async analyzeImage(request: AIRuntimeVisionRequest): Promise<string> {
     const model = resolveModel(request.model, this.config.visionModel, 'AI vision');
+    const messages: CopilotChatMessage[] = [];
+
+    if (request.systemPrompt?.trim()) {
+      messages.push({ role: 'system', content: request.systemPrompt });
+    }
+
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'text', text: request.prompt },
+        { type: 'image_url', image_url: { url: request.imageDataUrl } },
+      ],
+    });
+
     const data = await this.requestJson<CopilotChatCompletionResponse>(
       '/chat/completions',
       {
         model,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: request.prompt },
-              { type: 'image_url', image_url: { url: request.imageDataUrl } },
-            ],
-          },
-        ],
+        messages,
         stream: false,
       },
       request.timeoutMs ?? this.config.timeoutMs,

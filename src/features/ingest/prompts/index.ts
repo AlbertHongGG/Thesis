@@ -1,24 +1,17 @@
-import { AIRuntimeConfigurationError } from '@/ai';
-import { INGEST_PROMPT_VARIANT_ALIASES } from './aliases';
-import type { IngestPromptVariant } from './types';
-import { defaultIngestPromptVariant } from './variants/default';
+import { createChunkAnalysisPromptBundle } from './chunk-analysis';
+import { createDocumentSummaryPromptBundle } from './document-summary';
+import { createImageAnalysisPromptBundle } from './image-analysis';
+import type { IngestPrompts } from './types';
 
-const variants = new Map<string, IngestPromptVariant>([
-  [defaultIngestPromptVariant.id, defaultIngestPromptVariant],
-]);
+const INGEST_PROMPTS_ID = 'ingest';
 
-export type IngestPromptVariantId = 'default';
-
-export function resolveIngestPromptVariant(rawVariant: string | undefined): IngestPromptVariant {
-  const normalized = rawVariant?.trim().toLowerCase() || 'default';
-  const resolvedId = INGEST_PROMPT_VARIANT_ALIASES[normalized] ?? normalized;
-  const variant = variants.get(resolvedId);
-
-  if (!variant) {
-    throw new AIRuntimeConfigurationError(`Unsupported INGEST_PROMPT_VARIANT: ${rawVariant}`);
-  }
-
-  return variant;
+export function createIngestPrompts(): IngestPrompts {
+  return {
+    id: INGEST_PROMPTS_ID,
+    chunkAnalysis: createChunkAnalysisPromptBundle(INGEST_PROMPTS_ID),
+    documentSummary: createDocumentSummaryPromptBundle(INGEST_PROMPTS_ID),
+    imageAnalysis: createImageAnalysisPromptBundle(INGEST_PROMPTS_ID),
+  };
 }
 
 export type * from './types';

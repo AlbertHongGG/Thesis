@@ -1,27 +1,66 @@
 import { buildPreview, clampContext } from '../text';
+import { renderPromptBlock, renderPromptTemplate } from './render';
 import { extractJsonObject, normalizeKeywords } from './shared';
 import type { ChunkAnalysisPromptBundle } from './types';
+
+const CHUNK_ANALYSIS_SYSTEM_PROMPT = `你是文件切塊分析器，專門把單一文件片段整理成適合 RAG 檢索與後續摘要的中介資訊。
+你必須忠於原文，不可虛構不存在的事實、結論、依賴或上下文。
+你的唯一輸出必須是單一個 JSON 物件，不得加入 Markdown、程式碼區塊、前言、解釋或多餘文字。`;
+
+const CHUNK_ANALYSIS_USER_PROMPT_TEMPLATE = `請分析以下文件 chunk，產出後續檢索會使用的結構化資訊。
+
+【任務目標】
+1. 準確概括此 chunk 的核心內容，保留明確事實、專有名詞、限制、條件、步驟與結論。
+2. 抽出最有助於搜尋的關鍵詞，優先保留檔名、路徑、命令、設定名稱、角色名稱、資料欄位、數值與技術術語。
+3. 說明此 chunk 若單獨被檢索到時，還需要哪些前後文才能被正確理解。
+
+【輸出格式】
+只可輸出 JSON 物件，欄位固定如下：
+{
+  "summary": "string",
+  "keywords": ["string"],
+  "bridgingContext": "string"
+}
+
+【欄位要求】
+- summary：使用繁體中文，控制在 1 到 2 句；不可空泛，要保留具體內容。
+- keywords：輸出 4 到 8 個短詞；可混用繁體中文與原文術語；不要輸出完整句子；不要重複。
+- bridgingContext：說明與前文、後文、外部設定或隱含假設的關係；若幾乎可獨立理解，請明確寫出可獨立理解的原因。
+- 若資料不足，請保守描述，不要猜測。
+
+【文件整體脈絡】
+{{globalContextBlock}}
+
+【前一個 chunk 預覽】
+{{previousChunkBlock}}
+
+【下一個 chunk 預覽】
+{{nextChunkBlock}}
+
+【目前 chunk 全文】
+{{chunkText}}`;
+
+const EMPTY_GLOBAL_CONTEXT = '（目前沒有可用的文件整體脈絡）';
+const EMPTY_PREVIOUS_CHUNK = '（沒有前一個 chunk）';
+const EMPTY_NEXT_CHUNK = '（沒有下一個 chunk）';
 
 export function createChunkAnalysisPromptBundle(bundleId: string): ChunkAnalysisPromptBundle {
   return {
     id: `${bundleId}:chunk-analysis`,
-    systemPrompt: 'You are a precise retrieval preprocessing system. Return strict JSON only with no markdown fences and no extra commentary.',
+    systemPrompt: CHUNK_ANALYSIS_SYSTEM_PROMPT,
     buildPrompt(input) {
-      const contextSection = input.globalContext.trim().length > 0
-        ? `\nPrevious document context:\n${clampContext(input.globalContext)}\n`
-        : '';
-
-      return [
-        'Analyze the following document chunk for downstream RAG retrieval.',
-        'Return strict JSON with keys: summary (string), keywords (string array), bridgingContext (string).',
-        'The summary must be concise but preserve specific facts and terminology.',
-        'Keywords should be short Traditional Chinese or English phrases that help retrieval.',
-        'bridgingContext should explain what adjacent chunk context may matter when this chunk is retrieved alone.',
-        contextSection,
-        input.previousChunk ? `Previous chunk preview:\n${buildPreview(input.previousChunk.text, 260)}\n` : 'Previous chunk preview:\n(none)\n',
-        input.nextChunk ? `Next chunk preview:\n${buildPreview(input.nextChunk.text, 260)}\n` : 'Next chunk preview:\n(none)\n',
-        `Chunk content:\n${input.chunk.text}`,
-      ].join('\n');
+      return renderPromptTemplate(CHUNK_ANALYSIS_USER_PROMPT_TEMPLATE, {
+        globalContextBlock: renderPromptBlock(clampContext(input.globalContext), EMPTY_GLOBAL_CONTEXT),
+        previousChunkBlock: renderPromptBlock(
+          input.previousChunk ? buildPreview(input.previousChunk.text, 260) : '',
+          EMPTY_PREVIOUS_CHUNK,
+        ),
+        nextChunkBlock: renderPromptBlock(
+          input.nextChunk ? buildPreview(input.nextChunk.text, 260) : '',
+          EMPTY_NEXT_CHUNK,
+        ),
+        chunkText: input.chunk.text.trim(),
+      });
     },
     parse(rawText) {
       const parsed = extractJsonObject(rawText);

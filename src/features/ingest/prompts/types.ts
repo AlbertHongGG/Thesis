@@ -31,10 +31,11 @@ export interface DocumentSummaryPromptBundle {
 
 export interface ImageAnalysisPromptBundle {
   id: string;
+  systemPrompt: string;
   buildPrompt(input: { globalContext: string }): string;
 }
 
-export interface IngestPromptVariant {
+export interface IngestPrompts {
   id: string;
   chunkAnalysis: ChunkAnalysisPromptBundle;
   documentSummary: DocumentSummaryPromptBundle;

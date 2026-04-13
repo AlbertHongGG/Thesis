@@ -10,7 +10,7 @@ import type {
   IngestStreamEvent,
   PreviewKind,
 } from './contracts';
-import type { IngestPromptVariant } from './prompts';
+import type { IngestPrompts } from './prompts';
 import { buildChunkRelations } from './relations';
 import type { IngestRepository, PersistableDocumentChunk } from './repository';
 import { ChunkAnalysisService } from './services/ChunkAnalysisService';
@@ -28,7 +28,7 @@ type IngestWorkflowInput = {
 
 type IngestWorkflowOptions = {
   runtime: AIRuntime;
-  prompts: IngestPromptVariant;
+  prompts: IngestPrompts;
   repository?: IngestRepository;
   now?: () => number;
   createId?: () => string;

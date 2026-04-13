@@ -4,7 +4,7 @@
 
 - `src/ai/runtime/` 只負責 AI runtime、provider 選擇與 env 解析
 - `src/features/ingest/` 只負責 ingest 功能流程
-- `src/features/ingest/prompts/` 是獨立 prompt 資產與 variant
+- `src/features/ingest/prompts/` 是獨立 prompt 定義
 - `src/app/api/ingest/route.ts` 是 thin controller，只負責接 request 與串流結果
 
 功能邏輯不再理解 provider 細節，runtime 也不再把 provider/model metadata 外洩到前端 DTO、session persistence 或 Supabase 核心資料表。
@@ -53,7 +53,6 @@ ingest 功能覆寫：
 - `INGEST_VISION_MODEL`
 - `INGEST_EMBEDDING_MODEL`
 - `INGEST_TIMEOUT_MS`
-- `INGEST_PROMPT_VARIANT`
 
 provider 專屬設定：
 
@@ -68,9 +67,8 @@ ingest prompt 已經從 workflow 拆開，位於：
 - `src/features/ingest/prompts/chunk-analysis.ts`
 - `src/features/ingest/prompts/document-summary.ts`
 - `src/features/ingest/prompts/image-analysis.ts`
-- `src/features/ingest/prompts/variants/default.ts`
 
-如果要調整 prompt，不需要修改 runtime 或 route；只需要調整 prompt bundle 或新增 variant，再透過 `INGEST_PROMPT_VARIANT` 切換。
+如果要調整 prompt，不需要修改 runtime 或 route；直接調整這三個 prompt 檔案檔頭的 prompt 常數即可。
 
 ## Supabase Schema
 

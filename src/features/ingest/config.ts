@@ -1,9 +1,9 @@
 import { AIRuntimeConfigurationError, resolveAIRuntimeConfig, type AIRuntimeResolvedConfig } from '@/ai';
-import { resolveIngestPromptVariant, type IngestPromptVariant } from './prompts';
+import { createIngestPrompts, type IngestPrompts } from './prompts';
 
 export interface IngestFeatureConfig {
   runtime: AIRuntimeResolvedConfig;
-  prompts: IngestPromptVariant;
+  prompts: IngestPrompts;
 }
 
 function assertConfiguredModel(model: string | undefined, envName: string) {
@@ -24,6 +24,6 @@ export function loadIngestFeatureConfig(env: NodeJS.ProcessEnv = process.env): I
 
   return {
     runtime,
-    prompts: resolveIngestPromptVariant(env.INGEST_PROMPT_VARIANT),
+    prompts: createIngestPrompts(),
   };
 }

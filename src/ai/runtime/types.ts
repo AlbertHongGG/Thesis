@@ -9,6 +9,7 @@ export interface AIRuntimeTextRequest {
 
 export interface AIRuntimeVisionRequest {
   imageDataUrl: string;
+  systemPrompt?: string;
   prompt: string;
   model?: string;
   timeoutMs?: number;
