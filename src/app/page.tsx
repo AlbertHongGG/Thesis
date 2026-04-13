@@ -25,6 +25,7 @@ import { DropZone, ExtendedFile } from '@/components/ui/DropZone';
 import { FilePreviewModal } from '@/components/ui/FilePreviewModal';
 import { FileTree } from '@/components/ui/FileTree';
 import { ProcessTimeline } from '@/components/ui/ProcessTimeline';
+import { RagQueryPanel } from '@/components/ui/RagQueryPanel';
 import { Button } from '@/components/ui/Button';
 import {
   canUseSessionPersistence,
@@ -1001,6 +1002,8 @@ export default function DataWorkbench() {
         entry={selectedPreviewEntry}
         onClose={() => setSelectedPreviewPath(null)}
       />
+
+      <RagQueryPanel />
     </div>
   );
 }
