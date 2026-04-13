@@ -1,8 +1,10 @@
-'use client';
-
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, CheckCircle2, ChevronRight, ChevronDown, Clock3, File, FileText, Folder, Image as ImageIcon, LoaderCircle, Trash2 } from 'lucide-react';
+import { 
+  AlertCircle, CheckCircle2, ChevronRight, ChevronDown, 
+  Clock3, File, FileText, Folder, Image as ImageIcon, 
+  LoaderCircle, Trash2
+} from 'lucide-react';
 import type { ExtendedFile } from './DropZone';
 import { DOCUMENT_FILE_PATTERN, IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
 import type { FileProcessStatus } from '@/lib/workbench/types';
@@ -47,9 +49,9 @@ export function buildTree(files: ExtendedFile[]): TreeNode {
 }
 
 const getFileIcon = (name: string) => {
-  if (IMAGE_FILE_PATTERN.test(name)) return <ImageIcon size={16} className={styles.iconImage} />;
-  if (DOCUMENT_FILE_PATTERN.test(name)) return <FileText size={16} className={styles.iconDoc} />;
-  return <File size={16} className={styles.iconDefault} />;
+  if (IMAGE_FILE_PATTERN.test(name)) return <ImageIcon size={15} className={styles.iconImage} strokeWidth={2.2} />;
+  if (DOCUMENT_FILE_PATTERN.test(name)) return <FileText size={15} className={styles.iconDoc} strokeWidth={2.2} />;
+  return <File size={15} className={styles.iconDefault} strokeWidth={2.2} />;
 };
 
 type FolderStats = {
@@ -86,160 +88,210 @@ function collectFolderStats(node: TreeNode, statuses: Record<string, FileProcess
   return stats;
 }
 
-function renderStatusBadge(status: FileProcessStatus | undefined) {
+const StatusIcon = React.memo(({ status }: { status: FileProcessStatus | undefined }) => {
   const safeStatus = status ?? 'idle';
-  const badgeClass = styles[`status${safeStatus.charAt(0).toUpperCase()}${safeStatus.slice(1)}`];
+  
+  switch (safeStatus) {
+    case 'processing': return <LoaderCircle size={14} className={`${styles.statusIcon} ${styles.iconSpin} ${styles.colorProcessing}`} strokeWidth={2.5} />;
+    case 'completed': return <CheckCircle2 size={14} className={`${styles.statusIcon} ${styles.colorCompleted}`} strokeWidth={2.5} />;
+    case 'error': return <AlertCircle size={14} className={`${styles.statusIcon} ${styles.colorError}`} strokeWidth={2.5} />;
+    default: return <Clock3 size={14} className={`${styles.statusIcon} ${styles.colorIdle}`} strokeWidth={2.5} />;
+  }
+});
+
+type FileLeafProps = {
+  node: TreeNode;
+  level: number;
+  status: FileProcessStatus | undefined;
+  isHighlighted: boolean;
+  isSelected: boolean;
+  onSelect: (node: TreeNode) => void;
+  onDelete: (path: string) => void;
+};
+
+const FileLeaf = React.memo(({ node, level, status, isHighlighted, isSelected, onSelect, onDelete }: FileLeafProps) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(node.path);
+  };
 
   return (
-    <span className={`${styles.statusBadge} ${badgeClass}`}>
-      {safeStatus === 'processing'
-        ? <LoaderCircle size={12} className={styles.spinningIcon} />
-        : safeStatus === 'completed'
-          ? <CheckCircle2 size={12} />
-          : safeStatus === 'error'
-            ? <AlertCircle size={12} />
-            : <Clock3 size={12} />}
-    </span>
+    <motion.div 
+      layout="position"
+      className={`${styles.nodeRow} ${isSelected ? styles.selected : ''} ${isHighlighted ? styles.highlighted : ''}`}
+    >
+      <div
+        className={styles.nodeItem}
+        style={{ paddingLeft: `${level * 16 + 12}px` }}
+        role="button"
+        tabIndex={0}
+        onClick={() => onSelect(node)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onSelect(node);
+          }
+        }}
+      >
+        {isSelected && (
+          <motion.div
+            layoutId="active-file-bg"
+            className={styles.activeBackground}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+          />
+        )}
+        <div className={styles.nodeContent}>
+          {getFileIcon(node.name)}
+          <span className={styles.nodeName}>{node.name}</span>
+        </div>
+        <div className={styles.nodeMeta}>
+          <StatusIcon status={status} />
+        </div>
+      </div>
+      <button type="button" className={styles.deleteBtn} onClick={handleDeleteClick} aria-label="Delete">
+        <Trash2 size={14} strokeWidth={2} />
+      </button>
+    </motion.div>
   );
-}
+});
 
-type TreeNodeRendererProps = {
+type FolderNodeProps = {
   node: TreeNode;
-  level?: number;
+  level: number;
   highlightedPath?: string | null;
   selectedPath?: string | null;
   statuses: Record<string, FileProcessStatus | undefined>;
   folderStats: FolderStatsMap;
-  onSelectFile?: (node: TreeNode) => void;
-  onDelete?: (path: string) => void;
+  onSelectFile: (node: TreeNode) => void;
+  onDelete: (path: string) => void;
 };
 
-const TreeNodeRenderer = React.memo(({ node, level = 0, highlightedPath, selectedPath, statuses, folderStats, onSelectFile, onDelete }: TreeNodeRendererProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+const FolderBranch = ({ node, level, highlightedPath, selectedPath, statuses, folderStats, onSelectFile, onDelete }: FolderNodeProps) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Auto-expand if highlightedPath is a child of this node
-  React.useEffect(() => {
+  useEffect(() => {
     if (highlightedPath && !node.isFile && node.path) {
       if (highlightedPath.startsWith(node.path + '/')) {
         setIsOpen(true);
       }
     }
   }, [highlightedPath, node.path, node.isFile]);
-  const childrenNodes = React.useMemo(() => (node.children ? Object.values(node.children).sort((a, b) => {
-      if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
-      return a.name.localeCompare(b.name);
+
+  const childrenNodes = useMemo(() => (node.children ? Object.values(node.children).sort((a, b) => {
+    if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
+    return a.name.localeCompare(b.name);
   }) : []), [node.children]);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onDelete) onDelete(node.path);
+    onDelete(node.path);
   };
 
-  if (node.name === 'root') {
-    return (
-      <div className={styles.treeRoot}>
-        {childrenNodes.map((child, idx) => (
-          <TreeNodeRenderer key={child.path || idx} node={child} level={0} highlightedPath={highlightedPath} selectedPath={selectedPath} statuses={statuses} folderStats={folderStats} onSelectFile={onSelectFile} onDelete={onDelete} />
-        ))}
-      </div>
-    );
-  }
-
-  if (node.isFile) {
-    const isHighlighted = highlightedPath === node.path;
-    const isSelected = selectedPath === node.path;
-
-    return (
-      <div className={`${styles.nodeRow} ${isSelected ? styles.selected : ''} ${isHighlighted ? styles.highlighted : ''}`}>
-        <div
-          className={styles.nodeItem}
-          style={{ marginLeft: `${level * 16}px` }}
-          role="button"
-          tabIndex={0}
-          onClick={() => onSelectFile?.(node)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              onSelectFile?.(node);
-            }
-          }}
-        >
-          <div className={styles.nodeMain}>
-            {getFileIcon(node.name)}
-            <span className={styles.nodeName}>{node.name}</span>
-          </div>
-          <div className={styles.nodeMeta}>
-            {renderStatusBadge(statuses[node.path])}
-          </div>
-        </div>
-        <button type="button" className={styles.deleteBtn} onClick={handleDeleteClick} aria-label={`Delete ${node.name}`}>
-          <Trash2 size={14} />
-        </button>
-      </div>
-    );
-  }
-
+  const isHighlightedRoot = highlightedPath === node.path;
   const stats = folderStats[node.path] ?? { total: 0, completed: 0, processing: 0, error: 0 };
+  const allCompleted = stats.total > 0 && stats.completed === stats.total;
 
   return (
-    <div className={styles.folderNode}>
+    <motion.div layout="position" className={styles.folderNode}>
       <div
-        className={`${styles.nodeRow} ${highlightedPath === node.path ? styles.highlighted : ''}`}
+        className={`${styles.nodeRow} ${styles.folderRow} ${isHighlightedRoot ? styles.highlighted : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         role="button"
         tabIndex={0}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            setIsOpen(prev => !prev);
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(p => !p);
           }
         }}
       >
-        <div className={styles.nodeItem} style={{ marginLeft: `${level * 16}px`, paddingLeft: '12px' }}>
-          <div className={styles.nodeMain}>
-            <span className={styles.chevron}>
-                {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </span>
-            <Folder size={16} className={styles.iconFolder} />
+        <div className={`${styles.nodeItem} ${styles.folderItem}`} style={{ paddingLeft: `${level * 16 + 8}px` }}>
+          <div className={styles.nodeContent}>
+             <motion.div 
+               animate={{ rotate: isOpen ? 90 : 0 }} 
+               transition={{ type: "spring", stiffness: 300, damping: 20 }}
+               className={styles.chevron}
+             >
+               <ChevronRight size={14} strokeWidth={2.5} />
+             </motion.div>
+            <Folder size={15} className={`${styles.iconFolder} ${isOpen ? styles.iconFolderOpen : ''}`} strokeWidth={2.2} fill="currentColor" fillOpacity={isOpen ? 0.2 : 0.1} />
             <span className={styles.nodeName}>{node.name}</span>
           </div>
-          <div className={styles.nodeMeta}>
-            {stats.error > 0 && <span className={`${styles.countBadge} ${styles.countError}`}>{stats.error} err</span>}
-            {stats.processing > 0 && <span className={`${styles.countBadge} ${styles.countProcessing}`}>{stats.processing} run</span>}
-            <span className={styles.countBadge}>{stats.completed}/{stats.total}</span>
+          
+          <div className={styles.nodeMetaFolder}>
+            {stats.error > 0 && (
+               <span className={`${styles.statsPill} ${styles.pillError}`}>
+                 {stats.error} err
+               </span>
+            )}
+            {stats.processing > 0 && (
+               <span className={`${styles.statsPill} ${styles.pillProcessing}`}>
+                 <LoaderCircle size={10} className={styles.iconSpin} />
+                 {stats.processing}
+               </span>
+            )}
+            <span className={`${styles.statsPill} ${allCompleted ? styles.pillSuccess : styles.pillDefault}`}>
+               {stats.completed}/{stats.total}
+            </span>
           </div>
         </div>
-        <button type="button" className={styles.deleteBtn} onClick={handleDeleteClick} aria-label={`Delete ${node.name}`}>
-          <Trash2 size={14} />
+        <button type="button" className={styles.deleteBtn} onClick={handleDeleteClick} aria-label="Delete Folder">
+          <Trash2 size={14} strokeWidth={2} />
         </button>
       </div>
-      
+
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            animate={{ height: 'auto', opacity: 1, transition: { height: { type: "spring", stiffness: 400, damping: 35 }, opacity: { duration: 0.2 } } }}
+            exit={{ height: 0, opacity: 0, transition: { height: { type: "spring", stiffness: 400, damping: 40 }, opacity: { duration: 0.2 } } }}
             className={styles.childrenContainer}
+            style={{ overflow: 'hidden' }}
           >
-            {childrenNodes.map((child, idx) => (
-              <TreeNodeRenderer key={child.path || idx} node={child} level={level + 1} highlightedPath={highlightedPath} selectedPath={selectedPath} statuses={statuses} folderStats={folderStats} onSelectFile={onSelectFile} onDelete={onDelete} />
-            ))}
+            {childrenNodes.map((child) => 
+               child.isFile ? (
+                 <FileLeaf 
+                   key={child.path} 
+                   node={child} 
+                   level={level + 1} 
+                   status={statuses[child.path]} 
+                   isHighlighted={highlightedPath === child.path}
+                   isSelected={selectedPath === child.path}
+                   onSelect={onSelectFile}
+                   onDelete={onDelete}
+                 />
+               ) : (
+                 <FolderBranch 
+                   key={child.path} 
+                   node={child} 
+                   level={level + 1} 
+                   highlightedPath={highlightedPath}
+                   selectedPath={selectedPath}
+                   statuses={statuses}
+                   folderStats={folderStats}
+                   onSelectFile={onSelectFile}
+                   onDelete={onDelete}
+                 />
+               )
+            )}
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
-});
+};
 
 export const FileTree = ({ 
   files, 
-  onDelete,
+  onDelete = () => {},
   highlightedPath,
   selectedPath,
   statuses = {},
-  onSelectFile,
+  onSelectFile = () => {},
 }: { 
   files: ExtendedFile[]; 
   onDelete?: (path: string) => void;
@@ -248,12 +300,66 @@ export const FileTree = ({
   statuses?: Record<string, FileProcessStatus | undefined>;
   onSelectFile?: (node: TreeNode) => void;
 }) => {
-  if (!files || files.length === 0) return <div className={styles.empty}>Empty selection</div>;
-  const tree = React.useMemo(() => buildTree(files), [files]);
-  const folderStats = React.useMemo(() => {
+  if (!files || files.length === 0) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className={styles.empty}
+      >
+        <File size={24} className={styles.emptyIcon} strokeWidth={1.5} />
+        <span>No files selected</span>
+      </motion.div>
+    );
+  }
+
+  const tree = useMemo(() => buildTree(files), [files]);
+  
+  const folderStats = useMemo(() => {
     const statsMap: FolderStatsMap = {};
     collectFolderStats(tree, statuses, statsMap);
     return statsMap;
   }, [statuses, tree]);
-  return <div className={styles.container}><TreeNodeRenderer node={tree} highlightedPath={highlightedPath} selectedPath={selectedPath} statuses={statuses} folderStats={folderStats} onSelectFile={onSelectFile} onDelete={onDelete} /></div>;
+
+  const rootChildren = useMemo(() => {
+    if (!tree.children) return [];
+    return Object.values(tree.children).sort((a, b) => {
+      if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [tree.children]);
+
+  return (
+    <div className={styles.container}>
+      <AnimatePresence initial={false}>
+        <div className={styles.treeRoot}>
+          {rootChildren.map((child) => 
+            child.isFile ? (
+              <FileLeaf 
+                key={child.path} 
+                node={child} 
+                level={0} 
+                status={statuses[child.path]} 
+                isHighlighted={highlightedPath === child.path}
+                isSelected={selectedPath === child.path}
+                onSelect={onSelectFile}
+                onDelete={onDelete}
+              />
+            ) : (
+              <FolderBranch 
+                key={child.path} 
+                node={child} 
+                level={0} 
+                highlightedPath={highlightedPath}
+                selectedPath={selectedPath}
+                statuses={statuses}
+                folderStats={folderStats}
+                onSelectFile={onSelectFile}
+                onDelete={onDelete}
+              />
+            )
+          )}
+        </div>
+      </AnimatePresence>
+    </div>
+  );
 };

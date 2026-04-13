@@ -1,206 +1,288 @@
 .container {
-  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary, #ffffff);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  font-family: var(--font-sans);
-  max-height: 400px;
+  border-radius: 12px;
   overflow-y: auto;
+  overflow-x: hidden;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  max-height: 480px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  /* Elegant Scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--border-color) 80%, transparent);
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 50%, transparent);
 }
 
 .treeRoot {
   display: flex;
   flex-direction: column;
+  padding: 8px 6px;
 }
 
 .nodeRow {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
   min-width: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.folderRow {
+  margin-top: 2px;
 }
 
 .nodeItem {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 6px 12px;
   cursor: pointer;
   user-select: none;
-  transition: background var(--transition-fast);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   width: 100%;
-  gap: 8px;
+  gap: 12px;
   min-width: 0;
   border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.nodeMain {
+.folderItem {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.nodeContent {
   display: flex;
   align-items: center;
   flex: 1;
   min-width: 0;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Background Highlight for selection */
+.activeBackground {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  border-radius: 6px;
+  z-index: 0;
 }
 
 .nodeItem:hover {
+  color: var(--text-primary);
   background: var(--bg-tertiary);
 }
 
 .nodeRow.selected .nodeItem {
-  background: color-mix(in srgb, var(--accent-primary) 12%, var(--bg-secondary));
-  border: 1px solid color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  color: var(--accent-primary);
+  font-weight: 500;
+  background: transparent; /* let activeBackground handle it */
 }
 
 .chevron {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
   color: var(--text-muted);
+  margin-right: -4px;
 }
 
+.nodeItem:hover .chevron {
+  color: var(--text-secondary);
+}
+
+/* Icons */
 .iconFolder {
   color: var(--accent-primary);
-  margin-right: 6px;
-  fill: rgba(59, 130, 246, 0.2);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+
+.iconFolderOpen {
+  transform: scale(1.1);
+  color: color-mix(in srgb, var(--accent-primary) 80%, white);
 }
 
 .iconImage {
   color: #10b981;
-  margin-right: 6px;
-  margin-left: 20px;
+  flex-shrink: 0;
 }
 
 .iconDoc {
-  color: var(--text-secondary);
-  margin-right: 6px;
-  margin-left: 20px;
+  color: #8b5cf6;
+  flex-shrink: 0;
 }
 
 .iconDefault {
   color: var(--text-muted);
-  margin-right: 6px;
-  margin-left: 20px;
+  flex-shrink: 0;
 }
 
 .nodeName {
   font-size: 0.85rem;
-  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  flex: 1;
+  letter-spacing: 0.01em;
 }
 
-.childrenContainer {
-  overflow: hidden;
-}
-
-.nodeRow.highlighted .nodeItem {
-  background-color: rgba(37, 99, 235, 0.1);
-  border: 1px solid var(--accent-primary);
-  border-radius: 4px;
-  animation: pulseHighlight 2s ease-in-out infinite;
+/* Pulsing highlight for currently processed item */
+.nodeRow.highlighted .nodeItem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  border: 1px dashed var(--accent-primary);
+  background: radial-gradient(circle at left, color-mix(in srgb, var(--accent-primary) 8%, transparent) 0%, transparent 70%);
+  animation: pulseHighlight 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  z-index: -1;
+  pointer-events: none;
 }
 
 @keyframes pulseHighlight {
-  0% { background-color: rgba(37, 99, 235, 0.05); }
-  50% { background-color: rgba(37, 99, 235, 0.15); }
-  100% { background-color: rgba(37, 99, 235, 0.05); }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; border-style: solid; box-shadow: 0 0 12px color-mix(in srgb, var(--accent-primary) 15%, transparent); }
 }
 
 .empty {
-  padding: var(--space-4);
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  text-align: center;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px dashed var(--border-highlight);
-}
-
-/* Deletion Button styling */
-.deleteBtn {
-  opacity: 0;
-  margin-left: auto;
-  color: var(--text-muted);
-  padding: 4px;
-  border-radius: 4px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 0 0 28px;
-  width: 28px;
-  min-width: 28px;
-  background: transparent;
-  border: 0;
-  transition: all var(--transition-fast);
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  gap: 12px;
+  height: 100%;
 }
 
-.nodeRow:hover .deleteBtn {
-  opacity: 1;
+.emptyIcon {
+  opacity: 0.5;
 }
 
-.deleteBtn:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.nodeMeta {
+/* Flexbox Swap & Delete Button Reveal */
+.nodeMeta, .nodeMetaFolder {
   display: flex;
   align-items: center;
   gap: 6px;
   flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
-.statusBadge,
-.countBadge {
+.deleteBtn {
+  position: absolute;
+  right: 6px;
+  opacity: 0;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  z-index: 10;
+  transform: translateX(10px);
+  pointer-events: none; /* Ignore clicks until fully visible */
+}
+
+.nodeRow:hover .nodeMeta, 
+.nodeRow:hover .nodeMetaFolder {
+  transform: translateX(-30px);
+  opacity: 0.2; /* Fade out but stay visible slightly */
+}
+
+.nodeRow:hover .deleteBtn {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+  background: color-mix(in srgb, #ef4444 10%, var(--bg-primary));
+  border-color: color-mix(in srgb, #ef4444 30%, var(--border-color));
+  transform: scale(1.05);
+}
+
+/* Micro-interaction status icons for file leaf */
+.statusIcon {
+  flex: 0 0 auto;
+}
+
+.colorProcessing { color: var(--accent-primary); }
+.colorCompleted { color: #10b981; }
+.colorError { color: #ef4444; }
+.colorIdle { color: var(--text-muted); }
+
+/* Folder Stat Pills (Compact & minimal) */
+.statsPill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  min-width: 22px;
-  min-height: 22px;
   border-radius: 999px;
-  padding: 0 7px;
-  font-size: 0.72rem;
-  font-weight: 700;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.statusIdle,
-.countBadge {
-  background: var(--bg-tertiary);
+.pillDefault {
   color: var(--text-secondary);
 }
 
-.statusProcessing,
-.countProcessing {
-  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
-  color: var(--accent-primary);
-}
-
-.statusCompleted {
+.pillSuccess {
   background: color-mix(in srgb, #10b981 12%, transparent);
   color: #10b981;
 }
 
-.statusError,
-.countError {
+.pillProcessing {
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  color: var(--accent-primary);
+}
+
+.pillError {
   background: color-mix(in srgb, #ef4444 12%, transparent);
   color: #ef4444;
 }
 
-.spinningIcon {
-  animation: treeSpin 0.9s linear infinite;
+.iconSpin {
+  animation: spinSmooth 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-@keyframes treeSpin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes spinSmooth {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
 }
