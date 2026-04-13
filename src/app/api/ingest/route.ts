@@ -3,6 +3,11 @@ import { createAiRuntimeFromConfig } from '@/ai';
 import { loadIngestFeatureConfig } from '@/features/ingest/config';
 import { encodeStreamEvent } from '@/features/ingest/contracts';
 import { SupabaseIngestRepository } from '@/features/ingest/SupabaseIngestRepository';
+import {
+  DEFAULT_KNOWLEDGE_BASE_NAME,
+  DEFAULT_KNOWLEDGE_BASE_SLUG,
+  type KnowledgeBaseRecord,
+} from '@/features/ingest/knowledge';
 import { IngestWorkflow } from '@/features/ingest/workflow';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getPreviewKind } from '@/lib/workbench/filePreview';
@@ -28,23 +33,39 @@ function createRepository() {
   return new SupabaseIngestRepository(supabaseAdmin);
 }
 
+function createFallbackKnowledgeBase(id?: string): KnowledgeBaseRecord {
+  return {
+    id: id || '00000000-0000-0000-0000-000000000001',
+    slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
+    name: DEFAULT_KNOWLEDGE_BASE_NAME,
+    status: 'active',
+    sourceCount: 0,
+    chunkCount: 0,
+    profileVersion: 0,
+  };
+}
+
 export async function POST(req: Request) {
   try {
     const featureConfig = loadIngestFeatureConfig();
     const formData = await req.formData();
     const file = formData.get('file');
-    const globalContextValue = formData.get('globalContext');
+    const knowledgeBaseValue = formData.get('knowledgeBaseId');
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    const globalContext = typeof globalContextValue === 'string' ? globalContextValue : '';
+    const knowledgeBaseId = typeof knowledgeBaseValue === 'string' ? knowledgeBaseValue : '';
     const previewKind = getPreviewKind(file.name);
+    const repository = createRepository();
+    const knowledgeBase = repository
+      ? await repository.ensureKnowledgeBase({ id: knowledgeBaseId || undefined })
+      : createFallbackKnowledgeBase(knowledgeBaseId || undefined);
     const workflow = new IngestWorkflow({
       runtime: createAiRuntimeFromConfig(featureConfig.runtime),
       prompts: featureConfig.prompts,
-      repository: createRepository(),
+      repository,
     });
     const encoder = new TextEncoder();
 
@@ -58,8 +79,8 @@ export async function POST(req: Request) {
           const result = await workflow.run(
             {
               file,
-              globalContext,
               previewKind,
+              knowledgeBase,
             },
             send,
           );

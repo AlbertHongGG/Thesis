@@ -39,6 +39,12 @@ import {
   syncSessionFiles,
 } from '@/lib/storage/sessionStore';
 import type { IngestStreamEvent } from '@/features/ingest/contracts';
+import {
+  DEFAULT_KNOWLEDGE_BASE_NAME,
+  DEFAULT_KNOWLEDGE_BASE_SLUG,
+  type KnowledgeBaseMaintenanceAction,
+  type KnowledgeBaseRecord,
+} from '@/features/ingest/knowledge';
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
 import type {
@@ -59,7 +65,16 @@ interface RestorePromptState {
   files: PersistedFileRecord[];
 }
 
-const MAX_GLOBAL_CONTEXT_CHARS = 10000;
+const FALLBACK_KNOWLEDGE_BASE_ID = '00000000-0000-0000-0000-000000000001';
+const FALLBACK_KNOWLEDGE_BASE: KnowledgeBaseRecord = {
+  id: FALLBACK_KNOWLEDGE_BASE_ID,
+  slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
+  name: DEFAULT_KNOWLEDGE_BASE_NAME,
+  status: 'active',
+  sourceCount: 0,
+  chunkCount: 0,
+  profileVersion: 0,
+};
 
 async function readIngestError(response: Response) {
   const contentType = response.headers.get('content-type') ?? '';
@@ -94,46 +109,36 @@ function cloneChunkAnalysis(chunk: DocumentChunkAnalysis): DocumentChunkAnalysis
   };
 }
 
+function cloneKnowledgeContext(trace?: IngestResult['knowledgeContext']) {
+  if (!trace) {
+    return undefined;
+  }
+
+  return {
+    ...trace,
+    usedSources: trace.usedSources.map(source => ({ ...source })),
+  };
+}
+
 function serializeResult(result?: IngestResult) {
   if (!result) return undefined;
 
   if (result.type === 'image') {
-    return { ...result } satisfies IngestResult;
+    return {
+      ...result,
+      knowledgeContext: cloneKnowledgeContext(result.knowledgeContext),
+    } satisfies IngestResult;
   }
 
   return {
     ...result,
+    knowledgeContext: cloneKnowledgeContext(result.knowledgeContext),
     chunkAnalyses: result.chunkAnalyses.map(cloneChunkAnalysis),
   } satisfies IngestResult;
 }
 
 function normalizeRestoredResult(result?: IngestResult) {
   return serializeResult(result);
-}
-
-function clampGlobalContext(text: string, maxLength = MAX_GLOBAL_CONTEXT_CHARS) {
-  if (text.length <= maxLength) {
-    return text;
-  }
-
-  return text.slice(-maxLength);
-}
-
-function buildResultContextSnippet(result: IngestResult) {
-  if (result.type === 'image') {
-    return result.description?.trim() || result.descriptionSnippet?.trim() || '';
-  }
-
-  const semanticHighlights = result.chunkAnalyses
-    .filter(chunk => chunk.summary.trim().length > 0)
-    .slice(0, 4)
-    .map(chunk => {
-      const keywords = chunk.keywords.length > 0 ? ` 關鍵詞：${chunk.keywords.join('、')}` : '';
-      return `Chunk ${chunk.index + 1}: ${chunk.summary}${keywords}`;
-    })
-    .join('\n');
-
-  return [result.summary?.trim() || '', semanticHighlights].filter(Boolean).join('\n');
 }
 
 function serializeSteps(steps: ProcessStepEntry[]): PersistedProcessStepEntry[] {
@@ -229,11 +234,21 @@ export default function DataWorkbench() {
   const [selectedPreviewPath, setSelectedPreviewPath] = useState<string | null>(null);
   const [processEntries, setProcessEntries] = useState<Record<string, FileProcessEntry>>({});
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
-  const [globalContextValue, setGlobalContextValue] = useState('');
+  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseRecord[]>([]);
+  const [activeKnowledgeBaseId, setActiveKnowledgeBaseId] = useState<string | null>(null);
+  const [newKnowledgeBaseName, setNewKnowledgeBaseName] = useState('');
+  const [knowledgeBaseError, setKnowledgeBaseError] = useState<string | null>(null);
+  const [isCreatingKnowledgeBase, setIsCreatingKnowledgeBase] = useState(false);
+  const [maintenanceState, setMaintenanceState] = useState<{ action: KnowledgeBaseMaintenanceAction; knowledgeBaseId: string } | null>(null);
+  const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
   const [persistencePhase, setPersistencePhase] = useState<PersistencePhase>('checking');
   const [restorePrompt, setRestorePrompt] = useState<RestorePromptState | null>(null);
-  const globalContextRef = useRef<string>('');
   const lastPersistedFileSignatureRef = useRef('');
+
+  const activeKnowledgeBase = useMemo(
+    () => knowledgeBases.find(knowledgeBase => knowledgeBase.id === activeKnowledgeBaseId) ?? null,
+    [activeKnowledgeBaseId, knowledgeBases],
+  );
 
   const sortedFiles = useMemo(() => {
     const docs = files.filter(file => !IMAGE_FILE_PATTERN.test(file.name));
@@ -293,23 +308,185 @@ export default function DataWorkbench() {
     return nextStatuses;
   }, [allPaths, processEntries]);
 
-  const appendGlobalContext = useCallback((text: string) => {
-    const trimmed = text.trim();
+  const refreshKnowledgeBases = useCallback(async (preferredKnowledgeBaseId?: string | null) => {
+    try {
+      setKnowledgeBaseError(null);
+      const response = await fetch('/api/knowledge-bases');
 
-    if (!trimmed) return;
+      if (!response.ok) {
+        throw new Error(`Knowledge base request failed: ${response.status}`);
+      }
 
-    const nextValue = clampGlobalContext(
-      [globalContextRef.current.trim(), trimmed].filter(Boolean).join('\n'),
-    );
+      const data = await response.json();
+      let nextKnowledgeBases = (data.knowledgeBases ?? []) as KnowledgeBaseRecord[];
 
-    globalContextRef.current = nextValue;
-    setGlobalContextValue(nextValue);
+      if (nextKnowledgeBases.length === 0) {
+        const createResponse = await fetch('/api/knowledge-bases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: FALLBACK_KNOWLEDGE_BASE_ID,
+            slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
+            name: DEFAULT_KNOWLEDGE_BASE_NAME,
+            description: 'Default knowledge base for thesis research ingestion.',
+          }),
+        });
+
+        if (!createResponse.ok) {
+          throw new Error(`Failed to create default knowledge base: ${createResponse.status}`);
+        }
+
+        const created = await createResponse.json();
+        nextKnowledgeBases = [created.knowledgeBase as KnowledgeBaseRecord];
+      }
+
+      setKnowledgeBases(nextKnowledgeBases);
+      setActiveKnowledgeBaseId(current => {
+        const candidate = preferredKnowledgeBaseId ?? current ?? nextKnowledgeBases[0]?.id ?? null;
+        if (candidate && nextKnowledgeBases.some(knowledgeBase => knowledgeBase.id === candidate)) {
+          return candidate;
+        }
+
+        return nextKnowledgeBases[0]?.id ?? null;
+      });
+    } catch (error) {
+      console.error('Failed to load knowledge bases:', error);
+      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+      setKnowledgeBases([FALLBACK_KNOWLEDGE_BASE]);
+      setActiveKnowledgeBaseId(preferredKnowledgeBaseId ?? FALLBACK_KNOWLEDGE_BASE_ID);
+    }
   }, []);
+
+  const createKnowledgeBase = useCallback(async () => {
+    const trimmedName = newKnowledgeBaseName.trim();
+
+    if (!trimmedName) {
+      return;
+    }
+
+    setIsCreatingKnowledgeBase(true);
+    setKnowledgeBaseError(null);
+
+    try {
+      const response = await fetch('/api/knowledge-bases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmedName }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create knowledge base: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const created = data.knowledgeBase as KnowledgeBaseRecord;
+
+      setKnowledgeBases(prev => {
+        const next = [...prev.filter(knowledgeBase => knowledgeBase.id !== created.id), created];
+        next.sort((left, right) => left.name.localeCompare(right.name));
+        return next;
+      });
+      setActiveKnowledgeBaseId(created.id);
+      setNewKnowledgeBaseName('');
+    } catch (error) {
+      console.error('Failed to create knowledge base:', error);
+      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsCreatingKnowledgeBase(false);
+    }
+  }, [newKnowledgeBaseName]);
+
+  const deleteActiveKnowledgeBase = useCallback(async () => {
+    if (!activeKnowledgeBaseId || knowledgeBases.length <= 1) {
+      return;
+    }
+
+    const knowledgeBaseToDelete = knowledgeBases.find(knowledgeBase => knowledgeBase.id === activeKnowledgeBaseId);
+    if (!knowledgeBaseToDelete) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete knowledge base "${knowledgeBaseToDelete.name}"? This will remove its stored documents and chunks.`);
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/knowledge-bases?id=${encodeURIComponent(activeKnowledgeBaseId)}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete knowledge base: ${response.status}`);
+      }
+
+      if (processMode !== 'idle') {
+        setProcessMode('idle');
+      }
+
+      await refreshKnowledgeBases();
+    } catch (error) {
+      console.error('Failed to delete knowledge base:', error);
+      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+    }
+  }, [activeKnowledgeBaseId, knowledgeBases, processMode, refreshKnowledgeBases]);
+
+  const runKnowledgeBaseMaintenance = useCallback(async (action: KnowledgeBaseMaintenanceAction) => {
+    if (!activeKnowledgeBaseId || !activeKnowledgeBase) {
+      return;
+    }
+
+    const actionLabel = action === 'reindex' ? 'reindex this knowledge base' : 'rebuild the knowledge profile';
+    const confirmed = window.confirm(`Run ${actionLabel} for "${activeKnowledgeBase.name}"?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    setMaintenanceState({ action, knowledgeBaseId: activeKnowledgeBaseId });
+    setKnowledgeBaseError(null);
+    setMaintenanceMessage(null);
+
+    try {
+      const response = await fetch(`/api/knowledge-bases/${encodeURIComponent(activeKnowledgeBaseId)}/maintenance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Maintenance request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const result = data.result as {
+        action: KnowledgeBaseMaintenanceAction;
+        sourceCount: number;
+        chunkCount: number;
+        imageCount: number;
+        profileVersion?: number;
+      };
+
+      setMaintenanceMessage(
+        action === 'reindex'
+          ? `Reindex completed: ${result.chunkCount} chunks and ${result.imageCount} images refreshed. Profile v${result.profileVersion ?? '-'}.`
+          : `Knowledge profile rebuilt: ${result.sourceCount} sources, ${result.chunkCount} chunks, profile v${result.profileVersion ?? '-'}.`,
+      );
+      await refreshKnowledgeBases(activeKnowledgeBaseId);
+    } catch (error) {
+      console.error('Knowledge base maintenance failed:', error);
+      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setMaintenanceState(null);
+    }
+  }, [activeKnowledgeBase, activeKnowledgeBaseId, refreshKnowledgeBases]);
 
   useEffect(() => {
     let ignore = false;
 
-    const hydrateSession = async () => {
+    const bootstrap = async () => {
+      await refreshKnowledgeBases();
+
       if (!canUseSessionPersistence()) {
         if (!ignore) {
           setPersistencePhase('ready');
@@ -327,6 +504,11 @@ export default function DataWorkbench() {
             snapshot: restorableSession.snapshot,
             files: restorableSession.files,
           });
+
+          if (restorableSession.snapshot.activeKnowledgeBaseId) {
+            void refreshKnowledgeBases(restorableSession.snapshot.activeKnowledgeBaseId);
+          }
+
           setPersistencePhase('prompt');
         } else {
           setPersistencePhase('ready');
@@ -339,12 +521,12 @@ export default function DataWorkbench() {
       }
     };
 
-    void hydrateSession();
+    void bootstrap();
 
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [refreshKnowledgeBases]);
 
   useEffect(() => {
     if (persistencePhase !== 'ready' || !canUseSessionPersistence()) {
@@ -357,13 +539,13 @@ export default function DataWorkbench() {
     }
 
     void saveSessionSnapshot({
-      globalContext: globalContextValue,
+      activeKnowledgeBaseId,
       fileOrder: allPaths,
       processEntries: sessionEntries,
     }).catch(error => {
       console.error('Failed to save session snapshot:', error);
     });
-  }, [allPaths, globalContextValue, persistencePhase, sessionEntries]);
+  }, [activeKnowledgeBaseId, allPaths, persistencePhase, sessionEntries]);
 
   useEffect(() => {
     if (persistencePhase !== 'ready' || !canUseSessionPersistence()) {
@@ -465,6 +647,8 @@ export default function DataWorkbench() {
         ? existing.result
         : {
             type: 'document',
+            knowledgeBaseId: event.knowledgeBaseId,
+            knowledgeBaseName: event.knowledgeBaseName,
             previewKind: event.previewKind,
             documentId: event.documentId,
             chunkCount: event.chunkCount,
@@ -662,21 +846,24 @@ export default function DataWorkbench() {
     startProcessingEntry(fullPath);
 
     try {
+      if (!activeKnowledgeBaseId) {
+        throw new Error('No active knowledge base selected');
+      }
+
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('globalContext', globalContextRef.current);
+      formData.append('knowledgeBaseId', activeKnowledgeBaseId);
 
       const res = await fetch('/api/ingest', { method: 'POST', body: formData });
-      const result = await processStreamResponse(res, fullPath);
-
-      appendGlobalContext(buildResultContextSnippet(result));
+      await processStreamResponse(res, fullPath);
+      void refreshKnowledgeBases(activeKnowledgeBaseId);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       failProcessingEntry(fullPath, message);
     } finally {
       setCurrentIndex(prev => prev + 1);
     }
-  }, [appendGlobalContext, ensureEntry, failProcessingEntry, processStreamResponse, startProcessingEntry]);
+  }, [activeKnowledgeBaseId, ensureEntry, failProcessingEntry, processStreamResponse, refreshKnowledgeBases, startProcessingEntry]);
 
   useEffect(() => {
     let ignore = false;
@@ -743,8 +930,6 @@ export default function DataWorkbench() {
       });
       setRestorePrompt(null);
       setPersistencePhase('ready');
-      globalContextRef.current = '';
-      setGlobalContextValue('');
     }
 
     setFiles(prev => {
@@ -769,8 +954,6 @@ export default function DataWorkbench() {
   const handlePlay = () => {
     if (currentIndex >= sortedFiles.length) {
       setCurrentIndex(0);
-      globalContextRef.current = '';
-      setGlobalContextValue('');
       resetProcessEntries(sortedFiles);
     }
     setProcessMode('playing');
@@ -792,8 +975,6 @@ export default function DataWorkbench() {
     setProcessMode('idle');
     setHighlightedPath(null);
     setSelectedPreviewPath(null);
-    globalContextRef.current = '';
-    setGlobalContextValue('');
     setRestorePrompt(null);
     setPersistencePhase('ready');
     lastPersistedFileSignatureRef.current = '';
@@ -831,8 +1012,10 @@ export default function DataWorkbench() {
     setProcessMode('idle');
     setHighlightedPath(null);
     setSelectedPreviewPath(null);
-    globalContextRef.current = restorePrompt.snapshot.globalContext;
-    setGlobalContextValue(restorePrompt.snapshot.globalContext);
+    if (restorePrompt.snapshot.activeKnowledgeBaseId) {
+      setActiveKnowledgeBaseId(restorePrompt.snapshot.activeKnowledgeBaseId);
+      void refreshKnowledgeBases(restorePrompt.snapshot.activeKnowledgeBaseId);
+    }
     setRestorePrompt(null);
     setPersistencePhase('ready');
     lastPersistedFileSignatureRef.current = '';
@@ -906,18 +1089,104 @@ export default function DataWorkbench() {
         <main className={styles.mainPanel}>
           <div className={styles.workingArea}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>RAG Knowledge Extraction Engine</h3>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>RAG Knowledge Extraction Engine</h3>
+                <div style={{ marginTop: '0.35rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                  Active KB: {activeKnowledgeBase?.name || 'Loading knowledge base...'}
+                </div>
+              </div>
 
               {files.length > 0 && (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {processMode === 'playing' ? (
                     <Button variant="secondary" onClick={handlePause}><Square size={14} /> Stop</Button>
                   ) : (
-                    <Button variant="primary" onClick={handlePlay}><Play size={14} /> {currentIndex > 0 && currentIndex < sortedFiles.length ? 'Resume' : 'Start Auto'}</Button>
+                    <Button variant="primary" onClick={handlePlay} disabled={!activeKnowledgeBaseId}><Play size={14} /> {currentIndex > 0 && currentIndex < sortedFiles.length ? 'Resume' : 'Start Auto'}</Button>
                   )}
-                  <Button variant="secondary" onClick={() => void handleNext()} disabled={processMode === 'playing'}><SkipForward size={14} /> Next Step</Button>
+                  <Button variant="secondary" onClick={() => void handleNext()} disabled={processMode === 'playing' || !activeKnowledgeBaseId}><SkipForward size={14} /> Next Step</Button>
                 </div>
               )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '16px', padding: '0.9rem 1rem', background: 'rgba(255,255,255,0.04)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.65rem' }}>
+                  <div style={{ fontSize: '0.82rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Knowledge Base</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    {activeKnowledgeBase ? `${activeKnowledgeBase.sourceCount} sources · ${activeKnowledgeBase.chunkCount} chunks` : 'No KB loaded'}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <select
+                    value={activeKnowledgeBaseId ?? ''}
+                    onChange={event => setActiveKnowledgeBaseId(event.target.value)}
+                    style={{
+                      minWidth: '220px',
+                      padding: '0.6rem 0.75rem',
+                      borderRadius: '12px',
+                      border: '1px solid var(--border-color)',
+                      background: 'rgba(0,0,0,0.22)',
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {knowledgeBases.map(knowledgeBase => (
+                      <option key={knowledgeBase.id} value={knowledgeBase.id}>
+                        {knowledgeBase.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    value={newKnowledgeBaseName}
+                    onChange={event => setNewKnowledgeBaseName(event.target.value)}
+                    placeholder="Create new knowledge base..."
+                    style={{
+                      minWidth: '220px',
+                      flex: 1,
+                      padding: '0.6rem 0.75rem',
+                      borderRadius: '12px',
+                      border: '1px solid var(--border-color)',
+                      background: 'rgba(0,0,0,0.18)',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                  <Button variant="secondary" onClick={() => void createKnowledgeBase()} disabled={isCreatingKnowledgeBase || !newKnowledgeBaseName.trim()}>
+                    {isCreatingKnowledgeBase ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Database size={14} />} New KB
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void runKnowledgeBaseMaintenance('rebuild-profile')}
+                    disabled={!activeKnowledgeBaseId || maintenanceState !== null}
+                  >
+                    {maintenanceState?.action === 'rebuild-profile' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <RotateCcw size={14} />} Rebuild Profile
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => void runKnowledgeBaseMaintenance('reindex')}
+                    disabled={!activeKnowledgeBaseId || maintenanceState !== null}
+                  >
+                    {maintenanceState?.action === 'reindex' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Box size={14} />} Reindex KB
+                  </Button>
+                  <Button variant="ghost" onClick={() => void deleteActiveKnowledgeBase()} disabled={knowledgeBases.length <= 1 || !activeKnowledgeBaseId}>
+                    <Trash2 size={14} /> Delete KB
+                  </Button>
+                </div>
+                {activeKnowledgeBase?.description && (
+                  <div style={{ marginTop: '0.65rem', fontSize: '0.88rem', color: 'var(--text-muted)' }}>{activeKnowledgeBase.description}</div>
+                )}
+                {maintenanceMessage && (
+                  <div style={{ marginTop: '0.65rem', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{maintenanceMessage}</div>
+                )}
+                {knowledgeBaseError && (
+                  <div style={{ marginTop: '0.65rem', fontSize: '0.88rem', color: 'var(--accent-red)' }}>{knowledgeBaseError}</div>
+                )}
+              </div>
+
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: '16px', padding: '0.9rem 1rem', background: 'rgba(255,255,255,0.04)' }}>
+                <div style={{ fontSize: '0.82rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.65rem' }}>Workflow</div>
+                <div style={{ fontSize: '0.92rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>
+                  文件會先進入目前選定的知識庫，更新領域摘要與 chunk 向量；圖片則會先讀取該知識庫摘要，再檢索最相關片段做 hybrid 分析。
+                </div>
+              </div>
             </div>
 
             {persistencePhase === 'prompt' && restorePrompt && (
@@ -928,7 +1197,7 @@ export default function DataWorkbench() {
                 <div className={styles.resumeBannerContent}>
                   <div className={styles.resumeBannerTitle}>發現上次未完成的處理紀錄</div>
                   <div className={styles.resumeBannerText}>
-                    已保存 {restorePrompt.files.length} 個檔案的執行紀錄。上次保存時間：{formatSavedAt(restorePrompt.snapshot.savedAt)}。其中 {countRunnablePaths(restorePrompt.snapshot) > 0 ? `${countRunnablePaths(restorePrompt.snapshot)} 個檔案可直接接續` : '所有檔案都已完成，可保留紀錄或重新開始'}。
+                    已保存 {restorePrompt.files.length} 個檔案的執行紀錄。上次保存時間：{formatSavedAt(restorePrompt.snapshot.savedAt)}。其中 {countRunnablePaths(restorePrompt.snapshot) > 0 ? `${countRunnablePaths(restorePrompt.snapshot)} 個檔案可直接接續` : '所有檔案都已完成，可保留紀錄或重新開始'}。{restorePrompt.snapshot.activeKnowledgeBaseId ? ' 恢復後會切回當時的 active knowledge base。' : ''}
                   </div>
                 </div>
                 <div className={styles.resumeBannerActions}>
@@ -940,7 +1209,7 @@ export default function DataWorkbench() {
 
             {persistencePhase === 'ready' && sortedFiles.length > 0 && (
               <div className={styles.persistenceSummary}>
-                目前已保存 {sortedFiles.length} 個檔案的執行紀錄，其中 {resumablePaths.length} 個仍可接續處理。
+                目前已保存 {sortedFiles.length} 個檔案的執行紀錄，其中 {resumablePaths.length} 個仍可接續處理。Active KB：{activeKnowledgeBase?.name || '未指定'}。
               </div>
             )}
 
@@ -1003,7 +1272,7 @@ export default function DataWorkbench() {
         onClose={() => setSelectedPreviewPath(null)}
       />
 
-      <RagQueryPanel />
+      <RagQueryPanel knowledgeBaseId={activeKnowledgeBaseId} knowledgeBaseName={activeKnowledgeBase?.name} />
     </div>
   );
 }

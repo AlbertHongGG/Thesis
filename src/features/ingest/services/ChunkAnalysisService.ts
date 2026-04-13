@@ -18,7 +18,7 @@ export class ChunkAnalysisService {
     chunk: TextChunk;
     previousChunk?: TextChunk;
     nextChunk?: TextChunk;
-    globalContext: string;
+    knowledgeContext: string;
     documentOverview: string;
   }): Promise<ChunkAnalysisServiceResult> {
     const raw = await this.runtime.generateText({

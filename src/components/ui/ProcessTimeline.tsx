@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, Clock3, FileText, Image as ImageIcon, Link2, LoaderCircle, Rows3, Tag, Check } from 'lucide-react';
+import { AlertCircle, Clock3, Database, FileText, Image as ImageIcon, Link2, LoaderCircle, Rows3, Tag, Check } from 'lucide-react';
 import { formatDuration, getStepStatusLabel } from '@/lib/workbench/formatting';
 import type { FileProcessEntry } from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
@@ -49,11 +49,50 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
               <ImageIcon size={16} className={styles.headerIcon} />
               圖片分析結果
             </div>
-            {result.contextApplied && <div className={styles.outputMeta}>含文件上下文</div>}
+            {result.contextApplied && <div className={styles.outputMeta}>含知識庫上下文</div>}
           </div>
           <div className={styles.markdown}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.description}</ReactMarkdown>
           </div>
+        </motion.section>
+      )}
+
+      {result.knowledgeContext && (
+        <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+          <div className={styles.outputHeader}>
+            <div className={styles.outputTitle}>
+              <Database size={16} className={styles.headerIcon} />
+              知識庫上下文
+            </div>
+            <div className={styles.outputMeta}>{result.knowledgeContext.knowledgeBaseName || result.knowledgeBaseId}</div>
+          </div>
+          <div className={styles.chunkMetaRow}>
+            <div className={styles.chunkMetaTitle}><Rows3 size={13} /> 檢索摘要</div>
+            <div className={styles.chunkMetaText}>
+              {result.knowledgeContext.profileSummary || '本次未使用持久化知識庫摘要。'}
+            </div>
+          </div>
+          {result.knowledgeContext.retrievalQuery && (
+            <div className={styles.chunkMetaRow}>
+              <div className={styles.chunkMetaTitle}><Tag size={13} /> Retrieval Query</div>
+              <div className={styles.chunkMetaText}>{result.knowledgeContext.retrievalQuery}</div>
+            </div>
+          )}
+          {result.knowledgeContext.usedSources.length > 0 && (
+            <div className={styles.chunkMetaRow}>
+              <div className={styles.chunkMetaTitle}><Link2 size={13} /> 來源</div>
+              <div className={styles.chunkRelationList}>
+                {result.knowledgeContext.usedSources.map(source => (
+                  <div key={`${result.knowledgeBaseId}-${source.sourceId}`} className={styles.chunkRelationItem}>
+                    <span className={styles.chunkRelationLabel}>{source.label}</span>
+                    <span className={styles.chunkRelationScore}>
+                        {typeof source.similarity === 'number' ? `${Math.round(source.similarity * 100)}%` : source.kind}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </motion.section>
       )}
 

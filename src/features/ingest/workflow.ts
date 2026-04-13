@@ -10,6 +10,14 @@ import type {
   IngestStreamEvent,
   PreviewKind,
 } from './contracts';
+import {
+  buildKnowledgeSourceReferences,
+  renderKnowledgeContext,
+  uniqueStrings,
+  type KnowledgeBaseRecord,
+  type KnowledgeChunkMatch,
+  type KnowledgeProfileRecord,
+} from './knowledge';
 import type { IngestPrompts } from './prompts';
 import { buildChunkRelations } from './relations';
 import type { IngestRepository, PersistableDocumentChunk } from './repository';
@@ -17,14 +25,15 @@ import { ChunkAnalysisService } from './services/ChunkAnalysisService';
 import { DocumentOverviewService } from './services/DocumentOverviewService';
 import { DocumentSummaryService } from './services/DocumentSummaryService';
 import { ImageAnalysisService } from './services/ImageAnalysisService';
+import { KnowledgeProfileService } from './services/KnowledgeProfileService';
 import { buildParsedPreview, buildPreview } from './text';
 
 type EnrichedChunk = PersistableDocumentChunk;
 
 type IngestWorkflowInput = {
   file: File;
-  globalContext: string;
   previewKind: PreviewKind;
+  knowledgeBase: KnowledgeBaseRecord;
 };
 
 type IngestWorkflowOptions = {
@@ -62,11 +71,29 @@ function buildChunkEmbeddingText(documentOverview: string, summary: string, chun
   ].filter(Boolean).join('\n');
 }
 
+function buildImageRetrievalQuery(filename: string, hints: {
+  summary: string;
+  chartType: string;
+  keywords: string[];
+  candidateQueries: string[];
+  visibleText: string[];
+}) {
+  return uniqueStrings([
+    filename.replace(/\.[^.]+$/, ''),
+    hints.summary,
+    hints.chartType,
+    ...hints.keywords,
+    ...hints.candidateQueries,
+    ...hints.visibleText,
+  ]).join(' ');
+}
+
 export class IngestWorkflow {
   private readonly overviewService: DocumentOverviewService;
   private readonly chunkAnalysisService: ChunkAnalysisService;
   private readonly summaryService: DocumentSummaryService;
   private readonly imageAnalysisService: ImageAnalysisService;
+  private readonly knowledgeProfileService: KnowledgeProfileService;
   private readonly now: () => number;
   private readonly createId: () => string;
 
@@ -74,7 +101,12 @@ export class IngestWorkflow {
     this.overviewService = new DocumentOverviewService(options.runtime, options.prompts.documentOverview);
     this.chunkAnalysisService = new ChunkAnalysisService(options.runtime, options.prompts.chunkAnalysis);
     this.summaryService = new DocumentSummaryService(options.runtime, options.prompts.documentSummary);
-    this.imageAnalysisService = new ImageAnalysisService(options.runtime, options.prompts.imageAnalysis);
+    this.imageAnalysisService = new ImageAnalysisService(
+      options.runtime,
+      options.prompts.imageQuery,
+      options.prompts.imageAnalysis,
+    );
+    this.knowledgeProfileService = new KnowledgeProfileService(options.runtime, options.prompts.knowledgeProfile);
     this.now = options.now ?? Date.now;
     this.createId = options.createId ?? randomUUID;
   }
@@ -128,39 +160,154 @@ export class IngestWorkflow {
     };
   }
 
+  private async loadProfileContext(knowledgeBase: KnowledgeBaseRecord) {
+    if (!this.options.repository) {
+      return {
+        profile: null as KnowledgeProfileRecord | null,
+        text: '',
+        trace: {
+          knowledgeBaseId: knowledgeBase.id,
+          knowledgeBaseName: knowledgeBase.name,
+          usedChunkCount: 0,
+          usedSources: [],
+          fallbackTriggered: true,
+        },
+      };
+    }
+
+    const profile = await this.options.repository.getKnowledgeProfile(knowledgeBase.id);
+    const text = renderKnowledgeContext({ profile });
+
+    return {
+      profile,
+      text,
+      trace: {
+        knowledgeBaseId: knowledgeBase.id,
+        knowledgeBaseName: knowledgeBase.name,
+        profileVersion: profile?.version,
+        profileSummary: profile?.summary,
+        usedChunkCount: 0,
+        usedSources: buildKnowledgeSourceReferences({ profile }),
+        fallbackTriggered: !profile || text.trim().length === 0,
+      },
+    };
+  }
+
+  private async refreshKnowledgeProfile(knowledgeBase: KnowledgeBaseRecord, emit: IngestEventHandler) {
+    if (!this.options.repository) {
+      return null;
+    }
+
+    this.emitStep(emit, '更新知識庫聚合摘要與術語輪廓。');
+    const [sources, stats] = await Promise.all([
+      this.options.repository.listKnowledgeProfileSources(knowledgeBase.id, 16),
+      this.options.repository.getKnowledgeBaseStats(knowledgeBase.id),
+    ]);
+
+    const profile = await this.knowledgeProfileService.summarize({
+      knowledgeBaseName: knowledgeBase.name,
+      sources,
+    });
+
+    return this.options.repository.saveKnowledgeProfile({
+      knowledgeBaseId: knowledgeBase.id,
+      summary: profile.summary,
+      focusAreas: profile.focusAreas,
+      keyTerms: profile.keyTerms,
+      researchQuestions: profile.researchQuestions,
+      methods: profile.methods,
+      recentUpdates: profile.recentUpdates,
+      sourceCount: stats.sourceCount,
+      chunkCount: stats.chunkCount,
+    });
+  }
+
+  private async retrieveKnowledgeChunks(knowledgeBase: KnowledgeBaseRecord, queryText: string, matchCount = 4) {
+    if (!this.options.repository || !queryText.trim()) {
+      return [] as KnowledgeChunkMatch[];
+    }
+
+    const queryEmbedding = await this.options.runtime.createEmbedding({ text: queryText });
+    return this.options.repository.retrieveRelevantChunks({
+      knowledgeBaseId: knowledgeBase.id,
+      queryText,
+      queryEmbedding,
+      matchCount,
+      matchThreshold: 0.35,
+      sourceTypes: ['document'],
+    });
+  }
+
   private async processImage(input: IngestWorkflowInput, emit: IngestEventHandler): Promise<ImageIngestResult> {
     const startedAt = this.now();
-    const contextApplied = input.globalContext.trim().length > 0;
 
-    this.emitStep(emit, '讀取圖片檔案內容。');
+    this.emitStep(emit, `讀取圖片檔案內容，目標知識庫：${input.knowledgeBase.name}。`);
     const textBuffer = await input.file.arrayBuffer();
     const base64 = Buffer.from(textBuffer).toString('base64');
     const mimeType = input.file.type || 'image/jpeg';
+    const imageDataUrl = `data:${mimeType};base64,${base64}`;
 
-    this.emitStep(emit, contextApplied ? '套用前面文件摘要當作圖片分析上下文。' : '沒有文件上下文，直接做圖片分析。');
-    this.emitStep(emit, '送出至 AI runtime 進行圖片理解。');
-    const description = await this.imageAnalysisService.analyze(`data:${mimeType};base64,${base64}`, input.globalContext);
+    this.emitStep(emit, '先建立圖片的初步理解與檢索線索。');
+    const hints = await this.imageAnalysisService.buildRetrievalHints(imageDataUrl, input.file.name);
+    const retrievalQuery = buildImageRetrievalQuery(input.file.name, hints);
+
+    this.emitStep(emit, retrievalQuery ? '依照圖片線索到知識庫檢索相關片段。' : '本次未能建立有效檢索線索，將以知識庫摘要或純圖片理解作為 fallback。');
+    const [profileContext, retrievedChunks] = await Promise.all([
+      this.loadProfileContext(input.knowledgeBase),
+      this.retrieveKnowledgeChunks(input.knowledgeBase, retrievalQuery),
+    ]);
+
+    const knowledgeContext = renderKnowledgeContext({
+      profile: profileContext.profile,
+      chunks: retrievedChunks,
+      maxChunkCount: 4,
+    });
+    const contextApplied = knowledgeContext.trim().length > 0;
+
+    this.emitStep(emit, contextApplied ? '已注入知識庫摘要與相關片段，開始正式圖片分析。' : '知識庫中沒有足夠可用上下文，改以純圖片理解模式分析。');
+    const description = await this.imageAnalysisService.analyze({
+      imageDataUrl,
+      knowledgeContext,
+      preliminarySummary: hints.summary,
+      retrievalQuery,
+    });
 
     this.emitStep(emit, '圖片分析完成，開始生成向量表示。');
-    const embeddingVector = await this.options.runtime.createEmbedding({
-      text: description,
-    });
+    const embeddingVector = await this.options.runtime.createEmbedding({ text: description });
+
+    const knowledgeContextTrace = {
+      knowledgeBaseId: input.knowledgeBase.id,
+      knowledgeBaseName: input.knowledgeBase.name,
+      profileVersion: profileContext.profile?.version,
+      profileSummary: profileContext.profile?.summary,
+      retrievalQuery,
+      usedChunkCount: retrievedChunks.length,
+      usedSources: buildKnowledgeSourceReferences({
+        profile: profileContext.profile,
+        chunks: retrievedChunks,
+      }),
+      fallbackTriggered: !contextApplied,
+    };
 
     const result: ImageIngestResult = {
       type: 'image',
+      knowledgeBaseId: input.knowledgeBase.id,
+      knowledgeBaseName: input.knowledgeBase.name,
       previewKind: input.previewKind,
       processingDurationMs: this.now() - startedAt,
       description,
       descriptionSnippet: buildPreview(description, 120),
       contextApplied,
+      knowledgeContext: knowledgeContextTrace,
       dbWritten: false,
     };
 
     if (this.options.repository) {
-      this.emitStep(emit, '準備將圖片分析結果寫入資料庫。');
+      this.emitStep(emit, '準備將圖片分析結果寫入知識庫。');
 
       try {
         await this.options.repository.saveImage({
+          knowledgeBaseId: input.knowledgeBase.id,
           fileName: input.file.name,
           previewKind: input.previewKind,
           result,
@@ -170,9 +317,10 @@ export class IngestWorkflow {
           promptVariant: this.options.prompts.id,
         });
         result.dbWritten = true;
-        this.emitStep(emit, '圖片分析結果已寫入資料庫。');
+        this.emitStep(emit, '圖片分析結果已寫入知識庫。');
+        await this.refreshKnowledgeProfile(input.knowledgeBase, emit);
       } catch (error) {
-        this.emitStep(emit, `圖片結果寫入資料庫失敗：${getErrorMessage(error)}`);
+        this.emitStep(emit, `圖片結果寫入知識庫失敗：${getErrorMessage(error)}`);
       }
     }
 
@@ -181,10 +329,11 @@ export class IngestWorkflow {
 
   private async processDocument(input: IngestWorkflowInput, emit: IngestEventHandler): Promise<DocumentIngestResult> {
     const startedAt = this.now();
-    const contextApplied = input.globalContext.trim().length > 0;
     const documentId = this.createId();
+    const profileContext = await this.loadProfileContext(input.knowledgeBase);
+    const contextApplied = profileContext.text.trim().length > 0;
 
-    this.emitStep(emit, '讀取文件檔案內容。');
+    this.emitStep(emit, `讀取文件檔案內容，目標知識庫：${input.knowledgeBase.name}。`);
     const buffer = Buffer.from(await input.file.arrayBuffer());
 
     let parsedText = '';
@@ -199,12 +348,12 @@ export class IngestWorkflow {
     const parsedTextPreview = buildParsedPreview(parsedText);
     this.emitStep(emit, `文件已依語意邊界切成 ${chunks.length} 個 chunks（目標 500 words，重疊 100 words）。`);
 
-    this.emitStep(emit, '先建立文件總覽，讓後續 chunk 分析具備整體脈絡。');
+    this.emitStep(emit, contextApplied ? '已載入既有知識庫摘要，將作為本次文件分析脈絡。' : '知識庫尚未形成穩定摘要，先以文件自身脈絡建立新知識。');
     const documentOverview = await this.overviewService.summarize(
       input.file.name,
       chunks,
       parsedTextPreview,
-      input.globalContext,
+      profileContext.text,
     );
 
     const enrichedChunks: EnrichedChunk[] = [];
@@ -217,7 +366,7 @@ export class IngestWorkflow {
           chunk,
           previousChunk: chunks[chunk.index - 1],
           nextChunk: chunks[chunk.index + 1],
-          globalContext: input.globalContext,
+          knowledgeContext: profileContext.text,
           documentOverview,
         });
         const embedding = await this.options.runtime.createEmbedding({
@@ -236,6 +385,8 @@ export class IngestWorkflow {
         enrichedChunks.push(enrichedChunk);
         emit({
           type: 'chunk',
+          knowledgeBaseId: input.knowledgeBase.id,
+          knowledgeBaseName: input.knowledgeBase.name,
           chunk: this.stripChunkEmbedding(enrichedChunk),
           documentId,
           chunkCount: chunks.length,
@@ -255,6 +406,8 @@ export class IngestWorkflow {
         enrichedChunks.push(fallbackChunk);
         emit({
           type: 'chunk',
+          knowledgeBaseId: input.knowledgeBase.id,
+          knowledgeBaseName: input.knowledgeBase.name,
           chunk: this.stripChunkEmbedding(fallbackChunk),
           documentId,
           chunkCount: chunks.length,
@@ -277,12 +430,14 @@ export class IngestWorkflow {
     const summary = await this.summaryService.summarize(
       input.file.name,
       chunksWithRelations.map(chunk => this.stripChunkEmbedding(chunk)),
-      input.globalContext,
+      profileContext.text,
       documentOverview,
     );
 
     const result: DocumentIngestResult = {
       type: 'document',
+      knowledgeBaseId: input.knowledgeBase.id,
+      knowledgeBaseName: input.knowledgeBase.name,
       previewKind: input.previewKind,
       documentId,
       chunkCount: chunks.length,
@@ -292,14 +447,16 @@ export class IngestWorkflow {
       parsedTextPreview,
       chunkAnalyses: chunksWithRelations.map(chunk => this.stripChunkEmbedding(chunk)),
       contextApplied,
+      knowledgeContext: profileContext.trace,
       dbWritten: false,
     };
 
     if (this.options.repository) {
-      this.emitStep(emit, '準備將文件與 chunk 分析結果寫入資料庫。');
+      this.emitStep(emit, '準備將文件與 chunk 分析結果寫入知識庫。');
 
       try {
         await this.options.repository.saveDocument({
+          knowledgeBaseId: input.knowledgeBase.id,
           fileName: input.file.name,
           previewKind: input.previewKind,
           result,
@@ -307,9 +464,10 @@ export class IngestWorkflow {
           promptVariant: this.options.prompts.id,
         });
         result.dbWritten = true;
-        this.emitStep(emit, '文件與 chunk 分析結果已寫入資料庫。');
+        this.emitStep(emit, '文件與 chunk 分析結果已寫入知識庫。');
+        await this.refreshKnowledgeProfile(input.knowledgeBase, emit);
       } catch (error) {
-        this.emitStep(emit, `文件結果寫入資料庫失敗：${getErrorMessage(error)}`);
+        this.emitStep(emit, `文件結果寫入知識庫失敗：${getErrorMessage(error)}`);
       }
     }
 

@@ -7,13 +7,22 @@ import styles from './RagQueryPanel.module.css';
 
 interface SearchResult {
   id: string;
+  knowledgeBaseId: string;
   documentId: string;
+  filename: string;
+  sourceType: 'document' | 'image';
   content: string;
   summary: string;
+  keywords: string[];
   similarity: number;
 }
 
-export function RagQueryPanel() {
+interface RagQueryPanelProps {
+  knowledgeBaseId: string | null;
+  knowledgeBaseName?: string;
+}
+
+export function RagQueryPanel({ knowledgeBaseId, knowledgeBaseName }: RagQueryPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [isQuerying, setIsQuerying] = useState(false);
@@ -49,10 +58,14 @@ export function RagQueryPanel() {
     setErrorMsg(null);
 
     try {
+      if (!knowledgeBaseId) {
+        throw new Error('請先選擇知識庫。');
+      }
+
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim(), limit: 5 }),
+        body: JSON.stringify({ query: query.trim(), knowledgeBaseId, limit: 5 }),
       });
 
       if (!response.ok) {
@@ -125,7 +138,7 @@ export function RagQueryPanel() {
                 ref={inputRef}
                 type="text"
                 className={styles.inputField}
-                placeholder="Search knowledge base..."
+                placeholder={knowledgeBaseName ? `Search ${knowledgeBaseName}...` : 'Search knowledge base...'}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -189,6 +202,7 @@ export function RagQueryPanel() {
                           </div>
                           <div className={styles.cardBody}>
                             <div className={styles.cardTitle}>{result.summary || '未命名片段'}</div>
+                            <div className={styles.cardSnippet}>{result.filename} · {result.sourceType}</div>
                             <div className={styles.cardSnippet}>{result.content}</div>
                           </div>
                         </motion.div>

@@ -8,7 +8,7 @@ export class DocumentOverviewService {
     private readonly prompt: DocumentOverviewPromptBundle,
   ) {}
 
-  async summarize(filename: string, chunks: TextChunk[], parsedTextPreview: string, globalContext: string) {
+  async summarize(filename: string, chunks: TextChunk[], parsedTextPreview: string, knowledgeContext: string) {
     if (chunks.length === 0) {
       return `文件 ${filename} 已完成解析，但目前沒有可用的 chunk 可建立整體總覽。`;
     }
@@ -18,7 +18,7 @@ export class DocumentOverviewService {
         systemPrompt: this.prompt.systemPrompt,
         prompt: this.prompt.buildPrompt({
           filename,
-          globalContext,
+          knowledgeContext,
           parsedTextPreview,
           chunks,
         }),

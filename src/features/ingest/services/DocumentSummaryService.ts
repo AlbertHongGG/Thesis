@@ -8,7 +8,7 @@ export class DocumentSummaryService {
     private readonly prompt: DocumentSummaryPromptBundle,
   ) {}
 
-  async summarize(filename: string, chunks: DocumentChunkAnalysis[], globalContext: string, documentOverview: string) {
+  async summarize(filename: string, chunks: DocumentChunkAnalysis[], knowledgeContext: string, documentOverview: string) {
     const usableChunks = chunks.filter(chunk => chunk.summary.trim().length > 0).slice(0, 12);
 
     if (usableChunks.length === 0) {
@@ -20,7 +20,7 @@ export class DocumentSummaryService {
         systemPrompt: this.prompt.systemPrompt,
         prompt: this.prompt.buildPrompt({
           filename,
-          globalContext,
+          knowledgeContext,
           documentOverview,
           chunks: usableChunks,
         }),

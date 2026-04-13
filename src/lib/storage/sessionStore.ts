@@ -1,7 +1,7 @@
 import { INGEST_CONTRACT_VERSION, type IngestResult } from '@/features/ingest/contracts';
 
 const DB_NAME = 'thesis-rag-workbench';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const SESSION_STORE = 'session';
 const FILE_STORE = 'files';
 const ACTIVE_SESSION_KEY = 'active';
@@ -30,7 +30,7 @@ export type PersistedFileProcessEntry = {
 export type PersistedSessionSnapshot = {
   key: string;
   schemaVersion: number;
-  globalContext: string;
+  activeKnowledgeBaseId: string | null;
   fileOrder: string[];
   processEntries: Record<string, PersistedFileProcessEntry>;
   savedAt: number;

@@ -14,7 +14,7 @@ export interface ChunkAnalysisPromptBundle {
     chunk: TextChunk;
     previousChunk?: TextChunk;
     nextChunk?: TextChunk;
-    globalContext: string;
+    knowledgeContext: string;
     documentOverview: string;
   }): string;
   parse(rawText: string): ChunkAnalysisPromptResult;
@@ -25,7 +25,7 @@ export interface DocumentOverviewPromptBundle {
   systemPrompt: string;
   buildPrompt(input: {
     filename: string;
-    globalContext: string;
+    knowledgeContext: string;
     parsedTextPreview: string;
     chunks: TextChunk[];
   }): string;
@@ -36,16 +36,53 @@ export interface DocumentSummaryPromptBundle {
   systemPrompt: string;
   buildPrompt(input: {
     filename: string;
-    globalContext: string;
+    knowledgeContext: string;
     documentOverview: string;
     chunks: DocumentChunkAnalysis[];
   }): string;
 }
 
+export type ImageQueryPromptResult = {
+  summary: string;
+  chartType: string;
+  keywords: string[];
+  candidateQueries: string[];
+  visibleText: string[];
+};
+
+export interface ImageQueryPromptBundle {
+  id: string;
+  systemPrompt: string;
+  buildPrompt(input: { filename: string }): string;
+  parse(rawText: string): ImageQueryPromptResult;
+}
+
 export interface ImageAnalysisPromptBundle {
   id: string;
   systemPrompt: string;
-  buildPrompt(input: { globalContext: string }): string;
+  buildPrompt(input: {
+    knowledgeContext: string;
+    preliminarySummary: string;
+    retrievalQuery: string;
+  }): string;
+}
+
+export interface KnowledgeProfilePromptBundle {
+  id: string;
+  systemPrompt: string;
+  buildPrompt(input: {
+    knowledgeBaseName: string;
+    sourceSummaries: string[];
+    keyTerms: string[];
+  }): string;
+  parse(rawText: string): {
+    summary: string;
+    focusAreas: string[];
+    keyTerms: string[];
+    researchQuestions: string[];
+    methods: string[];
+    recentUpdates: string[];
+  };
 }
 
 export interface IngestPrompts {
@@ -53,5 +90,7 @@ export interface IngestPrompts {
   documentOverview: DocumentOverviewPromptBundle;
   chunkAnalysis: ChunkAnalysisPromptBundle;
   documentSummary: DocumentSummaryPromptBundle;
+  imageQuery: ImageQueryPromptBundle;
   imageAnalysis: ImageAnalysisPromptBundle;
+  knowledgeProfile: KnowledgeProfilePromptBundle;
 }

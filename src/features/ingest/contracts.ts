@@ -1,4 +1,6 @@
-export const INGEST_CONTRACT_VERSION = 3;
+import type { KnowledgeContextTrace } from './knowledge';
+
+export const INGEST_CONTRACT_VERSION = 4;
 
 export type PreviewKind = 'image' | 'text' | 'parsed-text' | 'unsupported';
 
@@ -27,6 +29,8 @@ export type DocumentChunkAnalysis = {
 
 export type DocumentIngestResult = {
   type: 'document';
+  knowledgeBaseId: string;
+  knowledgeBaseName?: string;
   previewKind?: PreviewKind;
   documentId: string;
   chunkCount: number;
@@ -36,16 +40,20 @@ export type DocumentIngestResult = {
   parsedTextPreview?: string;
   chunkAnalyses: DocumentChunkAnalysis[];
   contextApplied?: boolean;
+  knowledgeContext?: KnowledgeContextTrace;
   dbWritten?: boolean;
 };
 
 export type ImageIngestResult = {
   type: 'image';
+  knowledgeBaseId: string;
+  knowledgeBaseName?: string;
   previewKind?: PreviewKind;
   processingDurationMs?: number;
   description?: string;
   descriptionSnippet?: string;
   contextApplied?: boolean;
+  knowledgeContext?: KnowledgeContextTrace;
   dbWritten?: boolean;
 };
 
@@ -58,6 +66,8 @@ export type IngestStepEvent = {
 
 export type IngestChunkEvent = {
   type: 'chunk';
+  knowledgeBaseId: string;
+  knowledgeBaseName?: string;
   chunk: DocumentChunkAnalysis;
   documentId: string;
   chunkCount: number;
