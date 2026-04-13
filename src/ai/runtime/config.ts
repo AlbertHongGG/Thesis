@@ -68,6 +68,7 @@ export function resolveAIRuntimeConfig(options: AIRuntimeFactoryOptions = {}): A
   const env = options.env ?? process.env;
   const defaultProvider = parseProvider(normalizeString(env.AI_PROVIDER), 'AI_PROVIDER', 'ollama');
   const featureProvider = parseProvider(readFeatureValue(env, options.featureKey, 'AI_PROVIDER'), `${normalizeFeatureKey(options.featureKey) ?? 'FEATURE'}_AI_PROVIDER`, defaultProvider);
+  const resolvedProvider = options.provider ?? featureProvider;
   const modelConfig = readRuntimeModels(env, options.featureKey);
   const timeoutMs = options.timeoutMs
     ?? parsePositiveNumber(
@@ -77,7 +78,7 @@ export function resolveAIRuntimeConfig(options: AIRuntimeFactoryOptions = {}): A
     );
 
   return {
-    provider: options.provider ?? featureProvider,
+    provider: resolvedProvider,
     textModel: options.textModel ?? modelConfig.textModel,
     visionModel: options.visionModel ?? modelConfig.visionModel,
     embeddingModel: options.embeddingModel ?? modelConfig.embeddingModel,

@@ -30,7 +30,7 @@ const LiveDurationBadge = ({ startedAt, completedAt, status }: { startedAt: numb
   const isProcessing = status === 'processing';
   const liveNow = useLiveNow(isProcessing);
   const durationText = useMemo(() => {
-    return formatDuration((completedAt ?? liveNow) - startedAt);
+    return formatDuration((completedAt ?? liveNow ?? startedAt) - startedAt);
   }, [completedAt, liveNow, startedAt]);
 
   return (
@@ -43,23 +43,33 @@ const LiveDurationBadge = ({ startedAt, completedAt, status }: { startedAt: numb
 
 export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewModalProps) => {
   const [previewState, setPreviewState] = useState<PreviewState>({ status: 'idle' });
+  const previewKind = file ? getPreviewKind(file.name) : 'unsupported';
+  const imageObjectUrl = useMemo(() => {
+    if (!isOpen || !file || previewKind !== 'image') {
+      return null;
+    }
+
+    return URL.createObjectURL(file);
+  }, [file, isOpen, previewKind]);
 
   useEffect(() => {
-    if (!isOpen || !file) return;
+    if (!imageObjectUrl) {
+      return;
+    }
 
-    const previewKind = getPreviewKind(file.name);
+    return () => {
+      URL.revokeObjectURL(imageObjectUrl);
+    };
+  }, [imageObjectUrl]);
+
+  useEffect(() => {
+    if (!isOpen || !file || previewKind === 'image') {
+      return;
+    }
+
     let revoked = false;
-    let objectUrl = '';
 
     const loadPreview = async () => {
-      if (previewKind === 'image') {
-        objectUrl = URL.createObjectURL(file);
-        if (!revoked) {
-          setPreviewState({ status: 'ready', kind: 'image', content: objectUrl, metaLabel: '原始圖片' });
-        }
-        return;
-      }
-
       if (previewKind === 'text') {
         setPreviewState({ status: 'loading' });
         try {
@@ -99,11 +109,24 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
 
     return () => {
       revoked = true;
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
     };
-  }, [entry?.result, entry?.status, file, isOpen]);
+  }, [entry?.result, entry?.status, file, isOpen, previewKind]);
+
+  const resolvedPreviewState = useMemo<PreviewState>(() => {
+    if (!isOpen || !file) {
+      return { status: 'idle' };
+    }
+
+    if (previewKind === 'image') {
+      if (!imageObjectUrl) {
+        return { status: 'loading' };
+      }
+
+      return { status: 'ready', kind: 'image', content: imageObjectUrl, metaLabel: '原始圖片' };
+    }
+
+    return previewState;
+  }, [file, imageObjectUrl, isOpen, previewKind, previewState]);
 
   const headerStatusClass = entry ? styles[`status${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] : styles.statusIdle;
 
@@ -111,7 +134,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
     <div className={styles.modalTitle}>
       <div className={styles.titleInfo}>
         <div className={styles.titleRow}>
-          {getPreviewKind(file.name) === 'image' ? <ImageIcon size={20} className={styles.titleIcon} /> : <FileText size={20} className={styles.titleIcon} />}
+          {previewKind === 'image' ? <ImageIcon size={20} className={styles.titleIcon} /> : <FileText size={20} className={styles.titleIcon} />}
           <h2 className={styles.titleText}>{file.name}</h2>
         </div>
         <div className={styles.pathText}>{file.path || file.name}</div>
@@ -151,29 +174,29 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
                   </div>
                   <div className={styles.metaList}>
                     <span className={styles.metaBadge}>{formatFileSize(file.size)}</span>
-                    <span className={styles.metaBadgeBadgeBlue}>{previewState.status === 'ready' ? previewState.metaLabel : '內容準備中'}</span>
+                    <span className={styles.metaBadgeBadgeBlue}>{resolvedPreviewState.status === 'ready' ? resolvedPreviewState.metaLabel : '內容準備中'}</span>
                   </div>
                 </div>
                 <div className={styles.sectionBody}>
-                  {previewState.status === 'ready' && previewState.kind === 'image' && (
+                  {resolvedPreviewState.status === 'ready' && resolvedPreviewState.kind === 'image' && (
                     <motion.div className={styles.imagePreviewFrame} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
-                      <Image src={previewState.content} alt={file.name} className={styles.imagePreview} width={1200} height={900} unoptimized />
+                      <Image src={resolvedPreviewState.content} alt={file.name} className={styles.imagePreview} width={1200} height={900} unoptimized />
                     </motion.div>
                   )}
-                  {previewState.status === 'ready' && previewState.kind !== 'image' && (
-                    <motion.pre className={styles.textPreview} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{previewState.content}</motion.pre>
+                  {resolvedPreviewState.status === 'ready' && resolvedPreviewState.kind !== 'image' && (
+                    <motion.pre className={styles.textPreview} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{resolvedPreviewState.content}</motion.pre>
                   )}
-                  {previewState.status === 'loading' && (
+                  {resolvedPreviewState.status === 'loading' && (
                     <motion.div className={styles.previewState} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                       <LoaderCircle size={20} className={styles.spinningIcon} /> 正在讀取檔案內容...
                     </motion.div>
                   )}
-                  {previewState.status === 'unsupported' && (
-                    <motion.div className={styles.previewState} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{previewState.message}</motion.div>
+                  {resolvedPreviewState.status === 'unsupported' && (
+                    <motion.div className={styles.previewState} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{resolvedPreviewState.message}</motion.div>
                   )}
-                  {previewState.status === 'error' && (
+                  {resolvedPreviewState.status === 'error' && (
                     <motion.div className={styles.previewStateError} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                      <AlertCircle size={20} /> Preview 載入失敗：{previewState.message}
+                      <AlertCircle size={20} /> Preview 載入失敗：{resolvedPreviewState.message}
                     </motion.div>
                   )}
                 </div>

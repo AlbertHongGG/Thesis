@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export function useLiveNow(active: boolean, intervalMs = 1000) {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     if (!active) return;

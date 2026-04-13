@@ -60,6 +60,20 @@ interface RestorePromptState {
 
 const MAX_GLOBAL_CONTEXT_CHARS = 10000;
 
+async function readIngestError(response: Response) {
+  const contentType = response.headers.get('content-type') ?? '';
+
+  if (contentType.includes('application/json')) {
+    const data = await response.json().catch(() => null) as { error?: unknown } | null;
+    if (typeof data?.error === 'string' && data.error.trim()) {
+      return data.error.trim();
+    }
+  }
+
+  const text = await response.text().catch(() => '');
+  return text.trim() || `HTTP ${response.status}`;
+}
+
 
 function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
   const file = new File([record.blob], record.name, {
@@ -201,7 +215,7 @@ const ProcessDurationValue = React.memo(({ entry }: { entry: FileProcessEntry })
     return <strong className={styles.processDurationValue}>0.0s</strong>;
   }
 
-  const duration = formatDuration((entry.completedAt ?? liveNow) - entry.startedAt);
+  const duration = formatDuration((entry.completedAt ?? liveNow ?? entry.startedAt) - entry.startedAt);
   return <strong className={styles.processDurationValue}>{duration}</strong>;
 });
 ProcessDurationValue.displayName = 'ProcessDurationValue';
@@ -573,7 +587,7 @@ export default function DataWorkbench() {
 
   const processStreamResponse = useCallback(async (res: Response, fullPath: string): Promise<IngestResult> => {
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
+      throw new Error(await readIngestError(res));
     }
 
     if (!res.body) {

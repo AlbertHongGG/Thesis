@@ -1,39 +1,55 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Next.js: dev",
-      "type": "shell",
-      "command": "npm run dev",
-      "isBackground": true,
-      "problemMatcher": "$nextjs-dev",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      }
-    },
-    {
-      "label": "Next.js: build",
-      "type": "shell",
-      "command": "npm run build",
-      "problemMatcher": [],
-      "group": "build"
-    },
-    {
-      "label": "Next.js: start",
-      "type": "shell",
-      "command": "npm start",
-      "problemMatcher": []
-    },
-    {
-      "label": "Project: install",
-      "type": "shell",
-      "command": "npm install",
-      "problemMatcher": []
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Next.js: dev",
+			"type": "shell",
+			"command": "npm run dev",
+			"isBackground": true,
+			"problemMatcher": "$nextjs-dev",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Next.js: build",
+			"type": "shell",
+			"command": "npm run build",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Next.js: start",
+			"type": "shell",
+			"command": "npm start",
+			"problemMatcher": []
+		},
+		{
+			"label": "Project: install",
+			"type": "shell",
+			"command": "npm install",
+			"problemMatcher": []
+		},
+		{
+			"label": "Ingest API smoke test",
+			"type": "shell",
+			"command": "curl",
+			"args": [
+				"-sS",
+				"-X",
+				"POST",
+				"-F",
+				"file=@README.md",
+				"-F",
+				"globalContext=",
+				"http://localhost:3000/api/ingest"
+			],
+			"isBackground": false
+		}
+	]
 }

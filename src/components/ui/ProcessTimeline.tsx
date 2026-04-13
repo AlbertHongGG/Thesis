@@ -21,7 +21,7 @@ const StepLiveDuration = ({ startedAt, completedAt, status }: { startedAt: numbe
   const liveNow = useLiveNow(isRunning);
   
   const stepDuration = useMemo(() => {
-    const stepEnd = completedAt ?? liveNow;
+    const stepEnd = completedAt ?? liveNow ?? startedAt;
     return formatDuration(stepEnd - startedAt);
   }, [completedAt, liveNow, startedAt]);
 
