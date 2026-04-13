@@ -1,7 +1,7 @@
-import type { IngestResult } from '@/lib/workbench/types';
+import { INGEST_CONTRACT_VERSION, type IngestResult } from '@/features/ingest/contracts';
 
 const DB_NAME = 'thesis-rag-workbench';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const SESSION_STORE = 'session';
 const FILE_STORE = 'files';
 const ACTIVE_SESSION_KEY = 'active';
@@ -29,6 +29,7 @@ export type PersistedFileProcessEntry = {
 
 export type PersistedSessionSnapshot = {
   key: string;
+  schemaVersion: number;
   globalContext: string;
   fileOrder: string[];
   processEntries: Record<string, PersistedFileProcessEntry>;
@@ -101,7 +102,7 @@ export async function loadRestorableSession(): Promise<RestorableSession | null>
       snapshotTransaction.objectStore(SESSION_STORE).get(ACTIVE_SESSION_KEY),
     ) as PersistedSessionSnapshot | undefined;
 
-    if (!snapshot || snapshot.fileOrder.length === 0) {
+    if (!snapshot || snapshot.schemaVersion !== INGEST_CONTRACT_VERSION || snapshot.fileOrder.length === 0) {
       return null;
     }
 
@@ -128,12 +129,13 @@ export async function loadRestorableSession(): Promise<RestorableSession | null>
   });
 }
 
-export async function saveSessionSnapshot(snapshot: Omit<PersistedSessionSnapshot, 'key' | 'savedAt'>): Promise<void> {
+export async function saveSessionSnapshot(snapshot: Omit<PersistedSessionSnapshot, 'key' | 'savedAt' | 'schemaVersion'>): Promise<void> {
   return withDatabase(async db => {
     const transaction = db.transaction(SESSION_STORE, 'readwrite');
     transaction.objectStore(SESSION_STORE).put({
       ...snapshot,
       key: ACTIVE_SESSION_KEY,
+      schemaVersion: INGEST_CONTRACT_VERSION,
       savedAt: Date.now(),
     });
 

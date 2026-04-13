@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Thesis Editor
+
+這個工作區現在採用和 `Transitor` 相同的 AI 邊界設計：
+
+- `src/ai/runtime/` 只負責 AI runtime、provider 選擇與 env 解析
+- `src/features/ingest/` 只負責 ingest 功能流程
+- `src/features/ingest/prompts/` 是獨立 prompt 資產與 variant
+- `src/app/api/ingest/route.ts` 是 thin controller，只負責接 request 與串流結果
+
+功能邏輯不再理解 provider 細節，runtime 也不再把 provider/model metadata 外洩到前端 DTO、session persistence 或 Supabase 核心資料表。
 
 ## Getting Started
 
-First, run the development server:
+1. 準備 env
+
+	將 `.env.example` 的內容複製到 `.env`，再依照你要用的 provider/model 調整。
+
+2. 安裝依賴
+
+```bash
+npm install
+```
+
+3. 啟動開發伺服器
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. 驗證建置與 lint
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm run lint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## AI Runtime Env
 
-## Learn More
+全域預設：
 
-To learn more about Next.js, take a look at the following resources:
+- `AI_PROVIDER`: `ollama` 或 `copilot`
+- `AI_RUNTIME_MODEL`: 共用文字/視覺模型的簡寫預設
+- `AI_TEXT_MODEL`: 全域文字模型
+- `AI_VISION_MODEL`: 全域圖片分析模型
+- `AI_EMBEDDING_MODEL`: 全域 embedding 模型
+- `AI_RUNTIME_TIMEOUT_MS`: 全域 timeout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+ingest 功能覆寫：
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `INGEST_AI_PROVIDER`
+- `INGEST_AI_MODEL`
+- `INGEST_TEXT_MODEL`
+- `INGEST_VISION_MODEL`
+- `INGEST_EMBEDDING_MODEL`
+- `INGEST_TIMEOUT_MS`
+- `INGEST_PROMPT_VARIANT`
 
-## Deploy on Vercel
+provider 專屬設定：
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `OLLAMA_BASE_URL`
+- `COPILOT_BASE_URL`
+- `GITHUB_TOKEN`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Prompt 調整
+
+ingest prompt 已經從 workflow 拆開，位於：
+
+- `src/features/ingest/prompts/chunk-analysis.ts`
+- `src/features/ingest/prompts/document-summary.ts`
+- `src/features/ingest/prompts/image-analysis.ts`
+- `src/features/ingest/prompts/variants/default.ts`
+
+如果要調整 prompt，不需要修改 runtime 或 route；只需要調整 prompt bundle 或新增 variant，再透過 `INGEST_PROMPT_VARIANT` 切換。
+
+## Supabase Schema
+
+`supabase/rag_schema.sql` 已移除 runtime/provider/model provenance 欄位，改回 feature-centric schema。若你要讓資料庫結構同步，請重新套用 schema migration。

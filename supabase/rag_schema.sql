@@ -45,13 +45,20 @@ create table if not exists public.rag_document_chunks (
   start_offset integer not null default 0,
   end_offset integer not null default 0,
   status text not null default 'ready' check (status in ('ready', 'error')),
-  analysis_model text,
-  embedding_model text,
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now()),
   unique (document_id, chunk_index)
 );
+
+alter table if exists public.rag_documents drop column if exists workflow_key;
+alter table if exists public.rag_documents drop column if exists runtime_profile;
+
+alter table if exists public.rag_document_chunks drop column if exists analysis_provider;
+alter table if exists public.rag_document_chunks drop column if exists analysis_model;
+alter table if exists public.rag_document_chunks drop column if exists embedding_provider;
+alter table if exists public.rag_document_chunks drop column if exists embedding_model;
+alter table if exists public.rag_document_chunks drop column if exists runtime_profile;
 
 create index if not exists rag_documents_source_type_idx
   on public.rag_documents (source_type, created_at desc);

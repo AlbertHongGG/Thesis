@@ -37,6 +37,7 @@ import {
   saveSessionSnapshot,
   syncSessionFiles,
 } from '@/lib/storage/sessionStore';
+import type { IngestStreamEvent } from '@/features/ingest/contracts';
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
 import type {
@@ -50,20 +51,6 @@ import type {
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
 import styles from './page.module.css';
 
-type StreamEvent =
-  | { type: 'step'; message: string }
-  | {
-      type: 'chunk';
-      chunk: DocumentChunkAnalysis;
-      documentId: string;
-      chunkCount: number;
-      totalCharCount: number;
-      parsedTextPreview: string;
-      previewKind: DocumentIngestResult['previewKind'];
-      progress: { current: number; total: number };
-    }
-  | { type: 'result'; result: IngestResult }
-  | { type: 'error'; error: string };
 type PersistencePhase = 'checking' | 'prompt' | 'ready';
 
 interface RestorePromptState {
@@ -105,87 +92,8 @@ function serializeResult(result?: IngestResult) {
   } satisfies IngestResult;
 }
 
-function normalizeLegacyChunk(preview: unknown, index: number, documentId: string): DocumentChunkAnalysis | null {
-  if (!preview || typeof preview !== 'object') {
-    return null;
-  }
-
-  const candidate = preview as {
-    preview?: unknown;
-    charCount?: unknown;
-    index?: unknown;
-  };
-  const chunkIndex = typeof candidate.index === 'number' ? candidate.index : index;
-  const chunkPreview = typeof candidate.preview === 'string' ? candidate.preview : '';
-
-  if (!chunkPreview) {
-    return null;
-  }
-
-  return {
-    id: `${documentId}:legacy:${chunkIndex + 1}`,
-    index: chunkIndex,
-    text: chunkPreview,
-    preview: chunkPreview,
-    charCount: typeof candidate.charCount === 'number' ? candidate.charCount : chunkPreview.length,
-    wordCount: chunkPreview.trim().split(/\s+/).filter(Boolean).length,
-    startOffset: 0,
-    endOffset: typeof candidate.charCount === 'number' ? candidate.charCount : chunkPreview.length,
-    summary: chunkPreview,
-    keywords: [],
-    bridgingContext: '',
-    relatedChunks: [],
-    status: 'ready',
-  };
-}
-
 function normalizeRestoredResult(result?: IngestResult) {
-  if (!result) {
-    return undefined;
-  }
-
-  if (result.type === 'image') {
-    return { ...result } satisfies IngestResult;
-  }
-
-  const candidate = result as DocumentIngestResult & {
-    documentId?: string;
-    chunkCount?: number;
-    totalCharCount?: number;
-    chunkAnalyses?: unknown;
-    chunks?: unknown;
-    chunkPreviews?: unknown;
-  };
-  const documentId = typeof candidate.documentId === 'string' ? candidate.documentId : `restored-${Date.now()}`;
-  const chunkAnalyses = Array.isArray(candidate.chunkAnalyses)
-    ? candidate.chunkAnalyses.map(chunk => cloneChunkAnalysis(chunk as DocumentChunkAnalysis))
-    : Array.isArray(candidate.chunkPreviews)
-      ? candidate.chunkPreviews
-          .map((preview, index) => normalizeLegacyChunk(preview, index, documentId))
-          .filter((chunk): chunk is DocumentChunkAnalysis => chunk !== null)
-      : [];
-
-  return {
-    type: 'document',
-    previewKind: candidate.previewKind,
-    documentId,
-    chunkCount: typeof candidate.chunkCount === 'number'
-      ? candidate.chunkCount
-      : typeof candidate.chunks === 'number'
-        ? candidate.chunks
-        : chunkAnalyses.length,
-    totalCharCount: typeof candidate.totalCharCount === 'number'
-      ? candidate.totalCharCount
-      : typeof candidate.parsedTextPreview === 'string'
-        ? candidate.parsedTextPreview.length
-        : 0,
-    processingDurationMs: candidate.processingDurationMs,
-    summary: candidate.summary,
-    parsedTextPreview: candidate.parsedTextPreview,
-    chunkAnalyses,
-    contextApplied: candidate.contextApplied,
-    dbWritten: candidate.dbWritten,
-  } satisfies DocumentIngestResult;
+  return serializeResult(result);
 }
 
 function clampGlobalContext(text: string, maxLength = MAX_GLOBAL_CONTEXT_CHARS) {
@@ -535,7 +443,7 @@ export default function DataWorkbench() {
     });
   }, [buildInitialEntry]);
 
-  const mergeChunkResult = useCallback((fullPath: string, event: Extract<StreamEvent, { type: 'chunk' }>) => {
+  const mergeChunkResult = useCallback((fullPath: string, event: Extract<IngestStreamEvent, { type: 'chunk' }>) => {
     setProcessEntries(prev => {
       const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
       const documentResult = existing.result?.type === 'document'
@@ -687,7 +595,7 @@ export default function DataWorkbench() {
       for (const line of lines) {
         if (!line.trim()) continue;
 
-        const event = JSON.parse(line) as StreamEvent;
+        const event = JSON.parse(line) as IngestStreamEvent;
 
         if (event.type === 'step') {
           appendProcessStep(fullPath, event.message);
@@ -710,7 +618,7 @@ export default function DataWorkbench() {
     }
 
     if (buffer.trim()) {
-      const event = JSON.parse(buffer) as StreamEvent;
+      const event = JSON.parse(buffer) as IngestStreamEvent;
 
       if (event.type === 'step') {
         appendProcessStep(fullPath, event.message);
