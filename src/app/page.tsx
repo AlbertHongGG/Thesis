@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
   Box,
@@ -41,12 +41,8 @@ import {
   loadRestorableSession,
   type PersistedFileProcessEntry,
   type PersistedFileRecord,
-  type PersistedProcessStepEntry,
   type PersistedSessionSnapshot,
-  saveSessionSnapshot,
-  syncSessionFiles,
 } from '@/lib/storage/sessionStore';
-import type { IngestStreamEvent } from '@/features/ingest/contracts';
 import {
   DEFAULT_KNOWLEDGE_BASE_NAME,
   DEFAULT_KNOWLEDGE_BASE_SLUG,
@@ -55,6 +51,7 @@ import {
 } from '@/features/ingest/knowledge';
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
+import { useWorkbenchQueueState, workbenchQueue } from '@/lib/workbench/ingestQueue';
 import type {
   FileProcessEntry,
   FileProcessStatus,
@@ -83,20 +80,6 @@ const FALLBACK_KNOWLEDGE_BASE: KnowledgeBaseRecord = {
   unitCount: 0,
   profileVersion: 0,
 };
-
-async function readIngestError(response: Response) {
-  const contentType = response.headers.get('content-type') ?? '';
-
-  if (contentType.includes('application/json')) {
-    const data = await response.json().catch(() => null) as { error?: unknown } | null;
-    if (typeof data?.error === 'string' && data.error.trim()) {
-      return data.error.trim();
-    }
-  }
-
-  const text = await response.text().catch(() => '');
-  return text.trim() || `HTTP ${response.status}`;
-}
 
 
 function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
@@ -153,29 +136,6 @@ function normalizeRestoredResult(result?: IngestResult) {
   return serializeResult(result);
 }
 
-function serializeSteps(steps: ProcessStepEntry[]): PersistedProcessStepEntry[] {
-  return steps.map(step => ({
-    id: step.id,
-    message: step.message,
-    status: step.status,
-    startedAt: step.startedAt,
-    completedAt: step.completedAt,
-  }));
-}
-
-function serializeEntry(entry: FileProcessEntry): PersistedFileProcessEntry {
-  return {
-    path: entry.path,
-    displayPath: entry.displayPath,
-    status: entry.status,
-    steps: serializeSteps(entry.steps),
-    startedAt: entry.startedAt,
-    completedAt: entry.completedAt,
-    result: serializeResult(entry.result),
-    errorMessage: entry.errorMessage,
-  };
-}
-
 function normalizeRestoredEntry(entry: PersistedFileProcessEntry): FileProcessEntry {
   const restoredAt = Date.now();
   const normalizedSteps: ProcessStepEntry[] = entry.steps.map(step => ({
@@ -208,17 +168,6 @@ function normalizeRestoredEntry(entry: PersistedFileProcessEntry): FileProcessEn
   };
 }
 
-function buildPersistedFileRecord(file: ExtendedFile): PersistedFileRecord {
-  return {
-    path: file.path || file.name,
-    name: file.name,
-    type: file.type,
-    size: file.size,
-    lastModified: file.lastModified,
-    blob: file,
-  };
-}
-
 function countRunnablePaths(snapshot: PersistedSessionSnapshot) {
   return snapshot.fileOrder.filter(path => {
     const entry = snapshot.processEntries[path];
@@ -240,22 +189,17 @@ ProcessDurationValue.displayName = 'ProcessDurationValue';
 
 export default function DataWorkbench() {
   const router = useRouter();
-  const [files, setFiles] = useState<ExtendedFile[]>([]);
-  const [processMode, setProcessMode] = useState<'idle' | 'playing' | 'paused'>('idle');
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { files, processEntries, processMode, currentIndex, activeKnowledgeBaseId } = useWorkbenchQueueState();
   const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
   const [selectedPreviewPath, setSelectedPreviewPath] = useState<string | null>(null);
-  const [processEntries, setProcessEntries] = useState<Record<string, FileProcessEntry>>({});
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseRecord[]>([]);
-  const [activeKnowledgeBaseId, setActiveKnowledgeBaseId] = useState<string | null>(null);
   const [newKnowledgeBaseName, setNewKnowledgeBaseName] = useState('');
   const [isCreatingKnowledgeBase, setIsCreatingKnowledgeBase] = useState(false);
   const [maintenanceState, setMaintenanceState] = useState<{ action: KnowledgeBaseMaintenanceAction; knowledgeBaseId: string } | null>(null);
   const [persistencePhase, setPersistencePhase] = useState<PersistencePhase>('checking');
   const [restorePrompt, setRestorePrompt] = useState<RestorePromptState | null>(null);
   const [isKnowledgeBaseModalOpen, setIsKnowledgeBaseModalOpen] = useState(false);
-  const lastPersistedFileSignatureRef = useRef('');
   const { toast } = useToast();
 
   const activeKnowledgeBase = useMemo(
@@ -294,21 +238,6 @@ export default function DataWorkbench() {
   const resumablePaths = useMemo(
     () => allPaths.filter(path => (processEntries[path]?.status ?? 'idle') !== 'completed'),
     [allPaths, processEntries],
-  );
-
-  const sessionEntries = useMemo(() => {
-    const nextEntries: Record<string, PersistedFileProcessEntry> = {};
-
-    for (const path of allPaths) {
-      nextEntries[path] = serializeEntry(processEntries[path] ?? buildInitialEntry(path));
-    }
-
-    return nextEntries;
-  }, [allPaths, buildInitialEntry, processEntries]);
-
-  const sessionFileSignature = useMemo(
-    () => sortedFiles.map(file => `${file.path || file.name}:${file.size}:${file.lastModified}`).join('|'),
-    [sortedFiles],
   );
 
   const fileStatuses = useMemo(() => {
@@ -353,19 +282,18 @@ export default function DataWorkbench() {
       }
 
       setKnowledgeBases(nextKnowledgeBases);
-      setActiveKnowledgeBaseId(current => {
-        const candidate = preferredKnowledgeBaseId ?? current ?? nextKnowledgeBases[0]?.id ?? null;
-        if (candidate && nextKnowledgeBases.some(knowledgeBase => knowledgeBase.id === candidate)) {
-          return candidate;
-        }
+      const currentActiveKnowledgeBaseId = workbenchQueue.getSnapshot().activeKnowledgeBaseId;
+      const candidate = preferredKnowledgeBaseId ?? currentActiveKnowledgeBaseId ?? nextKnowledgeBases[0]?.id ?? null;
+      const resolvedKnowledgeBaseId = candidate && nextKnowledgeBases.some(knowledgeBase => knowledgeBase.id === candidate)
+        ? candidate
+        : (nextKnowledgeBases[0]?.id ?? null);
 
-        return nextKnowledgeBases[0]?.id ?? null;
-      });
+      workbenchQueue.setActiveKnowledgeBaseId(resolvedKnowledgeBaseId);
     } catch (error) {
       console.error('Failed to load knowledge bases:', error);
       toast(error instanceof Error ? error.message : String(error), 'error');
       setKnowledgeBases([FALLBACK_KNOWLEDGE_BASE]);
-      setActiveKnowledgeBaseId(preferredKnowledgeBaseId ?? FALLBACK_KNOWLEDGE_BASE_ID);
+      workbenchQueue.setActiveKnowledgeBaseId(preferredKnowledgeBaseId ?? FALLBACK_KNOWLEDGE_BASE_ID);
     }
   }, [toast]);
 
@@ -397,7 +325,7 @@ export default function DataWorkbench() {
         next.sort((left, right) => left.name.localeCompare(right.name));
         return next;
       });
-      setActiveKnowledgeBaseId(created.id);
+      workbenchQueue.setActiveKnowledgeBaseId(created.id);
       setNewKnowledgeBaseName('');
       toast(`Knowledge base "${created.name}" created.`, 'success');
     } catch (error) {
@@ -433,7 +361,7 @@ export default function DataWorkbench() {
       }
 
       if (processMode !== 'idle') {
-        setProcessMode('idle');
+        workbenchQueue.stopProcessing();
       }
 
       await refreshKnowledgeBases();
@@ -497,7 +425,15 @@ export default function DataWorkbench() {
     let ignore = false;
 
     const bootstrap = async () => {
-      await refreshKnowledgeBases();
+      const runtimeSnapshot = workbenchQueue.getSnapshot();
+      await refreshKnowledgeBases(runtimeSnapshot.activeKnowledgeBaseId);
+
+      if (workbenchQueue.hasActiveRuntime()) {
+        if (!ignore) {
+          setPersistencePhase('ready');
+        }
+        return;
+      }
 
       if (!canUseSessionPersistence()) {
         if (!ignore) {
@@ -541,46 +477,6 @@ export default function DataWorkbench() {
   }, [refreshKnowledgeBases]);
 
   useEffect(() => {
-    if (persistencePhase !== 'ready' || !canUseSessionPersistence()) {
-      return;
-    }
-
-    if (allPaths.length === 0) {
-      void clearStoredSession();
-      return;
-    }
-
-    void saveSessionSnapshot({
-      activeKnowledgeBaseId,
-      fileOrder: allPaths,
-      processEntries: sessionEntries,
-    }).catch(error => {
-      console.error('Failed to save session snapshot:', error);
-    });
-  }, [activeKnowledgeBaseId, allPaths, persistencePhase, sessionEntries]);
-
-  useEffect(() => {
-    if (persistencePhase !== 'ready' || !canUseSessionPersistence()) {
-      return;
-    }
-
-    if (sessionFileSignature === lastPersistedFileSignatureRef.current) {
-      return;
-    }
-
-    lastPersistedFileSignatureRef.current = sessionFileSignature;
-
-    if (sortedFiles.length === 0) {
-      void clearStoredSession();
-      return;
-    }
-
-    void syncSessionFiles(sortedFiles.map(buildPersistedFileRecord)).catch(error => {
-      console.error('Failed to sync session files:', error);
-    });
-  }, [persistencePhase, sessionFileSignature, sortedFiles]);
-
-  useEffect(() => {
     if (!selectedPreviewPath) return;
 
     const previewStillExists = sortedFiles.some(file => (file.path || file.name) === selectedPreviewPath);
@@ -588,330 +484,6 @@ export default function DataWorkbench() {
       setSelectedPreviewPath(null);
     }
   }, [selectedPreviewPath, sortedFiles]);
-
-  const ensureEntry = useCallback((fullPath: string) => {
-    setProcessEntries(prev => {
-      if (prev[fullPath]) return prev;
-      return { ...prev, [fullPath]: buildInitialEntry(fullPath) };
-    });
-  }, [buildInitialEntry]);
-
-  const startProcessingEntry = useCallback((fullPath: string) => {
-    const startedAt = Date.now();
-
-    setProcessEntries(prev => {
-      const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
-      return {
-        ...prev,
-        [fullPath]: {
-          ...existing,
-          status: 'processing',
-          startedAt,
-          completedAt: undefined,
-          errorMessage: undefined,
-          result: undefined,
-          steps: [],
-        },
-      };
-    });
-  }, [buildInitialEntry]);
-
-  const appendProcessStep = useCallback((fullPath: string, message: string) => {
-    const timestamp = Date.now();
-
-    setProcessEntries(prev => {
-      const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
-      const steps = [...existing.steps];
-      const lastStep = steps[steps.length - 1];
-
-      if (lastStep && lastStep.status === 'running') {
-        steps[steps.length - 1] = {
-          ...lastStep,
-          status: 'completed',
-          completedAt: timestamp,
-        };
-      }
-
-      steps.push({
-        id: steps.length + 1,
-        message,
-        status: 'running',
-        startedAt: timestamp,
-      });
-
-      return {
-        ...prev,
-        [fullPath]: {
-          ...existing,
-          status: 'processing',
-          startedAt: existing.startedAt ?? timestamp,
-          completedAt: undefined,
-          steps,
-        },
-      };
-    });
-  }, [buildInitialEntry]);
-
-  const mergeUnitResult = useCallback((fullPath: string, event: Extract<IngestStreamEvent, { type: 'unit' }>) => {
-    setProcessEntries(prev => {
-      const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
-      const sourceResult = existing.result ?? {
-        type: 'source',
-        knowledgeBaseId: event.knowledgeBaseId,
-        knowledgeBaseName: event.knowledgeBaseName,
-        previewKind: event.previewKind,
-        sourceId: event.sourceId,
-        sourceType: event.sourceType,
-        title: event.title,
-        totalUnitCount: event.totalUnitCount,
-        totalCharCount: event.totalCharCount,
-        rawPreview: event.rawPreview,
-        meta: {
-          schemaVersion: 1,
-          sourceType: event.sourceType,
-          title: event.title,
-          summary: '',
-          terms: [],
-          entities: [],
-        },
-        units: [],
-      } satisfies IngestResult;
-
-      const nextUnits = [...sourceResult.units];
-      const existingUnitIndex = nextUnits.findIndex(unit => unit.id === event.unit.id);
-
-      if (existingUnitIndex === -1) {
-        nextUnits.push(cloneUnit(event.unit));
-      } else {
-        nextUnits[existingUnitIndex] = cloneUnit(event.unit);
-      }
-
-      nextUnits.sort((left, right) => left.sequence - right.sequence);
-
-      return {
-        ...prev,
-        [fullPath]: {
-          ...existing,
-          status: 'processing',
-          startedAt: existing.startedAt ?? Date.now(),
-          completedAt: undefined,
-          result: {
-            ...sourceResult,
-            previewKind: event.previewKind,
-            sourceId: event.sourceId,
-            sourceType: event.sourceType,
-            title: event.title,
-            totalUnitCount: event.totalUnitCount,
-            totalCharCount: event.totalCharCount,
-            rawPreview: event.rawPreview,
-            units: nextUnits,
-          },
-        },
-      };
-    });
-  }, [buildInitialEntry]);
-
-  const completeProcessingEntry = useCallback((fullPath: string, result: IngestResult) => {
-    const completedAt = Date.now();
-
-    setProcessEntries(prev => {
-      const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
-      const steps = [...existing.steps];
-      const lastStep = steps[steps.length - 1];
-
-      if (lastStep && lastStep.status === 'running') {
-        steps[steps.length - 1] = {
-          ...lastStep,
-          status: 'completed',
-          completedAt,
-        };
-      }
-
-      return {
-        ...prev,
-        [fullPath]: {
-          ...existing,
-          status: 'completed',
-          steps,
-          completedAt,
-          startedAt: existing.startedAt ?? completedAt,
-          result,
-          errorMessage: undefined,
-        },
-      };
-    });
-  }, [buildInitialEntry]);
-
-  const failProcessingEntry = useCallback((fullPath: string, errorMessage: string) => {
-    const completedAt = Date.now();
-
-    setProcessEntries(prev => {
-      const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
-      const steps = [...existing.steps];
-      const lastStep = steps[steps.length - 1];
-
-      if (lastStep && lastStep.status === 'running') {
-        steps[steps.length - 1] = {
-          ...lastStep,
-          status: 'completed',
-          completedAt,
-        };
-      }
-
-      steps.push({
-        id: steps.length + 1,
-        message: `處理失敗：${errorMessage}`,
-        status: 'error',
-        startedAt: completedAt,
-        completedAt,
-      });
-
-      return {
-        ...prev,
-        [fullPath]: {
-          ...existing,
-          status: 'error',
-          steps,
-          startedAt: existing.startedAt ?? completedAt,
-          completedAt,
-          errorMessage,
-        },
-      };
-    });
-  }, [buildInitialEntry]);
-
-  const resetProcessEntries = useCallback((targetFiles: ExtendedFile[]) => {
-    setProcessEntries(() => {
-      const nextEntries: Record<string, FileProcessEntry> = {};
-      for (const file of targetFiles) {
-        const fullPath = file.path || file.name;
-        nextEntries[fullPath] = buildInitialEntry(fullPath);
-      }
-      return nextEntries;
-    });
-    setExpandedPaths({});
-  }, [buildInitialEntry]);
-
-  const processStreamResponse = useCallback(async (res: Response, fullPath: string): Promise<IngestResult> => {
-    if (!res.ok) {
-      throw new Error(await readIngestError(res));
-    }
-
-    if (!res.body) {
-      throw new Error('Response body is empty');
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-    let finalResult: IngestResult | null = null;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
-
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-
-        const event = JSON.parse(line) as IngestStreamEvent;
-
-        if (event.type === 'step') {
-          appendProcessStep(fullPath, event.message);
-          continue;
-        }
-
-        if (event.type === 'unit') {
-          mergeUnitResult(fullPath, event);
-          continue;
-        }
-
-        if (event.type === 'error') {
-          throw new Error(event.error);
-        }
-
-        finalResult = event.result;
-      }
-
-      if (done) break;
-    }
-
-    if (buffer.trim()) {
-      const event = JSON.parse(buffer) as IngestStreamEvent;
-
-      if (event.type === 'step') {
-        appendProcessStep(fullPath, event.message);
-      } else if (event.type === 'unit') {
-        mergeUnitResult(fullPath, event);
-      } else if (event.type === 'error') {
-        throw new Error(event.error);
-      } else {
-        finalResult = event.result;
-      }
-    }
-
-    if (!finalResult) {
-      throw new Error('No final result returned from ingest stream');
-    }
-
-    completeProcessingEntry(fullPath, finalResult);
-    return finalResult;
-  }, [appendProcessStep, completeProcessingEntry, mergeUnitResult]);
-
-  const processFile = useCallback(async (file: ExtendedFile) => {
-    const fullPath = file.path || file.name;
-
-    setHighlightedPath(fullPath);
-    ensureEntry(fullPath);
-    startProcessingEntry(fullPath);
-
-    try {
-      if (!activeKnowledgeBaseId) {
-        throw new Error('No active knowledge base selected');
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('knowledgeBaseId', activeKnowledgeBaseId);
-      formData.append('filePath', fullPath);
-
-      const res = await fetch('/api/ingest', { method: 'POST', body: formData });
-      await processStreamResponse(res, fullPath);
-      void refreshKnowledgeBases(activeKnowledgeBaseId);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      failProcessingEntry(fullPath, message);
-    } finally {
-      setCurrentIndex(prev => prev + 1);
-    }
-  }, [activeKnowledgeBaseId, ensureEntry, failProcessingEntry, processStreamResponse, refreshKnowledgeBases, startProcessingEntry]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    const processNext = async () => {
-      if (processMode !== 'playing' || ignore) return;
-      if (currentIndex >= sortedFiles.length) {
-        setProcessMode('idle');
-        return;
-      }
-
-      await processFile(sortedFiles[currentIndex]);
-    };
-
-    if (processMode === 'playing') {
-      const timer = window.setTimeout(() => {
-        void processNext();
-      }, 200);
-
-      return () => {
-        ignore = true;
-        window.clearTimeout(timer);
-      };
-    }
-  }, [currentIndex, processFile, processMode, sortedFiles]);
 
   const handleDelete = async (path: string) => {
     if (persistencePhase === 'prompt' && canUseSessionPersistence()) {
@@ -922,16 +494,7 @@ export default function DataWorkbench() {
       setPersistencePhase('ready');
     }
 
-    setFiles(prev => prev.filter(file => !(file.path || file.name).startsWith(path)));
-    setProcessEntries(prev => {
-      const nextEntries = { ...prev };
-      for (const key of Object.keys(nextEntries)) {
-        if (key.startsWith(path)) {
-          delete nextEntries[key];
-        }
-      }
-      return nextEntries;
-    });
+    workbenchQueue.deleteByPath(path);
     setExpandedPaths(prev => {
       const nextExpanded = { ...prev };
       for (const key of Object.keys(nextExpanded)) {
@@ -941,7 +504,6 @@ export default function DataWorkbench() {
       }
       return nextExpanded;
     });
-    if (processMode !== 'idle') setProcessMode('idle');
     if (highlightedPath?.startsWith(path)) setHighlightedPath(null);
     if (selectedPreviewPath?.startsWith(path)) setSelectedPreviewPath(null);
   };
@@ -955,58 +517,27 @@ export default function DataWorkbench() {
       setPersistencePhase('ready');
     }
 
-    setFiles(prev => {
-      const existingPaths = prev.map(file => file.path || file.name);
-      const filteredNew = newFiles.filter(file => !existingPaths.includes(file.path || file.name));
-
-      if (filteredNew.length > 0) {
-        setProcessEntries(prevEntries => {
-          const nextEntries = { ...prevEntries };
-          for (const file of filteredNew) {
-            const fullPath = file.path || file.name;
-            nextEntries[fullPath] = nextEntries[fullPath] ?? buildInitialEntry(fullPath);
-          }
-          return nextEntries;
-        });
-      }
-
-      return [...prev, ...filteredNew];
-    });
+    workbenchQueue.addFiles(newFiles);
   };
 
   const handlePlay = () => {
-    if (currentIndex >= sortedFiles.length) {
-      setCurrentIndex(0);
-      resetProcessEntries(sortedFiles);
-    }
-    setProcessMode('playing');
+    workbenchQueue.startProcessing();
   };
 
-  const handlePause = () => setProcessMode('paused');
+  const handlePause = () => workbenchQueue.pauseProcessing();
 
   const handleNext = async () => {
     if (currentIndex >= sortedFiles.length) return;
-    setProcessMode('paused');
-    await processFile(sortedFiles[currentIndex]);
+    await workbenchQueue.processNext();
   };
 
   const handleClear = async () => {
-    setFiles([]);
-    setProcessEntries({});
+    await workbenchQueue.clear();
     setExpandedPaths({});
-    setCurrentIndex(0);
-    setProcessMode('idle');
     setHighlightedPath(null);
     setSelectedPreviewPath(null);
     setRestorePrompt(null);
     setPersistencePhase('ready');
-    lastPersistedFileSignatureRef.current = '';
-
-    if (canUseSessionPersistence()) {
-      await clearStoredSession().catch(error => {
-        console.error('Failed to clear stored session:', error);
-      });
-    }
   };
 
   const handleRestoreSession = () => {
@@ -1024,24 +555,24 @@ export default function DataWorkbench() {
       }
     }
 
-    setFiles(restoredFiles);
-    setProcessEntries(restoredEntries);
     setExpandedPaths({});
     const restoredNextRunnableIndex = restorePrompt.snapshot.fileOrder.findIndex(path => {
       const entry = restoredEntries[path];
       return (entry?.status ?? 'idle') !== 'completed';
     });
-    setCurrentIndex(restoredNextRunnableIndex === -1 ? restorePrompt.snapshot.fileOrder.length : restoredNextRunnableIndex);
-    setProcessMode('idle');
+    workbenchQueue.restoreSession({
+      files: restoredFiles,
+      processEntries: restoredEntries,
+      currentIndex: restoredNextRunnableIndex === -1 ? restorePrompt.snapshot.fileOrder.length : restoredNextRunnableIndex,
+      activeKnowledgeBaseId: restorePrompt.snapshot.activeKnowledgeBaseId ?? null,
+    });
     setHighlightedPath(null);
     setSelectedPreviewPath(null);
     if (restorePrompt.snapshot.activeKnowledgeBaseId) {
-      setActiveKnowledgeBaseId(restorePrompt.snapshot.activeKnowledgeBaseId);
       void refreshKnowledgeBases(restorePrompt.snapshot.activeKnowledgeBaseId);
     }
     setRestorePrompt(null);
     setPersistencePhase('ready');
-    lastPersistedFileSignatureRef.current = '';
   };
 
   const handleDiscardStoredSession = async () => {
@@ -1182,7 +713,7 @@ export default function DataWorkbench() {
                   <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>Select Knowledge Base</label>
                   <Select
                     value={activeKnowledgeBaseId ?? ''}
-                    onChange={val => setActiveKnowledgeBaseId(val)}
+                    onChange={val => workbenchQueue.setActiveKnowledgeBaseId(val)}
                     options={knowledgeBases.map(kb => ({ value: kb.id, label: kb.name }))}
                     placeholder="Loading..."
                   />
