@@ -32,6 +32,7 @@ import { FileTree } from '@/components/ui/FileTree';
 import { ProcessTimeline } from '@/components/ui/ProcessTimeline';
 import { RagQueryPanel } from '@/components/ui/RagQueryPanel';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 import {
   canUseSessionPersistence,
   clearStoredSession,
@@ -244,14 +245,13 @@ export default function DataWorkbench() {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseRecord[]>([]);
   const [activeKnowledgeBaseId, setActiveKnowledgeBaseId] = useState<string | null>(null);
   const [newKnowledgeBaseName, setNewKnowledgeBaseName] = useState('');
-  const [knowledgeBaseError, setKnowledgeBaseError] = useState<string | null>(null);
   const [isCreatingKnowledgeBase, setIsCreatingKnowledgeBase] = useState(false);
   const [maintenanceState, setMaintenanceState] = useState<{ action: KnowledgeBaseMaintenanceAction; knowledgeBaseId: string } | null>(null);
-  const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
   const [persistencePhase, setPersistencePhase] = useState<PersistencePhase>('checking');
   const [restorePrompt, setRestorePrompt] = useState<RestorePromptState | null>(null);
   const [isKnowledgeBaseModalOpen, setIsKnowledgeBaseModalOpen] = useState(false);
   const lastPersistedFileSignatureRef = useRef('');
+  const { toast } = useToast();
 
   const activeKnowledgeBase = useMemo(
     () => knowledgeBases.find(knowledgeBase => knowledgeBase.id === activeKnowledgeBaseId) ?? null,
@@ -318,7 +318,6 @@ export default function DataWorkbench() {
 
   const refreshKnowledgeBases = useCallback(async (preferredKnowledgeBaseId?: string | null) => {
     try {
-      setKnowledgeBaseError(null);
       const response = await fetch('/api/knowledge-bases');
 
       if (!response.ok) {
@@ -359,11 +358,11 @@ export default function DataWorkbench() {
       });
     } catch (error) {
       console.error('Failed to load knowledge bases:', error);
-      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+      toast(error instanceof Error ? error.message : String(error), 'error');
       setKnowledgeBases([FALLBACK_KNOWLEDGE_BASE]);
       setActiveKnowledgeBaseId(preferredKnowledgeBaseId ?? FALLBACK_KNOWLEDGE_BASE_ID);
     }
-  }, []);
+  }, [toast]);
 
   const createKnowledgeBase = useCallback(async () => {
     const trimmedName = newKnowledgeBaseName.trim();
@@ -373,7 +372,6 @@ export default function DataWorkbench() {
     }
 
     setIsCreatingKnowledgeBase(true);
-    setKnowledgeBaseError(null);
 
     try {
       const response = await fetch('/api/knowledge-bases', {
@@ -396,13 +394,14 @@ export default function DataWorkbench() {
       });
       setActiveKnowledgeBaseId(created.id);
       setNewKnowledgeBaseName('');
+      toast(`Knowledge base "${created.name}" created.`, 'success');
     } catch (error) {
       console.error('Failed to create knowledge base:', error);
-      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+      toast(error instanceof Error ? error.message : String(error), 'error');
     } finally {
       setIsCreatingKnowledgeBase(false);
     }
-  }, [newKnowledgeBaseName]);
+  }, [newKnowledgeBaseName, toast]);
 
   const deleteActiveKnowledgeBase = useCallback(async () => {
     if (!activeKnowledgeBaseId || knowledgeBases.length <= 1) {
@@ -433,11 +432,12 @@ export default function DataWorkbench() {
       }
 
       await refreshKnowledgeBases();
+      toast(`Knowledge base deleted.`, 'success');
     } catch (error) {
       console.error('Failed to delete knowledge base:', error);
-      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+      toast(error instanceof Error ? error.message : String(error), 'error');
     }
-  }, [activeKnowledgeBaseId, knowledgeBases, processMode, refreshKnowledgeBases]);
+  }, [activeKnowledgeBaseId, knowledgeBases, processMode, refreshKnowledgeBases, toast]);
 
   const runKnowledgeBaseMaintenance = useCallback(async (action: KnowledgeBaseMaintenanceAction) => {
     if (!activeKnowledgeBaseId || !activeKnowledgeBase) {
@@ -452,8 +452,7 @@ export default function DataWorkbench() {
     }
 
     setMaintenanceState({ action, knowledgeBaseId: activeKnowledgeBaseId });
-    setKnowledgeBaseError(null);
-    setMaintenanceMessage(null);
+    toast(action === 'reindex' ? 'Reindexing KB...' : 'Rebuilding profile...', 'info');
 
     try {
       const response = await fetch(`/api/knowledge-bases/${encodeURIComponent(activeKnowledgeBaseId)}/maintenance`, {
@@ -475,39 +474,20 @@ export default function DataWorkbench() {
         profileVersion?: number;
       };
 
-      setMaintenanceMessage(
+      toast(
         action === 'reindex'
-          ? `Reindex completed: ${result.chunkCount} chunks and ${result.imageCount} images refreshed. Profile v${result.profileVersion ?? '-'}.`
-          : `Knowledge profile rebuilt: ${result.sourceCount} sources, ${result.chunkCount} chunks, profile v${result.profileVersion ?? '-'}.`,
+          ? `Reindex completed: ${result.chunkCount} chunks. Profile v${result.profileVersion ?? '-'}.`
+          : `Knowledge profile rebuilt successfully!`,
+        'success'
       );
       await refreshKnowledgeBases(activeKnowledgeBaseId);
     } catch (error) {
       console.error('Knowledge base maintenance failed:', error);
-      setKnowledgeBaseError(error instanceof Error ? error.message : String(error));
+      toast(error instanceof Error ? error.message : String(error), 'error');
     } finally {
       setMaintenanceState(null);
     }
-  }, [activeKnowledgeBase, activeKnowledgeBaseId, refreshKnowledgeBases]);
-
-  const handleClearKnowledgeBaseData = useCallback(async () => {
-    if (!activeKnowledgeBaseId) return;
-    if (!window.confirm('Are you absolutely sure you want to clear ALL document and vector data inside this Knowledge Base? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      setKnowledgeBaseError(null);
-      setMaintenanceMessage('Clearing KB data...');
-      const res = await fetch(`/api/graph?kbId=${activeKnowledgeBaseId}&deleteAll=true`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to clear KB data');
-      
-      setMaintenanceMessage('KB data successfully cleared.');
-      void refreshKnowledgeBases(activeKnowledgeBaseId);
-    } catch (err: any) {
-      setKnowledgeBaseError(err.message);
-      setMaintenanceMessage(null);
-    }
-  }, [activeKnowledgeBaseId, refreshKnowledgeBases]);
+  }, [activeKnowledgeBase, activeKnowledgeBaseId, refreshKnowledgeBases, toast]);
 
   useEffect(() => {
     let ignore = false;
@@ -1079,11 +1059,6 @@ export default function DataWorkbench() {
             <Sparkles className="text-gradient" size={24} />
             <span className="text-gradient">ThesisGen</span>
           </div>
-          <div className={styles.badgesRow} style={{ marginTop: 0 }}>
-            <div className={styles.badge}><Cpu size={14} /> <b>qwen3.5:27b</b></div>
-            <div className={styles.badge}><ImageIcon size={14} /> <b>qwen3-vl:32b</b></div>
-            <div className={styles.badge}><Box size={14} /> <b>embeddings</b></div>
-          </div>
         </div>
 
         <nav className={styles.navMenu}>
@@ -1222,14 +1197,6 @@ export default function DataWorkbench() {
                     >
                       {maintenanceState?.action === 'reindex' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Box size={14} />} Reindex KB
                     </Button>
-                    <Button 
-                      variant="secondary" 
-                      onClick={() => void handleClearKnowledgeBaseData()} 
-                      disabled={!activeKnowledgeBaseId}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      <Eraser size={14} /> Clear Data
-                    </Button>
                     <Button variant="ghost" onClick={() => void deleteActiveKnowledgeBase()} disabled={knowledgeBases.length <= 1 || !activeKnowledgeBaseId}>
                       <Trash2 size={14} /> Delete KB
                     </Button>
@@ -1237,15 +1204,9 @@ export default function DataWorkbench() {
                 </div>
 
                 {activeKnowledgeBase?.description && (
-                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '8px', lineHeight: 1.5 }}>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem 1rem', borderRadius: '8px', lineHeight: 1.5 }}>
                     {activeKnowledgeBase.description}
                   </div>
-                )}
-                {maintenanceMessage && (
-                  <div style={{ marginTop: '0.25rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{maintenanceMessage}</div>
-                )}
-                {knowledgeBaseError && (
-                  <div style={{ marginTop: '0.25rem', fontSize: '0.9rem', color: 'var(--accent-red)' }}>{knowledgeBaseError}</div>
                 )}
               </div>
             </Modal>

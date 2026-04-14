@@ -6,6 +6,7 @@ import { LoaderCircle, AlertCircle, ArrowLeft, Sparkles, Cpu, Image as ImageIcon
 import { ForceGraph, GraphData, GraphNode } from '@/components/graph/ForceGraph';
 import { NodeDetailPanel } from '@/components/graph/NodeDetailPanel';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
 import styles from './page.module.css';
 import mainStyles from '../page.module.css';
 
@@ -13,6 +14,7 @@ function GraphWorkspace() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const kbId = searchParams.get('kbId');
+  const { toast } = useToast();
 
   const [data, setData] = useState<GraphData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,11 +72,12 @@ function GraphWorkspace() {
       if (!res.ok) throw new Error('Failed to delete node data');
       
       setSelectedNode(null);
+      toast('Deleted node successfully.', 'success');
       if ((window as any).__refreshGraphData) {
         (window as any).__refreshGraphData();
       }
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message, 'error');
     }
   };
 
@@ -82,16 +85,18 @@ function GraphWorkspace() {
     if (!confirm('Are you absolutely sure you want to delete ALL vector embeddings and documents? This cannot be undone.')) {
         return;
     }
+    toast('Clearing all data...', 'info');
     try {
       const res = await fetch(`/api/graph?kbId=${kbId}&deleteAll=true`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to clear graph data');
       
       setSelectedNode(null);
+      toast('All data successfully cleared.', 'success');
       if ((window as any).__refreshGraphData) {
         (window as any).__refreshGraphData();
       }
     } catch (err: any) {
-      alert(err.message);
+      toast(err.message, 'error');
     }
   };
 
@@ -103,17 +108,9 @@ function GraphWorkspace() {
             <Sparkles className="text-gradient" size={24} />
             <span className="text-gradient">ThesisGen</span>
           </div>
-          <div className={mainStyles.badgesRow} style={{ marginTop: 0 }}>
-            <div className={mainStyles.badge}><Cpu size={14} /> <b>qwen3.5:27b</b></div>
-            <div className={mainStyles.badge}><ImageIcon size={14} /> <b>qwen3-vl:32b</b></div>
-            <div className={mainStyles.badge}><Box size={14} /> <b>embeddings</b></div>
-          </div>
         </div>
 
         <nav className={mainStyles.navMenu}>
-          <Button variant="ghost" onClick={handleDeleteAll} className="text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors">
-            <Trash2 size={16} /> Delete All Data
-          </Button>
           <Button variant="ghost" onClick={() => router.push('/')}>
             <Database size={16} /> Knowledge Base
           </Button>
@@ -168,6 +165,15 @@ function GraphWorkspace() {
           <div className={styles.legendItem}>
             <span className={`${styles.legendLine} ${styles.legendLineRelated}`}></span>
             Semantic Link
+          </div>
+          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'center' }}>
+            <Button 
+              variant="secondary" 
+              onClick={handleDeleteAll} 
+              style={{ width: '100%', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#ef4444', background: 'transparent' }}
+            >
+              <Trash2 size={14} /> Clear All Data
+            </Button>
           </div>
         </div>
       )}
