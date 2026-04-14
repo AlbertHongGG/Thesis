@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, Sparkles } from 'lucide-react';
 import styles from './DropZone.module.css';
 
 export interface ExtendedFile extends File {
@@ -28,9 +28,10 @@ interface DropZoneProps {
   accept?: string;
   multiple?: boolean;
   isCompact?: boolean;
+  isHero?: boolean;
 }
 
-export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false }: DropZoneProps) => {
+export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false, isHero = false }: DropZoneProps) => {
   const [isDragActive, setIsDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -99,7 +100,7 @@ export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false }:
 
   return (
     <motion.div
-      className={`${styles.container} ${isDragActive ? styles.active : ''} ${isCompact ? styles.compact : ''}`}
+      className={`${styles.container} ${isDragActive ? styles.active : ''} ${isCompact ? styles.compact : ''} ${isHero ? styles.hero : ''}`}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
@@ -116,13 +117,29 @@ export const DropZone = ({ onDrop, accept, multiple = true, isCompact = false }:
         onChange={handleChange}
         style={{ display: 'none' }}
       />
-      <div className={styles.iconWrapper}>
-        <UploadCloud size={isCompact ? 24 : 40} />
-      </div>
-      <div className={styles.title}>{isCompact ? 'Drop more files' : 'Click or drag to drop files here'}</div>
-      {!isCompact && (
-        <div className={styles.description}>
-          Supports PDF, DOCX, TXT, JSON and Image files for RAG vectorization.
+      
+      {isHero ? (
+        <div className={styles.heroContent} style={{ pointerEvents: 'none' }}>
+          <div className={styles.heroIconWrapper}>
+            <UploadCloud size={64} className={styles.heroPrimaryIcon} />
+            <Sparkles size={24} className={styles.heroSecondaryIcon} />
+          </div>
+          <div className={styles.heroTitle}>{isDragActive ? 'Release to upload!' : 'Drop files here'}</div>
+          <div className={styles.heroSubtitle}>
+            {isDragActive ? 'Preparing to extract knowledge...' : 'Support for PDFs, DOCX, TXT, images'}
+          </div>
+        </div>
+      ) : (
+        <div style={{ pointerEvents: 'none', display: 'flex', flexDirection: isCompact ? 'row' : 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div className={styles.iconWrapper}>
+            <UploadCloud size={isCompact ? 24 : 40} />
+          </div>
+          <div className={styles.title} style={{ marginLeft: isCompact ? '0.5rem' : 0 }}>{isCompact ? 'Drop more files' : 'Click or drag to drop files here'}</div>
+          {!isCompact && (
+            <div className={styles.description}>
+              Supports PDF, DOCX, TXT, JSON and Image files for RAG vectorization.
+            </div>
+          )}
         </div>
       )}
     </motion.div>

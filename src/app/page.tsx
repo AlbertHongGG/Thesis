@@ -1,5 +1,7 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
@@ -1082,29 +1084,39 @@ export default function DataWorkbench() {
         </nav>
       </header>
 
-      <div className={styles.mainWrapper}>
-        <aside className={styles.sidebarContainer}>
-          <DropZone onDrop={files => void handleDrop(files)} isCompact={files.length > 0} />
-
+      <motion.div layout className={styles.mainWrapper} style={{ display: 'flex', gap: '1px', background: 'var(--border-color)', flex: 1, overflow: 'hidden' }}>
+        <AnimatePresence initial={false}>
           {files.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 className={styles.sidebarSectionTitle} style={{ margin: 0 }}>Files ({files.length})</h3>
-                <Button variant="ghost" onClick={() => void handleClear()} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
+            <motion.aside 
+              className={styles.sidebarContainer}
+              initial={{ width: 0, opacity: 0, x: -50 }}
+              animate={{ width: 360, opacity: 1, x: 0 }}
+              exit={{ width: 0, opacity: 0, x: -50 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ overflow: 'hidden', padding: files.length > 0 ? 'var(--space-5)' : 0 }}
+            >
+              <div style={{ width: 320, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <DropZone onDrop={files => void handleDrop(files)} isCompact={true} />
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', marginTop: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <h3 className={styles.sidebarSectionTitle} style={{ margin: 0 }}>Files ({files.length})</h3>
+                    <Button variant="ghost" onClick={() => void handleClear()} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
+                  </div>
+                  <FileTree
+                    files={files}
+                    onDelete={path => void handleDelete(path)}
+                    highlightedPath={highlightedPath}
+                    selectedPath={selectedPreviewPath}
+                    statuses={fileStatuses}
+                    onSelectFile={node => handleSelectPreview(node.path)}
+                  />
+                </div>
               </div>
-              <FileTree
-                files={files}
-                onDelete={path => void handleDelete(path)}
-                highlightedPath={highlightedPath}
-                selectedPath={selectedPreviewPath}
-                statuses={fileStatuses}
-                onSelectFile={node => handleSelectPreview(node.path)}
-              />
-            </div>
+            </motion.aside>
           )}
-        </aside>
+        </AnimatePresence>
 
-        <main className={styles.mainPanel}>
+        <motion.main layout className={styles.mainPanel} style={{ flex: 1, overflow: 'auto', background: 'var(--bg-primary)' }}>
           <div className={styles.workingArea}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
               <div>
@@ -1236,12 +1248,27 @@ export default function DataWorkbench() {
             )}
 
             <div className={styles.processAccordionList}>
-              {orderedEntries.length === 0 ? (
-                <div className={styles.processEmptyState}>
-                  {persistencePhase === 'checking' ? 'Checking previous session...' : 'Upload files and press Start to begin RAG extraction step-by-step.'}
-                </div>
-              ) : (
-                orderedEntries.map(entry => {
+              <AnimatePresence mode="wait">
+                {orderedEntries.length === 0 ? (
+                  <motion.div 
+                    key="empty-state"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}
+                  >
+                    <DropZone onDrop={files => void handleDrop(files)} isHero={true} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="entry-list"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, staggerChildren: 0.1 }}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+                  >
+                    {orderedEntries.map(entry => {
                   const isExpanded = !!expandedPaths[entry.path];
 
                   return (
@@ -1280,12 +1307,14 @@ export default function DataWorkbench() {
                       )}
                     </section>
                   );
-                })
-              )}
+                })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-        </main>
-      </div>
+        </motion.main>
+      </motion.div>
 
       <FilePreviewModal
         isOpen={!!selectedPreviewFile && !!selectedPreviewEntry}

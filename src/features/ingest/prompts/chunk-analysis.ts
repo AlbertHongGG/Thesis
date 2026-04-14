@@ -37,6 +37,7 @@ const CHUNK_ANALYSIS_USER_PROMPT_TEMPLATE = `請分析以下文件 chunk，產�
 【前一個 chunk 預覽】
 {{previousChunkBlock}}
 
+
 【下一個 chunk 預覽】
 {{nextChunkBlock}}
 
