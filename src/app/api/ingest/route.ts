@@ -40,7 +40,7 @@ function createFallbackKnowledgeBase(id?: string): KnowledgeBaseRecord {
     name: DEFAULT_KNOWLEDGE_BASE_NAME,
     status: 'active',
     sourceCount: 0,
-    chunkCount: 0,
+    unitCount: 0,
     profileVersion: 0,
   };
 }

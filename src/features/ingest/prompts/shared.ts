@@ -1,3 +1,5 @@
+import { normalizeEntities, normalizeRelationHints, normalizeStructure, normalizeTerms } from '../metadata';
+
 export function extractJsonObject(rawText: string) {
   const fencedMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/i);
   const candidate = fencedMatch?.[1] ?? rawText;
@@ -11,13 +13,4 @@ export function extractJsonObject(rawText: string) {
   return JSON.parse(candidate.slice(start, end + 1)) as Record<string, unknown>;
 }
 
-export function normalizeKeywords(input: unknown) {
-  if (!Array.isArray(input)) {
-    return [];
-  }
-
-  return input
-    .map(keyword => (typeof keyword === 'string' ? keyword.trim() : ''))
-    .filter(Boolean)
-    .slice(0, 8);
-}
+export { normalizeEntities, normalizeRelationHints, normalizeStructure, normalizeTerms };

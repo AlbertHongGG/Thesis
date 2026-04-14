@@ -1,17 +1,8 @@
 create extension if not exists vector schema extensions;
 
-alter table public.rag_document_chunks
-  alter column embedding type vector
-  using (
-    case
-      when embedding is not null then (embedding::text)::vector
-      else null
-    end
-  );
+drop function if exists public.match_rag_units(vector, uuid, float, int, text[]);
 
-drop function if exists public.match_rag_chunks(vector, double precision, integer);
-
-create or replace function public.match_rag_chunks (
+create or replace function public.match_rag_units (
   query_embedding vector,
   kb_id uuid,
   match_threshold float,
@@ -21,39 +12,51 @@ create or replace function public.match_rag_chunks (
 returns table (
   id text,
   knowledge_base_id uuid,
-  document_id uuid,
-  filename text,
+  source_id uuid,
+  title text,
+  canonical_path text,
   source_type text,
+  unit_type text,
   content text,
   preview text,
   summary text,
-  keywords jsonb,
-  bridging_context text,
+  terms jsonb,
+  entities jsonb,
+  relation_hints jsonb,
   similarity float
 )
 language sql stable
 as $$
   select
-    chunks.id,
-    chunks.knowledge_base_id,
-    chunks.document_id,
-    docs.filename,
-    docs.source_type,
-    chunks.content,
-    chunks.preview,
-    chunks.summary,
-    chunks.keywords,
-    chunks.bridging_context,
-    1 - (chunks.embedding operator(extensions.<=>) query_embedding) as similarity
-  from public.rag_document_chunks chunks
-  join public.rag_documents docs on docs.id = chunks.document_id
-  where chunks.knowledge_base_id = kb_id
-    and docs.knowledge_base_id = kb_id
-    and chunks.embedding is not null
-    and chunks.status = 'ready'
-    and docs.ingest_status = 'ready'
-    and (source_types is null or docs.source_type = any(source_types))
-    and 1 - (chunks.embedding operator(extensions.<=>) query_embedding) > match_threshold
-  order by chunks.embedding operator(extensions.<=>) query_embedding
+    units.id,
+    units.knowledge_base_id,
+    units.source_id,
+    sources.title,
+    sources.canonical_path,
+    sources.source_type,
+    units.unit_type,
+    units.content,
+    units.preview,
+    coalesce(units.meta->>'summary', ''),
+    coalesce(units.meta->'terms', '[]'::jsonb),
+    coalesce(units.meta->'entities', '[]'::jsonb),
+    coalesce(
+      (
+        select jsonb_agg(item->>'label')
+        from jsonb_array_elements(coalesce(units.meta->'relationHints', '[]'::jsonb)) item
+      ),
+      '[]'::jsonb
+    ),
+    1 - (units.embedding operator(extensions.<=>) query_embedding) as similarity
+  from public.rag_units units
+  join public.rag_sources sources on sources.id = units.source_id
+  where units.knowledge_base_id = kb_id
+    and sources.knowledge_base_id = kb_id
+    and units.embedding is not null
+    and units.status = 'ready'
+    and sources.ingest_status = 'ready'
+    and (source_types is null or sources.source_type = any(source_types))
+    and 1 - (units.embedding operator(extensions.<=>) query_embedding) > match_threshold
+  order by units.embedding operator(extensions.<=>) query_embedding
   limit match_count;
 $$;

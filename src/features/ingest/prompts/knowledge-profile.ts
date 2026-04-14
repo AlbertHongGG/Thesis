@@ -1,4 +1,4 @@
-import { extractJsonObject, normalizeKeywords } from './shared';
+import { extractJsonObject, normalizeTerms } from './shared';
 import { renderPromptTemplate } from './render';
 import type { KnowledgeProfilePromptBundle } from './types';
 
@@ -13,9 +13,8 @@ const KNOWLEDGE_PROFILE_USER_PROMPT_TEMPLATE = `請根據以下來源，為知�
   "summary": "string",
   "focusAreas": ["string"],
   "keyTerms": ["string"],
-  "researchQuestions": ["string"],
-  "methods": ["string"],
-  "recentUpdates": ["string"]
+  "focusAreas": ["string"],
+  "keyTerms": ["string"]
 }
 
 【既有術語】
@@ -40,11 +39,8 @@ export function createKnowledgeProfilePromptBundle(bundleId: string): KnowledgeP
 
       return {
         summary: typeof parsed.summary === 'string' ? parsed.summary.trim() : '',
-        focusAreas: normalizeKeywords(parsed.focusAreas),
-        keyTerms: normalizeKeywords(parsed.keyTerms).slice(0, 16),
-        researchQuestions: normalizeKeywords(parsed.researchQuestions).slice(0, 8),
-        methods: normalizeKeywords(parsed.methods).slice(0, 8),
-        recentUpdates: normalizeKeywords(parsed.recentUpdates).slice(0, 8),
+        focusAreas: normalizeTerms(parsed.focusAreas).slice(0, 8),
+        keyTerms: normalizeTerms(parsed.keyTerms).slice(0, 16),
       };
     },
   };

@@ -5,8 +5,8 @@ import { uniqueStrings } from '../knowledge';
 
 type KnowledgeProfileSource = {
   summary: string;
-  filename: string;
-  keywords: string[];
+  title: string;
+  terms: string[];
 };
 
 export class KnowledgeProfileService {
@@ -22,17 +22,14 @@ export class KnowledgeProfileService {
     const sourceSummaries = input.sources
       .filter(source => source.summary.trim().length > 0)
       .slice(0, 12)
-      .map(source => `${source.filename}：${buildPreview(source.summary, 260)}`);
-    const keyTerms = uniqueStrings(input.sources.flatMap(source => source.keywords)).slice(0, 16);
+      .map(source => `${source.title}：${buildPreview(source.summary, 260)}`);
+    const keyTerms = uniqueStrings(input.sources.flatMap(source => source.terms)).slice(0, 16);
 
     if (sourceSummaries.length === 0) {
       return {
         summary: `${input.knowledgeBaseName} 目前已建立知識庫，但尚未累積足夠內容形成穩定的領域摘要。`,
         focusAreas: [],
         keyTerms,
-        researchQuestions: [],
-        methods: [],
-        recentUpdates: [],
       };
     }
 
@@ -52,9 +49,6 @@ export class KnowledgeProfileService {
         summary: sourceSummaries.slice(0, 4).join(' '),
         focusAreas: [],
         keyTerms,
-        researchQuestions: [],
-        methods: [],
-        recentUpdates: sourceSummaries.slice(0, 3).map(summary => buildPreview(summary, 160)),
       };
     }
   }

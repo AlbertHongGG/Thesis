@@ -5,7 +5,7 @@ export const DEFAULT_KNOWLEDGE_BASE_SLUG = 'thesis-research';
 
 export type KnowledgeBaseStatus = 'active' | 'archived';
 export type KnowledgeSourceType = 'document' | 'image';
-export type KnowledgeSourceReferenceKind = 'profile' | 'chunk' | 'document' | 'image';
+export type KnowledgeSourceReferenceKind = 'profile' | 'source' | 'unit';
 
 export type KnowledgeBaseRecord = {
   id: string;
@@ -14,7 +14,7 @@ export type KnowledgeBaseRecord = {
   description?: string;
   status: KnowledgeBaseStatus;
   sourceCount: number;
-  chunkCount: number;
+  unitCount: number;
   profileVersion: number;
   createdAt?: string;
   updatedAt?: string;
@@ -25,28 +25,28 @@ export type KnowledgeProfileRecord = {
   summary: string;
   focusAreas: string[];
   keyTerms: string[];
-  researchQuestions: string[];
-  methods: string[];
-  recentUpdates: string[];
   sourceCount: number;
-  chunkCount: number;
+  unitCount: number;
   version: number;
   createdAt?: string;
   updatedAt?: string;
 };
 
-export type KnowledgeChunkMatch = {
+export type KnowledgeUnitMatch = {
   id: string;
   knowledgeBaseId: string;
-  documentId: string;
-  filename: string;
+  sourceId: string;
+  title: string;
+  canonicalPath: string;
   sourceType: KnowledgeSourceType;
+  unitType: string;
   content: string;
   summary: string;
   similarity: number;
-  keywords: string[];
-  bridgingContext?: string;
-  preview?: string;
+  terms: string[];
+  entities: string[];
+  relationHints: string[];
+  preview: string;
 };
 
 export type KnowledgeSourceReference = {
@@ -65,7 +65,7 @@ export type KnowledgeContextTrace = {
   profileVersion?: number;
   profileSummary?: string;
   retrievalQuery?: string;
-  usedChunkCount: number;
+  usedUnitCount: number;
   usedSources: KnowledgeSourceReference[];
   fallbackTriggered?: boolean;
 };
@@ -101,12 +101,12 @@ export function uniqueStrings(values: string[]) {
 
 export function renderKnowledgeContext(input: {
   profile?: KnowledgeProfileRecord | null;
-  chunks?: KnowledgeChunkMatch[];
-  maxChunkCount?: number;
+  units?: KnowledgeUnitMatch[];
+  maxUnitCount?: number;
 }) {
   const sections: string[] = [];
   const profile = input.profile;
-  const chunks = (input.chunks ?? []).slice(0, input.maxChunkCount ?? 4);
+  const units = (input.units ?? []).slice(0, input.maxUnitCount ?? 4);
 
   if (profile) {
     sections.push(`【領域摘要】\n${clampContext(profile.summary, 1400) || '目前尚未建立知識庫摘要。'}`);
@@ -118,27 +118,16 @@ export function renderKnowledgeContext(input: {
     if (profile.focusAreas.length > 0) {
       sections.push(`【重點面向】\n${profile.focusAreas.slice(0, 8).join('；')}`);
     }
-
-    if (profile.researchQuestions.length > 0) {
-      sections.push(`【研究問題】\n${profile.researchQuestions.slice(0, 5).join('；')}`);
-    }
-
-    if (profile.methods.length > 0) {
-      sections.push(`【方法線索】\n${profile.methods.slice(0, 6).join('；')}`);
-    }
-
-    if (profile.recentUpdates.length > 0) {
-      sections.push(`【近期補充】\n${profile.recentUpdates.slice(0, 4).join('；')}`);
-    }
   }
 
-  if (chunks.length > 0) {
+  if (units.length > 0) {
     sections.push([
       '【相關知識片段】',
-      ...chunks.map((chunk, index) => {
-        const keywords = chunk.keywords.length > 0 ? ` 關鍵詞：${chunk.keywords.join('、')}` : '';
-        const relation = chunk.bridgingContext ? ` 脈絡：${buildPreview(chunk.bridgingContext, 180)}` : '';
-        return `${index + 1}. ${chunk.filename}｜相似度 ${Math.round(chunk.similarity * 100)}%｜摘要：${buildPreview(chunk.summary || chunk.content, 220)}${keywords}${relation}`;
+      ...units.map((unit, index) => {
+        const terms = unit.terms.length > 0 ? ` 術語：${unit.terms.join('、')}` : '';
+        const entities = unit.entities.length > 0 ? ` 實體：${unit.entities.join('、')}` : '';
+        const relations = unit.relationHints.length > 0 ? ` 關聯：${unit.relationHints.join('；')}` : '';
+        return `${index + 1}. ${unit.title}｜相似度 ${Math.round(unit.similarity * 100)}%｜摘要：${buildPreview(unit.summary || unit.content, 220)}${terms}${entities}${relations}`;
       }),
     ].join('\n'));
   }
@@ -148,7 +137,7 @@ export function renderKnowledgeContext(input: {
 
 export function buildKnowledgeSourceReferences(input: {
   profile?: KnowledgeProfileRecord | null;
-  chunks?: KnowledgeChunkMatch[];
+  units?: KnowledgeUnitMatch[];
 }) {
   const references: KnowledgeSourceReference[] = [];
 
@@ -161,15 +150,15 @@ export function buildKnowledgeSourceReferences(input: {
     });
   }
 
-  for (const chunk of input.chunks ?? []) {
+  for (const unit of input.units ?? []) {
     references.push({
-      kind: 'chunk',
-      sourceId: chunk.id,
-      label: chunk.filename,
-      detail: buildPreview(chunk.summary || chunk.content, 180),
-      similarity: chunk.similarity,
-      documentId: chunk.documentId,
-      sourceType: chunk.sourceType,
+      kind: 'unit',
+      sourceId: unit.id,
+      label: unit.title,
+      detail: buildPreview(unit.summary || unit.content, 180),
+      similarity: unit.similarity,
+      documentId: unit.sourceId,
+      sourceType: unit.sourceType,
     });
   }
 

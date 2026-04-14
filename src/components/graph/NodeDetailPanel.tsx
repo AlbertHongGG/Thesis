@@ -26,13 +26,13 @@ export const NodeDetailPanel: React.FC<NodeDetailPanelProps> = ({ node, onClose,
           <div className={styles.panel}>
             <div className={styles.header}>
               <div className={styles.titleGroup}>
-                <span className={`${styles.badge} ${node.type === 'chunk' ? styles.badgeChunk : ''}`}>
-                  {node.type === 'document' ? 'Document' : 'Knowledge Chunk'}
+                <span className={`${styles.badge} ${node.type === 'unit' ? styles.badgeChunk : ''}`}>
+                  {node.type === 'source' ? 'Source' : node.type === 'unit' ? 'Knowledge Unit' : 'Folder'}
                 </span>
                 <h3 className={styles.title}>{node.fullName || node.name}</h3>
               </div>
               <div className={styles.actionsGroup}>
-                {onDelete && node.type !== 'chunk' && (
+                {onDelete && node.type !== 'unit' && (
                   <button 
                     className={`${styles.iconButton} ${styles.dangerButton}`} 
                     onClick={() => {
@@ -71,14 +71,27 @@ export const NodeDetailPanel: React.FC<NodeDetailPanelProps> = ({ node, onClose,
                 </div>
               )}
 
-              {node.keywords && node.keywords.length > 0 && (
+              {node.terms && node.terms.length > 0 && (
                 <div className={styles.section}>
                   <h4 className={styles.sectionTitle}>
-                    <Hash /> Keywords
+                    <Hash /> Terms
                   </h4>
                   <div className={styles.tagContainer}>
-                    {node.keywords.map((kw, idx) => (
+                    {node.terms.map((kw, idx) => (
                       <span key={idx} className={styles.tag}>{kw}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {node.entities && node.entities.length > 0 && (
+                <div className={styles.section}>
+                  <h4 className={styles.sectionTitle}>
+                    <Hash /> Entities
+                  </h4>
+                  <div className={styles.tagContainer}>
+                    {node.entities.map((entity, idx) => (
+                      <span key={idx} className={styles.tag}>{entity}</span>
                     ))}
                   </div>
                 </div>

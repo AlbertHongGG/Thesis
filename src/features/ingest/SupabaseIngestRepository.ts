@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SourceMeta, UnitMeta } from './contracts';
 import {
   DEFAULT_KNOWLEDGE_BASE_NAME,
   DEFAULT_KNOWLEDGE_BASE_SLUG,
@@ -7,18 +8,16 @@ import {
   uniqueStrings,
   type KnowledgeBaseInput,
   type KnowledgeBaseRecord,
-  type KnowledgeChunkMatch,
   type KnowledgeProfileRecord,
+  type KnowledgeUnitMatch,
 } from './knowledge';
 import type {
   IngestRepository,
   KnowledgeProfileSourceMaterial,
-  PersistDocumentParams,
-  PersistImageParams,
   PersistKnowledgeProfileParams,
-  ReindexableDocumentChunk,
-  ReindexableImageSource,
-  RetrieveRelevantChunksParams,
+  PersistSourceParams,
+  ReindexableUnit,
+  RetrieveRelevantUnitsParams,
 } from './repository';
 
 function normalizeEmbedding(embedding: number[]) {
@@ -35,17 +34,48 @@ function toStringArray(value: unknown) {
     .filter(Boolean);
 }
 
+function mapSourceMeta(value: any): SourceMeta {
+  const meta = value && typeof value === 'object' ? value : {};
+  return {
+    schemaVersion: meta.schemaVersion ?? 5,
+    sourceType: meta.sourceType === 'image' ? 'image' : 'document',
+    title: typeof meta.title === 'string' ? meta.title : '',
+    summary: typeof meta.summary === 'string' ? meta.summary : '',
+    terms: toStringArray(meta.terms),
+    entities: toStringArray(meta.entities),
+    structure: meta.structure && typeof meta.structure === 'object'
+      ? {
+          kind: typeof meta.structure.kind === 'string' ? meta.structure.kind : 'unknown',
+          label: typeof meta.structure.label === 'string' ? meta.structure.label : 'Unknown',
+        }
+      : undefined,
+  };
+}
+
+function mapUnitMeta(value: any): UnitMeta {
+  const meta = value && typeof value === 'object' ? value : {};
+  return {
+    schemaVersion: meta.schemaVersion ?? 5,
+    unitType: typeof meta.unitType === 'string' ? meta.unitType : 'text-segment',
+    summary: typeof meta.summary === 'string' ? meta.summary : '',
+    terms: toStringArray(meta.terms),
+    entities: toStringArray(meta.entities),
+    relationHints: Array.isArray(meta.relationHints)
+      ? meta.relationHints
+          .filter((hint: any) => hint && typeof hint === 'object' && typeof hint.kind === 'string' && typeof hint.label === 'string')
+          .map((hint: any) => ({ kind: hint.kind, label: hint.label }))
+      : [],
+  };
+}
+
 function mapKnowledgeProfileRow(row: any): KnowledgeProfileRecord {
   return {
     knowledgeBaseId: row.knowledge_base_id,
     summary: row.summary ?? '',
     focusAreas: toStringArray(row.focus_areas),
     keyTerms: toStringArray(row.key_terms),
-    researchQuestions: toStringArray(row.research_questions),
-    methods: toStringArray(row.methods),
-    recentUpdates: toStringArray(row.recent_updates),
     sourceCount: row.source_count ?? 0,
-    chunkCount: row.chunk_count ?? 0,
+    unitCount: row.unit_count ?? 0,
     version: row.version ?? 1,
     createdAt: row.created_at ?? undefined,
     updatedAt: row.updated_at ?? undefined,
@@ -60,7 +90,7 @@ function mapKnowledgeBaseRow(row: any, profile?: any): KnowledgeBaseRecord {
     description: row.description ?? undefined,
     status: row.status,
     sourceCount: profile?.source_count ?? 0,
-    chunkCount: profile?.chunk_count ?? 0,
+    unitCount: profile?.unit_count ?? 0,
     profileVersion: profile?.version ?? 0,
     createdAt: row.created_at ?? undefined,
     updatedAt: row.updated_at ?? undefined,
@@ -73,7 +103,7 @@ export class SupabaseIngestRepository implements IngestRepository {
   async listKnowledgeBases(): Promise<KnowledgeBaseRecord[]> {
     const [baseResponse, profileResponse] = await Promise.all([
       this.client.from('knowledge_bases').select('*').order('updated_at', { ascending: false }),
-      this.client.from('knowledge_profiles').select('knowledge_base_id, source_count, chunk_count, version'),
+      this.client.from('knowledge_profiles').select('knowledge_base_id, source_count, unit_count, version'),
     ]);
 
     if (baseResponse.error) {
@@ -122,11 +152,8 @@ export class SupabaseIngestRepository implements IngestRepository {
       summary: '',
       focus_areas: [],
       key_terms: [],
-      research_questions: [],
-      methods: [],
-      recent_updates: [],
       source_count: 0,
-      chunk_count: 0,
+      unit_count: 0,
       version: 0,
     });
 
@@ -141,7 +168,7 @@ export class SupabaseIngestRepository implements IngestRepository {
       description: input.description,
       status: 'active',
       sourceCount: 0,
-      chunkCount: 0,
+      unitCount: 0,
       profileVersion: 0,
     };
   }
@@ -161,12 +188,12 @@ export class SupabaseIngestRepository implements IngestRepository {
   async getKnowledgeBaseStats(knowledgeBaseId: string) {
     const [sourceResponse, chunkResponse] = await Promise.all([
       this.client
-        .from('rag_documents')
+        .from('rag_sources')
         .select('id', { count: 'exact', head: true })
         .eq('knowledge_base_id', knowledgeBaseId)
         .neq('ingest_status', 'archived'),
       this.client
-        .from('rag_document_chunks')
+        .from('rag_units')
         .select('id', { count: 'exact', head: true })
         .eq('knowledge_base_id', knowledgeBaseId)
         .eq('status', 'ready'),
@@ -182,7 +209,7 @@ export class SupabaseIngestRepository implements IngestRepository {
 
     return {
       sourceCount: sourceResponse.count ?? 0,
-      chunkCount: chunkResponse.count ?? 0,
+      unitCount: chunkResponse.count ?? 0,
     };
   }
 
@@ -209,11 +236,8 @@ export class SupabaseIngestRepository implements IngestRepository {
       summary: params.summary,
       focus_areas: uniqueStrings(params.focusAreas),
       key_terms: uniqueStrings(params.keyTerms),
-      research_questions: uniqueStrings(params.researchQuestions),
-      methods: uniqueStrings(params.methods),
-      recent_updates: uniqueStrings(params.recentUpdates),
       source_count: params.sourceCount,
-      chunk_count: params.chunkCount,
+      unit_count: params.unitCount,
       version: nextVersion,
     };
 
@@ -231,58 +255,35 @@ export class SupabaseIngestRepository implements IngestRepository {
   }
 
   async listKnowledgeProfileSources(knowledgeBaseId: string, limit = 12): Promise<KnowledgeProfileSourceMaterial[]> {
-    const { data: documents, error: documentError } = await this.client
-      .from('rag_documents')
-      .select('id, filename, summary, description, source_preview')
+    const { data: sources, error: sourceError } = await this.client
+      .from('rag_sources')
+      .select('title, meta')
       .eq('knowledge_base_id', knowledgeBaseId)
       .order('updated_at', { ascending: false })
       .limit(limit);
 
-    if (documentError) {
-      throw documentError;
+    if (sourceError) {
+      throw sourceError;
     }
 
-    const rows = documents ?? [];
-    const documentIds = rows.map(row => row.id);
-
-    const keywordMap = new Map<string, string[]>();
-
-    if (documentIds.length > 0) {
-      const { data: chunks, error: chunkError } = await this.client
-        .from('rag_document_chunks')
-        .select('document_id, keywords')
-        .eq('knowledge_base_id', knowledgeBaseId)
-        .in('document_id', documentIds)
-        .eq('status', 'ready')
-        .order('updated_at', { ascending: false })
-        .limit(limit * 6);
-
-      if (chunkError) {
-        throw chunkError;
-      }
-
-      for (const chunk of chunks ?? []) {
-        const existing = keywordMap.get(chunk.document_id) ?? [];
-        keywordMap.set(chunk.document_id, uniqueStrings([...existing, ...toStringArray(chunk.keywords)]).slice(0, 12));
-      }
-    }
-
-    return rows.map(row => ({
-      filename: row.filename,
-      summary: row.summary || row.description || row.source_preview || '',
-      keywords: keywordMap.get(row.id) ?? [],
+    return ((sources ?? []).map((row: any) => {
+      const meta = mapSourceMeta(row.meta);
+      return {
+        title: row.title ?? meta.title,
+        summary: meta.summary,
+        terms: meta.terms,
+      };
     })).filter(row => row.summary.trim().length > 0);
   }
 
-  async listChunksForReindex(knowledgeBaseId: string): Promise<ReindexableDocumentChunk[]> {
+  async listUnitsForReindex(knowledgeBaseId: string): Promise<ReindexableUnit[]> {
     const { data, error } = await this.client
-      .from('rag_document_chunks')
-      .select('id, document_id, chunk_index, content, summary, keywords, status, rag_documents!inner(filename, summary, source_type)')
+      .from('rag_units')
+      .select('id, source_id, unit_type, sequence, content, status, meta, rag_sources!inner(title, canonical_path, source_type, meta)')
       .eq('knowledge_base_id', knowledgeBaseId)
-      .eq('rag_documents.knowledge_base_id', knowledgeBaseId)
-      .eq('rag_documents.source_type', 'document')
-      .order('document_id', { ascending: true })
-      .order('chunk_index', { ascending: true });
+      .eq('rag_sources.knowledge_base_id', knowledgeBaseId)
+      .order('source_id', { ascending: true })
+      .order('sequence', { ascending: true });
 
     if (error) {
       throw error;
@@ -290,37 +291,39 @@ export class SupabaseIngestRepository implements IngestRepository {
 
     return (data ?? []).map((row: any) => ({
       id: row.id,
-      documentId: row.document_id,
-      filename: row.rag_documents?.filename ?? 'Unknown document',
-      documentSummary: row.rag_documents?.summary ?? '',
-      chunkIndex: row.chunk_index,
+      sourceId: row.source_id,
+      title: row.rag_sources?.title ?? 'Unknown source',
+      canonicalPath: row.rag_sources?.canonical_path ?? row.rag_sources?.title ?? 'Unknown source',
+      sourceType: row.rag_sources?.source_type === 'image' ? 'image' : 'document',
+      sourceMeta: mapSourceMeta(row.rag_sources?.meta),
+      unitType: row.unit_type,
+      sequence: row.sequence,
       content: row.content ?? '',
-      summary: row.summary ?? '',
-      keywords: toStringArray(row.keywords),
+      meta: mapUnitMeta(row.meta),
       status: row.status,
     }));
   }
 
-  async saveReindexedChunks(params: {
+  async saveReindexedUnits(params: {
     knowledgeBaseId: string;
-    chunks: Array<{
+    units: Array<{
       id: string;
       embedding: number[] | null;
       embeddingDimensions: number | null;
-      relatedChunks: Array<{ chunkId: string; score: number; label: string }>;
+      relatedUnits: Array<{ unitId: string; kind: string; score: number; label: string }>;
     }>;
   }): Promise<void> {
-    if (params.chunks.length === 0) {
+    if (params.units.length === 0) {
       return;
     }
 
-    const { error } = await this.client.from('rag_document_chunks').upsert(
-      params.chunks.map(chunk => ({
-        id: chunk.id,
+    const { error } = await this.client.from('rag_units').upsert(
+      params.units.map(unit => ({
+        id: unit.id,
         knowledge_base_id: params.knowledgeBaseId,
-        embedding: chunk.embedding ? normalizeEmbedding(chunk.embedding) : null,
-        embedding_dimensions: chunk.embeddingDimensions,
-        related_chunks: chunk.relatedChunks,
+        embedding: unit.embedding ? normalizeEmbedding(unit.embedding) : null,
+        embedding_dimensions: unit.embeddingDimensions,
+        related_units: unit.relatedUnits,
       })),
     );
 
@@ -329,61 +332,8 @@ export class SupabaseIngestRepository implements IngestRepository {
     }
   }
 
-  async listImagesForReindex(knowledgeBaseId: string): Promise<ReindexableImageSource[]> {
-    const { data, error } = await this.client
-      .from('rag_documents')
-      .select('id, filename, description')
-      .eq('knowledge_base_id', knowledgeBaseId)
-      .eq('source_type', 'image')
-      .not('description', 'is', null)
-      .order('updated_at', { ascending: false });
-
-    if (error) {
-      throw error;
-    }
-
-    return (data ?? []).map((row: any) => ({
-      documentId: row.id,
-      filename: row.filename,
-      description: row.description ?? '',
-    })).filter(row => row.description.trim().length > 0);
-  }
-
-  async saveImageEmbedding(params: {
-    knowledgeBaseId: string;
-    documentId: string;
-    embedding: number[];
-  }): Promise<void> {
-    const { data, error: selectError } = await this.client
-      .from('rag_documents')
-      .select('metadata')
-      .eq('id', params.documentId)
-      .eq('knowledge_base_id', params.knowledgeBaseId)
-      .maybeSingle();
-
-    if (selectError) {
-      throw selectError;
-    }
-
-    const nextMetadata = {
-      ...(data?.metadata ?? {}),
-      embedding_dimensions: params.embedding.length,
-      embedding_vector: normalizeEmbedding(params.embedding),
-    };
-
-    const { error } = await this.client
-      .from('rag_documents')
-      .update({ metadata: nextMetadata })
-      .eq('id', params.documentId)
-      .eq('knowledge_base_id', params.knowledgeBaseId);
-
-    if (error) {
-      throw error;
-    }
-  }
-
-  async retrieveRelevantChunks(params: RetrieveRelevantChunksParams): Promise<KnowledgeChunkMatch[]> {
-    const { data, error } = await this.client.rpc('match_rag_chunks', {
+  async retrieveRelevantUnits(params: RetrieveRelevantUnitsParams): Promise<KnowledgeUnitMatch[]> {
+    const { data, error } = await this.client.rpc('match_rag_units', {
       query_embedding: normalizeEmbedding(params.queryEmbedding),
       kb_id: params.knowledgeBaseId,
       match_threshold: params.matchThreshold ?? 0.35,
@@ -398,104 +348,68 @@ export class SupabaseIngestRepository implements IngestRepository {
     return (data ?? []).map((row: any) => ({
       id: row.id,
       knowledgeBaseId: row.knowledge_base_id,
-      documentId: row.document_id,
-      filename: row.filename,
+      sourceId: row.source_id,
+      title: row.title,
+      canonicalPath: row.canonical_path,
       sourceType: row.source_type,
+      unitType: row.unit_type,
       content: row.content,
+      preview: row.preview,
       summary: row.summary || '',
       similarity: row.similarity,
-      keywords: toStringArray(row.keywords),
-      bridgingContext: row.bridging_context ?? undefined,
-      preview: row.preview ?? undefined,
+      terms: toStringArray(row.terms),
+      entities: toStringArray(row.entities),
+      relationHints: toStringArray(row.relation_hints),
     }));
   }
 
-  async saveImage(params: PersistImageParams): Promise<void> {
-    const documentId = randomUUID();
-    const { error } = await this.client.from('rag_documents').upsert({
-      id: documentId,
+  async saveSource(params: PersistSourceParams): Promise<void> {
+    const sourceResponse = await this.client.from('rag_sources').upsert({
+      id: params.result.sourceId,
       knowledge_base_id: params.knowledgeBaseId,
-      filename: params.fileName,
-      source_type: 'image',
+      title: params.result.title,
+      canonical_path: params.canonicalPath,
+      source_type: params.result.sourceType,
       ingest_status: 'ready',
       preview_kind: params.previewKind,
-      description: params.description,
-      source_preview: params.descriptionSnippet,
-      context_applied: params.result.contextApplied,
-      chunk_count: 0,
-      total_char_count: params.description.length,
-      processing_duration_ms: params.result.processingDurationMs,
-      metadata: {
-        prompt_variant: params.promptVariant,
-        embedding_dimensions: params.embeddingVector.length,
-        embedding_vector: normalizeEmbedding(params.embeddingVector),
-        knowledge_context: params.result.knowledgeContext ?? null,
-      },
-    });
-
-    if (error) {
-      throw error;
-    }
-  }
-
-  async saveDocument(params: PersistDocumentParams): Promise<void> {
-    const documentResponse = await this.client.from('rag_documents').upsert({
-      id: params.result.documentId,
-      knowledge_base_id: params.knowledgeBaseId,
-      filename: params.fileName,
-      source_type: 'document',
-      ingest_status: 'ready',
-      preview_kind: params.previewKind,
-      summary: params.result.summary,
-      parsed_text_preview: params.result.parsedTextPreview,
-      source_preview: params.result.summary || params.result.parsedTextPreview || '',
-      context_applied: params.result.contextApplied,
-      chunk_count: params.result.chunkCount,
+      raw_preview: params.result.rawPreview,
+      total_unit_count: params.result.totalUnitCount,
       total_char_count: params.result.totalCharCount,
       processing_duration_ms: params.result.processingDurationMs,
-      metadata: {
-        context_applied: params.result.contextApplied ?? false,
-        prompt_variant: params.promptVariant,
-        knowledge_context: params.result.knowledgeContext ?? null,
-      },
+      meta: params.result.meta,
     });
 
-    if (documentResponse.error) {
-      throw documentResponse.error;
+    if (sourceResponse.error) {
+      throw sourceResponse.error;
     }
 
-    if (params.chunks.length === 0) {
+    if (params.units.length === 0) {
       return;
     }
 
-    const chunkResponse = await this.client.from('rag_document_chunks').upsert(
-      params.chunks.map(chunk => ({
-        id: chunk.id,
+    const unitResponse = await this.client.from('rag_units').upsert(
+      params.units.map(unit => ({
+        id: unit.id,
         knowledge_base_id: params.knowledgeBaseId,
-        document_id: params.result.documentId,
-        chunk_index: chunk.index,
-        content: chunk.text,
-        preview: chunk.preview,
-        summary: chunk.summary,
-        keywords: chunk.keywords,
-        bridging_context: chunk.bridgingContext,
-        related_chunks: chunk.relatedChunks,
-        embedding: chunk.embedding ? normalizeEmbedding(chunk.embedding) : null,
-        embedding_dimensions: chunk.embedding?.length ?? null,
-        word_count: chunk.wordCount,
-        char_count: chunk.charCount,
-        start_offset: chunk.startOffset,
-        end_offset: chunk.endOffset,
-        status: chunk.status,
-        metadata: {
-          error_message: chunk.errorMessage ?? null,
-          prompt_variant: params.promptVariant,
-        },
+        source_id: params.result.sourceId,
+        unit_type: unit.unitType,
+        sequence: unit.sequence,
+        content: unit.content,
+        preview: unit.preview,
+        related_units: unit.relatedUnits,
+        embedding: unit.embedding ? normalizeEmbedding(unit.embedding) : null,
+        embedding_dimensions: unit.embedding?.length ?? null,
+        word_count: unit.wordCount,
+        char_count: unit.charCount,
+        start_offset: unit.startOffset,
+        end_offset: unit.endOffset,
+        status: unit.status,
+        meta: unit.meta,
       })),
     );
 
-    if (chunkResponse.error) {
-      throw chunkResponse.error;
+    if (unitResponse.error) {
+      throw unitResponse.error;
     }
   }
 
@@ -513,7 +427,7 @@ export class SupabaseIngestRepository implements IngestRepository {
     const profile = await this.getKnowledgeProfile(id);
     return mapKnowledgeBaseRow(data, profile ? {
       source_count: profile.sourceCount,
-      chunk_count: profile.chunkCount,
+      unit_count: profile.unitCount,
       version: profile.version,
     } : undefined);
   }
@@ -532,7 +446,7 @@ export class SupabaseIngestRepository implements IngestRepository {
     const profile = await this.getKnowledgeProfile(data.id);
     return mapKnowledgeBaseRow(data, profile ? {
       source_count: profile.sourceCount,
-      chunk_count: profile.chunkCount,
+      unit_count: profile.unitCount,
       version: profile.version,
     } : undefined);
   }

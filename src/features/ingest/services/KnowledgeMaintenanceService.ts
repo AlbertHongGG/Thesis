@@ -1,7 +1,8 @@
 import type { AIRuntime } from '@/ai';
-import { buildChunkRelations } from '../relations';
+import { buildUnitRelations } from '../relations';
+import type { UnitRelation } from '../contracts';
 import type { KnowledgeBaseRecord } from '../knowledge';
-import type { IngestRepository, ReindexableDocumentChunk } from '../repository';
+import type { IngestRepository, ReindexableUnit } from '../repository';
 import { KnowledgeProfileService } from './KnowledgeProfileService';
 
 export type KnowledgeMaintenanceResult = {
@@ -9,17 +10,20 @@ export type KnowledgeMaintenanceResult = {
   knowledgeBaseId: string;
   knowledgeBaseName: string;
   sourceCount: number;
-  chunkCount: number;
-  imageCount: number;
+  unitCount: number;
   profileVersion?: number;
 };
 
-function buildChunkEmbeddingText(chunk: ReindexableDocumentChunk) {
+function buildUnitEmbeddingText(unit: ReindexableUnit) {
+  const relationHints = unit.meta.relationHints.map(hint => `${hint.kind}:${hint.label}`).join('；');
   return [
-    chunk.documentSummary.trim() ? `文件摘要：${chunk.documentSummary.trim()}` : '',
-    chunk.summary.trim() ? `當前 chunk 摘要：${chunk.summary.trim()}` : '',
-    chunk.keywords.length > 0 ? `關鍵詞：${chunk.keywords.join('、')}` : '',
-    `原始 chunk 內容：${chunk.content}`,
+    unit.sourceMeta.summary.trim() ? `來源摘要：${unit.sourceMeta.summary.trim()}` : '',
+    unit.sourceMeta.structure?.label ? `來源結構：${unit.sourceMeta.structure.label}` : '',
+    unit.meta.summary.trim() ? `單位摘要：${unit.meta.summary.trim()}` : '',
+    unit.meta.terms.length > 0 ? `檢索詞：${unit.meta.terms.join('、')}` : '',
+    unit.meta.entities.length > 0 ? `實體：${unit.meta.entities.join('、')}` : '',
+    relationHints ? `關聯提示：${relationHints}` : '',
+    `內容：${unit.content}`,
   ].filter(Boolean).join('\n');
 }
 
@@ -46,11 +50,8 @@ export class KnowledgeMaintenanceService {
       summary: profile.summary,
       focusAreas: profile.focusAreas,
       keyTerms: profile.keyTerms,
-      researchQuestions: profile.researchQuestions,
-      methods: profile.methods,
-      recentUpdates: profile.recentUpdates,
       sourceCount: stats.sourceCount,
-      chunkCount: stats.chunkCount,
+      unitCount: stats.unitCount,
     });
 
     return {
@@ -58,80 +59,67 @@ export class KnowledgeMaintenanceService {
       knowledgeBaseId: knowledgeBase.id,
       knowledgeBaseName: knowledgeBase.name,
       sourceCount: stats.sourceCount,
-      chunkCount: stats.chunkCount,
-      imageCount: 0,
+      unitCount: stats.unitCount,
       profileVersion: saved.version,
     };
   }
 
   async reindex(knowledgeBase: KnowledgeBaseRecord): Promise<KnowledgeMaintenanceResult> {
-    const [chunks, images] = await Promise.all([
-      this.repository.listChunksForReindex(knowledgeBase.id),
-      this.repository.listImagesForReindex(knowledgeBase.id),
-    ]);
+    const units = await this.repository.listUnitsForReindex(knowledgeBase.id);
+    const sourceUnits = new Map<string, ReindexableUnit[]>();
 
-    const documents = new Map<string, ReindexableDocumentChunk[]>();
-    for (const chunk of chunks) {
-      const collection = documents.get(chunk.documentId) ?? [];
-      collection.push(chunk);
-      documents.set(chunk.documentId, collection);
+    for (const unit of units) {
+      const collection = sourceUnits.get(unit.sourceId) ?? [];
+      collection.push(unit);
+      sourceUnits.set(unit.sourceId, collection);
     }
 
-    const reindexedChunks: Array<{
+    const reindexedUnits: Array<{
       id: string;
       embedding: number[] | null;
       embeddingDimensions: number | null;
-      relatedChunks: Array<{ chunkId: string; score: number; label: string }>;
+      relatedUnits: UnitRelation[];
     }> = [];
 
-    for (const documentChunks of documents.values()) {
-      const enriched = await Promise.all(documentChunks.map(async chunk => {
-        if (chunk.status === 'error') {
+    for (const unitsForSource of sourceUnits.values()) {
+      const enriched = await Promise.all(unitsForSource.map(async unit => {
+        if (unit.status === 'error') {
           return {
-            ...chunk,
+            ...unit,
             embedding: undefined,
           };
         }
 
         const embedding = await this.runtime.createEmbedding({
-          text: buildChunkEmbeddingText(chunk),
+          text: buildUnitEmbeddingText(unit),
         });
 
         return {
-          ...chunk,
+          ...unit,
           embedding,
         };
       }));
 
-      const relationMap = buildChunkRelations(enriched.map(chunk => ({
-        id: chunk.id,
-        index: chunk.chunkIndex,
-        keywords: chunk.keywords,
-        status: chunk.status,
-        embedding: chunk.embedding,
+      const relationMap = buildUnitRelations(enriched.map(unit => ({
+        id: unit.id,
+        sequence: unit.sequence,
+        meta: unit.meta,
+        status: unit.status,
+        embedding: unit.embedding,
       })));
 
-      reindexedChunks.push(...enriched.map(chunk => ({
-        id: chunk.id,
-        embedding: chunk.embedding ?? null,
-        embeddingDimensions: chunk.embedding?.length ?? null,
-        relatedChunks: relationMap[chunk.id] ?? [],
+      reindexedUnits.push(...enriched.map(unit => ({
+        id: unit.id,
+        embedding: unit.embedding ?? null,
+        embeddingDimensions: unit.embedding?.length ?? null,
+        relatedUnits: relationMap[unit.id] ?? [],
       })));
     }
 
-    await this.repository.saveReindexedChunks({
+    await this.repository.saveReindexedUnits({
       knowledgeBaseId: knowledgeBase.id,
-      chunks: reindexedChunks,
+      units: reindexedUnits,
     });
-
-    for (const image of images) {
-      const embedding = await this.runtime.createEmbedding({ text: image.description });
-      await this.repository.saveImageEmbedding({
-        knowledgeBaseId: knowledgeBase.id,
-        documentId: image.documentId,
-        embedding,
-      });
-    }
 
     const profileResult = await this.rebuildProfile(knowledgeBase);
 
@@ -140,8 +128,7 @@ export class KnowledgeMaintenanceService {
       knowledgeBaseId: knowledgeBase.id,
       knowledgeBaseName: knowledgeBase.name,
       sourceCount: profileResult.sourceCount,
-      chunkCount: reindexedChunks.length,
-      imageCount: images.length,
+      unitCount: reindexedUnits.length,
       profileVersion: profileResult.profileVersion,
     };
   }

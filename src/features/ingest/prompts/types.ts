@@ -1,70 +1,68 @@
 import type { TextChunk } from '@/lib/rag/chunker';
-import type { DocumentChunkAnalysis } from '../contracts';
+import type { RelationHint, SourceStructure } from '../contracts';
 
-export type ChunkAnalysisPromptResult = {
+export type SourceMetadataPromptResult = {
   summary: string;
-  keywords: string[];
-  bridgingContext: string;
+  terms: string[];
+  entities: string[];
+  structure?: SourceStructure;
 };
 
-export interface ChunkAnalysisPromptBundle {
-  id: string;
-  systemPrompt: string;
-  buildPrompt(input: {
-    chunk: TextChunk;
-    previousChunk?: TextChunk;
-    nextChunk?: TextChunk;
-    knowledgeContext: string;
-    documentOverview: string;
-  }): string;
-  parse(rawText: string): ChunkAnalysisPromptResult;
-}
+export type UnitMetadataPromptResult = {
+  summary: string;
+  terms: string[];
+  entities: string[];
+  relationHints: RelationHint[];
+};
 
-export interface DocumentOverviewPromptBundle {
+export interface DocumentSourcePromptBundle {
   id: string;
   systemPrompt: string;
   buildPrompt(input: {
     filename: string;
     knowledgeContext: string;
     parsedTextPreview: string;
-    chunks: TextChunk[];
+    units: TextChunk[];
   }): string;
+  parse(rawText: string): SourceMetadataPromptResult;
 }
 
-export interface DocumentSummaryPromptBundle {
+export interface ImageSourcePromptBundle {
   id: string;
   systemPrompt: string;
   buildPrompt(input: {
     filename: string;
     knowledgeContext: string;
-    documentOverview: string;
-    chunks: DocumentChunkAnalysis[];
   }): string;
+  parse(rawText: string): SourceMetadataPromptResult;
 }
 
-export type ImageQueryPromptResult = {
-  summary: string;
-  chartType: string;
-  keywords: string[];
-  candidateQueries: string[];
-  visibleText: string[];
-};
-
-export interface ImageQueryPromptBundle {
-  id: string;
-  systemPrompt: string;
-  buildPrompt(input: { filename: string }): string;
-  parse(rawText: string): ImageQueryPromptResult;
-}
-
-export interface ImageAnalysisPromptBundle {
+export interface DocumentUnitPromptBundle {
   id: string;
   systemPrompt: string;
   buildPrompt(input: {
+    unit: TextChunk;
+    previousUnit?: TextChunk;
+    nextUnit?: TextChunk;
     knowledgeContext: string;
-    preliminarySummary: string;
-    retrievalQuery: string;
+    sourceSummary: string;
   }): string;
+  parse(rawText: string): UnitMetadataPromptResult;
+}
+
+export interface ImageUnitPromptBundle {
+  id: string;
+  systemPrompt: string;
+  buildPrompt(input: {
+    filename: string;
+    knowledgeContext: string;
+    sourceSummary: string;
+  }): string;
+  parse(rawText: string): UnitMetadataPromptResult;
+}
+
+export interface DocumentSummaryPromptBundle {
+  never?: never;
 }
 
 export interface KnowledgeProfilePromptBundle {
@@ -79,18 +77,14 @@ export interface KnowledgeProfilePromptBundle {
     summary: string;
     focusAreas: string[];
     keyTerms: string[];
-    researchQuestions: string[];
-    methods: string[];
-    recentUpdates: string[];
   };
 }
 
 export interface IngestPrompts {
   id: string;
-  documentOverview: DocumentOverviewPromptBundle;
-  chunkAnalysis: ChunkAnalysisPromptBundle;
-  documentSummary: DocumentSummaryPromptBundle;
-  imageQuery: ImageQueryPromptBundle;
-  imageAnalysis: ImageAnalysisPromptBundle;
+  documentSource: DocumentSourcePromptBundle;
+  imageSource: ImageSourcePromptBundle;
+  documentUnit: DocumentUnitPromptBundle;
+  imageUnit: ImageUnitPromptBundle;
   knowledgeProfile: KnowledgeProfilePromptBundle;
 }

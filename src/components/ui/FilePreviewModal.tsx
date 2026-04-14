@@ -87,7 +87,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
       }
 
       if (previewKind === 'parsed-text') {
-        const parsedTextPreview = entry?.result?.type === 'document' ? entry.result.parsedTextPreview : undefined;
+        const parsedTextPreview = entry?.result?.rawPreview;
         if (parsedTextPreview) {
           setPreviewState({ status: 'ready', kind: 'parsed-text', content: parsedTextPreview, metaLabel: '解析後內容預覽' });
           return;
@@ -212,8 +212,8 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
                   </div>
                   <div className={styles.metaList}>
                     {entry.result?.previewKind && <span className={styles.metaBadge}>{entry.result.previewKind}</span>}
-                    {entry.result?.type === 'image' && entry.result.contextApplied && <span className={styles.metaBadgeTheme}>含文件脈絡</span>}
-                    {entry.result?.type === 'document' && <span className={styles.metaBadgeOrange}>{entry.result.chunkCount} chunks</span>}
+                    {entry.result?.contextApplied && <span className={styles.metaBadgeTheme}>含知識庫脈絡</span>}
+                    {entry.result && <span className={styles.metaBadgeOrange}>{entry.result.totalUnitCount} units</span>}
                   </div>
                 </div>
                 <div className={styles.sectionBodyAlt}>

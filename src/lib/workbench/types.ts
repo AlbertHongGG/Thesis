@@ -2,11 +2,12 @@ import type { IngestResult } from '@/features/ingest/contracts';
 
 export type {
   PreviewKind,
-  ChunkRelation,
-  DocumentChunkAnalysis,
-  DocumentIngestResult,
-  ImageIngestResult,
+  IngestUnit,
+  RelationHint,
+  SourceMeta,
   IngestResult,
+  UnitMeta,
+  UnitRelation,
 } from '@/features/ingest/contracts';
 
 export type FileProcessStatus = 'idle' | 'processing' | 'completed' | 'error';

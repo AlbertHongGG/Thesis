@@ -1,78 +1,99 @@
-import type { KnowledgeContextTrace } from './knowledge';
+import type { KnowledgeContextTrace, KnowledgeSourceType } from './knowledge';
 
-export const INGEST_CONTRACT_VERSION = 4;
+export const INGEST_CONTRACT_VERSION = 5;
 
 export type PreviewKind = 'image' | 'text' | 'parsed-text' | 'unsupported';
 
-export type ChunkRelation = {
-  chunkId: string;
+export type RelationKind = 'depends-on' | 'continues' | 'compares' | 'explains' | 'references' | 'supports';
+
+export type RelationHint = {
+  kind: RelationKind;
+  label: string;
+};
+
+export type UnitRelation = {
+  unitId: string;
+  kind: RelationKind;
   score: number;
   label: string;
 };
 
-export type DocumentChunkAnalysis = {
+export type SourceStructure = {
+  kind: string;
+  label: string;
+};
+
+export type SourceMeta = {
+  schemaVersion: number;
+  sourceType: KnowledgeSourceType;
+  title: string;
+  summary: string;
+  terms: string[];
+  entities: string[];
+  structure?: SourceStructure;
+};
+
+export type UnitMeta = {
+  schemaVersion: number;
+  unitType: string;
+  summary: string;
+  terms: string[];
+  entities: string[];
+  relationHints: RelationHint[];
+};
+
+export type IngestUnit = {
   id: string;
-  index: number;
-  text: string;
+  sourceId: string;
+  unitType: string;
+  sequence: number;
+  content: string;
   preview: string;
   charCount: number;
   wordCount: number;
   startOffset: number;
   endOffset: number;
-  summary: string;
-  keywords: string[];
-  bridgingContext?: string;
-  relatedChunks: ChunkRelation[];
+  meta: UnitMeta;
+  relatedUnits: UnitRelation[];
   status: 'ready' | 'error';
   errorMessage?: string;
 };
 
-export type DocumentIngestResult = {
-  type: 'document';
+export type IngestResult = {
+  type: 'source';
   knowledgeBaseId: string;
   knowledgeBaseName?: string;
   previewKind?: PreviewKind;
-  documentId: string;
-  chunkCount: number;
+  sourceId: string;
+  sourceType: KnowledgeSourceType;
+  title: string;
+  totalUnitCount: number;
   totalCharCount: number;
   processingDurationMs?: number;
-  summary?: string;
-  parsedTextPreview?: string;
-  chunkAnalyses: DocumentChunkAnalysis[];
+  rawPreview?: string;
+  meta: SourceMeta;
+  units: IngestUnit[];
   contextApplied?: boolean;
   knowledgeContext?: KnowledgeContextTrace;
   dbWritten?: boolean;
 };
-
-export type ImageIngestResult = {
-  type: 'image';
-  knowledgeBaseId: string;
-  knowledgeBaseName?: string;
-  previewKind?: PreviewKind;
-  processingDurationMs?: number;
-  description?: string;
-  descriptionSnippet?: string;
-  contextApplied?: boolean;
-  knowledgeContext?: KnowledgeContextTrace;
-  dbWritten?: boolean;
-};
-
-export type IngestResult = DocumentIngestResult | ImageIngestResult;
 
 export type IngestStepEvent = {
   type: 'step';
   message: string;
 };
 
-export type IngestChunkEvent = {
-  type: 'chunk';
+export type IngestUnitEvent = {
+  type: 'unit';
   knowledgeBaseId: string;
   knowledgeBaseName?: string;
-  chunk: DocumentChunkAnalysis;
-  documentId: string;
-  chunkCount: number;
+  sourceId: string;
+  sourceType: KnowledgeSourceType;
+  title: string;
+  unit: IngestUnit;
+  totalUnitCount: number;
   totalCharCount: number;
-  parsedTextPreview: string;
+  rawPreview: string;
   previewKind: PreviewKind;
   progress: { current: number; total: number };
 };
@@ -87,7 +108,7 @@ export type IngestErrorEvent = {
   error: string;
 };
 
-export type IngestStreamEvent = IngestStepEvent | IngestChunkEvent | IngestResultEvent | IngestErrorEvent;
+export type IngestStreamEvent = IngestStepEvent | IngestUnitEvent | IngestResultEvent | IngestErrorEvent;
 
 export function encodeStreamEvent(event: IngestStreamEvent) {
   return `${JSON.stringify(event)}\n`;

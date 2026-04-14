@@ -1,37 +1,26 @@
-import type { DocumentChunkAnalysis, DocumentIngestResult, ImageIngestResult, PreviewKind } from './contracts';
+import type { IngestResult, IngestUnit, PreviewKind, SourceMeta, UnitMeta, UnitRelation } from './contracts';
 import type {
   KnowledgeBaseInput,
   KnowledgeBaseRecord,
-  KnowledgeChunkMatch,
   KnowledgeProfileRecord,
   KnowledgeSourceType,
+  KnowledgeUnitMatch,
 } from './knowledge';
 
-export type PersistableDocumentChunk = DocumentChunkAnalysis & {
+export type PersistableUnit = IngestUnit & {
   embedding?: number[];
 };
 
-export type PersistImageParams = {
+export type PersistSourceParams = {
   knowledgeBaseId: string;
-  fileName: string;
+  canonicalPath: string;
   previewKind: PreviewKind;
-  result: ImageIngestResult;
-  description: string;
-  descriptionSnippet: string;
-  embeddingVector: number[];
+  result: IngestResult;
+  units: PersistableUnit[];
   promptVariant: string;
 };
 
-export type PersistDocumentParams = {
-  knowledgeBaseId: string;
-  fileName: string;
-  previewKind: PreviewKind;
-  result: DocumentIngestResult;
-  chunks: PersistableDocumentChunk[];
-  promptVariant: string;
-};
-
-export type RetrieveRelevantChunksParams = {
+export type RetrieveRelevantUnitsParams = {
   knowledgeBaseId: string;
   queryText: string;
   queryEmbedding: number[];
@@ -45,40 +34,33 @@ export type PersistKnowledgeProfileParams = {
   summary: string;
   focusAreas: string[];
   keyTerms: string[];
-  researchQuestions: string[];
-  methods: string[];
-  recentUpdates: string[];
   sourceCount: number;
-  chunkCount: number;
+  unitCount: number;
 };
 
 export type KnowledgeProfileSourceMaterial = {
-  filename: string;
+  title: string;
   summary: string;
-  keywords: string[];
+  terms: string[];
 };
 
 export type KnowledgeBaseStats = {
   sourceCount: number;
-  chunkCount: number;
+  unitCount: number;
 };
 
-export type ReindexableDocumentChunk = {
+export type ReindexableUnit = {
   id: string;
-  documentId: string;
-  filename: string;
-  documentSummary: string;
-  chunkIndex: number;
+  sourceId: string;
+  title: string;
+  canonicalPath: string;
+  sourceType: KnowledgeSourceType;
+  sourceMeta: SourceMeta;
+  unitType: string;
+  sequence: number;
   content: string;
-  summary: string;
-  keywords: string[];
+  meta: UnitMeta;
   status: 'ready' | 'error';
-};
-
-export type ReindexableImageSource = {
-  documentId: string;
-  filename: string;
-  description: string;
 };
 
 export interface IngestRepository {
@@ -90,23 +72,16 @@ export interface IngestRepository {
   getKnowledgeProfile(knowledgeBaseId: string): Promise<KnowledgeProfileRecord | null>;
   saveKnowledgeProfile(params: PersistKnowledgeProfileParams): Promise<KnowledgeProfileRecord>;
   listKnowledgeProfileSources(knowledgeBaseId: string, limit?: number): Promise<KnowledgeProfileSourceMaterial[]>;
-  retrieveRelevantChunks(params: RetrieveRelevantChunksParams): Promise<KnowledgeChunkMatch[]>;
-  listChunksForReindex(knowledgeBaseId: string): Promise<ReindexableDocumentChunk[]>;
-  saveReindexedChunks(params: {
+  retrieveRelevantUnits(params: RetrieveRelevantUnitsParams): Promise<KnowledgeUnitMatch[]>;
+  listUnitsForReindex(knowledgeBaseId: string): Promise<ReindexableUnit[]>;
+  saveReindexedUnits(params: {
     knowledgeBaseId: string;
-    chunks: Array<{
+    units: Array<{
       id: string;
       embedding: number[] | null;
       embeddingDimensions: number | null;
-      relatedChunks: DocumentChunkAnalysis['relatedChunks'];
+      relatedUnits: UnitRelation[];
     }>;
   }): Promise<void>;
-  listImagesForReindex(knowledgeBaseId: string): Promise<ReindexableImageSource[]>;
-  saveImageEmbedding(params: {
-    knowledgeBaseId: string;
-    documentId: string;
-    embedding: number[];
-  }): Promise<void>;
-  saveImage(params: PersistImageParams): Promise<void>;
-  saveDocument(params: PersistDocumentParams): Promise<void>;
+  saveSource(params: PersistSourceParams): Promise<void>;
 }

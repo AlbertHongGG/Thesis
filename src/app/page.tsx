@@ -56,10 +56,9 @@ import {
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
 import type {
-  DocumentChunkAnalysis,
-  DocumentIngestResult,
   FileProcessEntry,
   FileProcessStatus,
+  IngestUnit,
   IngestResult,
   ProcessStepEntry,
 } from '@/lib/workbench/types';
@@ -81,7 +80,7 @@ const FALLBACK_KNOWLEDGE_BASE: KnowledgeBaseRecord = {
   name: DEFAULT_KNOWLEDGE_BASE_NAME,
   status: 'active',
   sourceCount: 0,
-  chunkCount: 0,
+  unitCount: 0,
   profileVersion: 0,
 };
 
@@ -110,11 +109,16 @@ function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
   return file;
 }
 
-function cloneChunkAnalysis(chunk: DocumentChunkAnalysis): DocumentChunkAnalysis {
+function cloneUnit(unit: IngestUnit): IngestUnit {
   return {
-    ...chunk,
-    keywords: [...chunk.keywords],
-    relatedChunks: chunk.relatedChunks.map(relation => ({ ...relation })),
+    ...unit,
+    meta: {
+      ...unit.meta,
+      terms: [...unit.meta.terms],
+      entities: [...unit.meta.entities],
+      relationHints: unit.meta.relationHints.map(relation => ({ ...relation })),
+    },
+    relatedUnits: unit.relatedUnits.map(relation => ({ ...relation })),
   };
 }
 
@@ -132,17 +136,16 @@ function cloneKnowledgeContext(trace?: IngestResult['knowledgeContext']) {
 function serializeResult(result?: IngestResult) {
   if (!result) return undefined;
 
-  if (result.type === 'image') {
-    return {
-      ...result,
-      knowledgeContext: cloneKnowledgeContext(result.knowledgeContext),
-    } satisfies IngestResult;
-  }
-
   return {
     ...result,
+    meta: {
+      ...result.meta,
+      terms: [...result.meta.terms],
+      entities: [...result.meta.entities],
+      structure: result.meta.structure ? { ...result.meta.structure } : undefined,
+    },
     knowledgeContext: cloneKnowledgeContext(result.knowledgeContext),
-    chunkAnalyses: result.chunkAnalyses.map(cloneChunkAnalysis),
+    units: result.units.map(cloneUnit),
   } satisfies IngestResult;
 }
 
@@ -471,14 +474,13 @@ export default function DataWorkbench() {
       const result = data.result as {
         action: KnowledgeBaseMaintenanceAction;
         sourceCount: number;
-        chunkCount: number;
-        imageCount: number;
+        unitCount: number;
         profileVersion?: number;
       };
 
       toast(
         action === 'reindex'
-          ? `Reindex completed: ${result.chunkCount} chunks. Profile v${result.profileVersion ?? '-'}.`
+          ? `Reindex completed: ${result.unitCount} units. Profile v${result.profileVersion ?? '-'}.`
           : `Knowledge profile rebuilt successfully!`,
         'success'
       );
@@ -650,33 +652,41 @@ export default function DataWorkbench() {
     });
   }, [buildInitialEntry]);
 
-  const mergeChunkResult = useCallback((fullPath: string, event: Extract<IngestStreamEvent, { type: 'chunk' }>) => {
+  const mergeUnitResult = useCallback((fullPath: string, event: Extract<IngestStreamEvent, { type: 'unit' }>) => {
     setProcessEntries(prev => {
       const existing = prev[fullPath] ?? buildInitialEntry(fullPath);
-      const documentResult = existing.result?.type === 'document'
-        ? existing.result
-        : {
-            type: 'document',
-            knowledgeBaseId: event.knowledgeBaseId,
-            knowledgeBaseName: event.knowledgeBaseName,
-            previewKind: event.previewKind,
-            documentId: event.documentId,
-            chunkCount: event.chunkCount,
-            totalCharCount: event.totalCharCount,
-            parsedTextPreview: event.parsedTextPreview,
-            chunkAnalyses: [],
-          } satisfies DocumentIngestResult;
+      const sourceResult = existing.result ?? {
+        type: 'source',
+        knowledgeBaseId: event.knowledgeBaseId,
+        knowledgeBaseName: event.knowledgeBaseName,
+        previewKind: event.previewKind,
+        sourceId: event.sourceId,
+        sourceType: event.sourceType,
+        title: event.title,
+        totalUnitCount: event.totalUnitCount,
+        totalCharCount: event.totalCharCount,
+        rawPreview: event.rawPreview,
+        meta: {
+          schemaVersion: 1,
+          sourceType: event.sourceType,
+          title: event.title,
+          summary: '',
+          terms: [],
+          entities: [],
+        },
+        units: [],
+      } satisfies IngestResult;
 
-      const nextChunkAnalyses = [...documentResult.chunkAnalyses];
-      const existingChunkIndex = nextChunkAnalyses.findIndex(chunk => chunk.id === event.chunk.id);
+      const nextUnits = [...sourceResult.units];
+      const existingUnitIndex = nextUnits.findIndex(unit => unit.id === event.unit.id);
 
-      if (existingChunkIndex === -1) {
-        nextChunkAnalyses.push(cloneChunkAnalysis(event.chunk));
+      if (existingUnitIndex === -1) {
+        nextUnits.push(cloneUnit(event.unit));
       } else {
-        nextChunkAnalyses[existingChunkIndex] = cloneChunkAnalysis(event.chunk);
+        nextUnits[existingUnitIndex] = cloneUnit(event.unit);
       }
 
-      nextChunkAnalyses.sort((left, right) => left.index - right.index);
+      nextUnits.sort((left, right) => left.sequence - right.sequence);
 
       return {
         ...prev,
@@ -686,13 +696,15 @@ export default function DataWorkbench() {
           startedAt: existing.startedAt ?? Date.now(),
           completedAt: undefined,
           result: {
-            ...documentResult,
+            ...sourceResult,
             previewKind: event.previewKind,
-            documentId: event.documentId,
-            chunkCount: event.chunkCount,
+            sourceId: event.sourceId,
+            sourceType: event.sourceType,
+            title: event.title,
+            totalUnitCount: event.totalUnitCount,
             totalCharCount: event.totalCharCount,
-            parsedTextPreview: event.parsedTextPreview,
-            chunkAnalyses: nextChunkAnalyses,
+            rawPreview: event.rawPreview,
+            units: nextUnits,
           },
         },
       };
@@ -811,8 +823,8 @@ export default function DataWorkbench() {
           continue;
         }
 
-        if (event.type === 'chunk') {
-          mergeChunkResult(fullPath, event);
+        if (event.type === 'unit') {
+          mergeUnitResult(fullPath, event);
           continue;
         }
 
@@ -831,8 +843,8 @@ export default function DataWorkbench() {
 
       if (event.type === 'step') {
         appendProcessStep(fullPath, event.message);
-      } else if (event.type === 'chunk') {
-        mergeChunkResult(fullPath, event);
+      } else if (event.type === 'unit') {
+        mergeUnitResult(fullPath, event);
       } else if (event.type === 'error') {
         throw new Error(event.error);
       } else {
@@ -846,7 +858,7 @@ export default function DataWorkbench() {
 
     completeProcessingEntry(fullPath, finalResult);
     return finalResult;
-  }, [appendProcessStep, completeProcessingEntry, mergeChunkResult]);
+  }, [appendProcessStep, completeProcessingEntry, mergeUnitResult]);
 
   const processFile = useCallback(async (file: ExtendedFile) => {
     const fullPath = file.path || file.name;
@@ -1161,7 +1173,7 @@ export default function DataWorkbench() {
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Current Status</span>
                     <span style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-primary)', marginTop: '0.25rem' }}>
-                      {activeKnowledgeBase ? `${activeKnowledgeBase.sourceCount} sources · ${activeKnowledgeBase.chunkCount} chunks` : 'No KB loaded'}
+                      {activeKnowledgeBase ? `${activeKnowledgeBase.sourceCount} sources · ${activeKnowledgeBase.unitCount} units` : 'No KB loaded'}
                     </span>
                   </div>
                 </div>

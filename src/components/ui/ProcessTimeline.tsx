@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, Clock3, Database, FileText, Image as ImageIcon, Link2, LoaderCircle, Rows3, Tag, Check } from 'lucide-react';
 import { formatDuration, getStepStatusLabel } from '@/lib/workbench/formatting';
@@ -42,20 +40,36 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
 
   return (
     <div className={styles.outputGroup}>
-      {result.type === 'image' && result.description && (
-        <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <div className={styles.outputHeader}>
-            <div className={styles.outputTitle}>
-              <ImageIcon size={16} className={styles.headerIcon} />
-              圖片分析結果
+      <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <div className={styles.outputHeader}>
+          <div className={styles.outputTitle}>
+            {result.sourceType === 'image' ? <ImageIcon size={16} className={styles.headerIcon} /> : <FileText size={16} className={styles.headerIcon} />}
+            來源摘要
+          </div>
+          <div className={styles.outputMeta}>{result.totalUnitCount} units</div>
+        </div>
+        <div className={styles.outputText}>{result.meta.summary || '目前沒有可用的來源摘要。'}</div>
+        {result.meta.terms.length > 0 && (
+          <div className={styles.chunkMetaRow}>
+            <div className={styles.chunkMetaTitle}><Tag size={13} /> 檢索詞</div>
+            <div className={styles.chunkTokenList}>
+              {result.meta.terms.map(term => (
+                <span key={`${result.sourceId}-${term}`} className={styles.chunkToken}>{term}</span>
+              ))}
             </div>
-            {result.contextApplied && <div className={styles.outputMeta}>含知識庫上下文</div>}
           </div>
-          <div className={styles.markdown}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.description}</ReactMarkdown>
+        )}
+        {result.meta.entities.length > 0 && (
+          <div className={styles.chunkMetaRow}>
+            <div className={styles.chunkMetaTitle}><Link2 size={13} /> 實體</div>
+            <div className={styles.chunkTokenList}>
+              {result.meta.entities.map(entity => (
+                <span key={`${result.sourceId}-${entity}`} className={styles.chunkToken}>{entity}</span>
+              ))}
+            </div>
           </div>
-        </motion.section>
-      )}
+        )}
+      </motion.section>
 
       {result.knowledgeContext && (
         <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
@@ -96,63 +110,67 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
         </motion.section>
       )}
 
-      {result.type === 'document' && result.summary && (
-        <motion.section className={styles.outputCard} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
-          <div className={styles.outputHeader}>
-            <div className={styles.outputTitle}>
-              <FileText size={16} className={styles.headerIcon} />
-              文件摘要
-            </div>
-            <div className={styles.outputMeta}>{result.chunkCount} chunks</div>
-          </div>
-          <div className={styles.outputText}>{result.summary}</div>
-        </motion.section>
-      )}
-
-      {result.type === 'document' && result.chunkAnalyses.length > 0 && (
+      {result.units.length > 0 && (
         <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
               <Rows3 size={16} className={styles.headerIcon} />
-              Chunk 語意分析
+              Units 語意分析
             </div>
-            <div className={styles.outputMeta}>{result.chunkAnalyses.length}/{result.chunkCount}</div>
+            <div className={styles.outputMeta}>{result.units.length}/{result.totalUnitCount}</div>
           </div>
           <div className={styles.chunkList}>
-            {result.chunkAnalyses.map((chunk, idx) => (
-              <motion.div key={`${entry.path}-chunk-${chunk.index}`} className={styles.chunkItem}
+            {result.units.map((unit, idx) => (
+              <motion.div key={`${entry.path}-unit-${unit.sequence}`} className={styles.chunkItem}
                 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(idx * 0.05, 0.5) }}>
                 <div className={styles.chunkLabel}>
-                  Chunk {chunk.index + 1}
-                  <span className={styles.charCountBadge}>{chunk.charCount} chars</span>
-                  <span className={`${styles.chunkStatusBadge} ${chunk.status === 'error' ? styles.chunkStatusError : styles.chunkStatusReady}`}>
-                    {chunk.status === 'error' ? '分析失敗' : '分析完成'}
+                  Unit {unit.sequence + 1}
+                  <span className={styles.charCountBadge}>{unit.charCount} chars</span>
+                  <span className={`${styles.chunkStatusBadge} ${unit.status === 'error' ? styles.chunkStatusError : styles.chunkStatusReady}`}>
+                    {unit.status === 'error' ? '分析失敗' : '分析完成'}
                   </span>
                 </div>
-                <div className={styles.chunkSummary}>{chunk.summary}</div>
-                <div className={styles.chunkPreview}>{chunk.preview}</div>
-                {chunk.keywords.length > 0 && (
+                <div className={styles.chunkSummary}>{unit.meta.summary}</div>
+                <div className={styles.chunkPreview}>{unit.preview}</div>
+                {unit.meta.terms.length > 0 && (
                   <div className={styles.chunkMetaRow}>
-                    <div className={styles.chunkMetaTitle}><Tag size={13} /> 關鍵詞</div>
+                    <div className={styles.chunkMetaTitle}><Tag size={13} /> 檢索詞</div>
                     <div className={styles.chunkTokenList}>
-                      {chunk.keywords.map(keyword => (
-                        <span key={`${chunk.id}-${keyword}`} className={styles.chunkToken}>{keyword}</span>
+                      {unit.meta.terms.map(term => (
+                        <span key={`${unit.id}-${term}`} className={styles.chunkToken}>{term}</span>
                       ))}
                     </div>
                   </div>
                 )}
-                {chunk.bridgingContext && (
+                {unit.meta.entities.length > 0 && (
                   <div className={styles.chunkMetaRow}>
-                    <div className={styles.chunkMetaTitle}><Rows3 size={13} /> 相鄰脈絡</div>
-                    <div className={styles.chunkMetaText}>{chunk.bridgingContext}</div>
+                    <div className={styles.chunkMetaTitle}><Link2 size={13} /> 實體</div>
+                    <div className={styles.chunkTokenList}>
+                      {unit.meta.entities.map(entity => (
+                        <span key={`${unit.id}-${entity}`} className={styles.chunkToken}>{entity}</span>
+                      ))}
+                    </div>
                   </div>
                 )}
-                {chunk.relatedChunks.length > 0 && (
+                {unit.meta.relationHints.length > 0 && (
                   <div className={styles.chunkMetaRow}>
-                    <div className={styles.chunkMetaTitle}><Link2 size={13} /> 關聯 Chunk</div>
+                    <div className={styles.chunkMetaTitle}><Rows3 size={13} /> 關聯提示</div>
                     <div className={styles.chunkRelationList}>
-                      {chunk.relatedChunks.map(relation => (
-                        <div key={`${chunk.id}-${relation.chunkId}`} className={styles.chunkRelationItem}>
+                      {unit.meta.relationHints.map((hint, hintIndex) => (
+                        <div key={`${unit.id}-hint-${hintIndex}`} className={styles.chunkRelationItem}>
+                          <span className={styles.chunkRelationLabel}>{hint.label}</span>
+                          <span className={styles.chunkRelationScore}>{hint.kind}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {unit.relatedUnits.length > 0 && (
+                  <div className={styles.chunkMetaRow}>
+                    <div className={styles.chunkMetaTitle}><Link2 size={13} /> 關聯 Units</div>
+                    <div className={styles.chunkRelationList}>
+                      {unit.relatedUnits.map(relation => (
+                        <div key={`${unit.id}-${relation.unitId}`} className={styles.chunkRelationItem}>
                           <span className={styles.chunkRelationLabel}>{relation.label}</span>
                           <span className={styles.chunkRelationScore}>{relation.score.toFixed(2)}</span>
                         </div>
@@ -160,7 +178,7 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
                     </div>
                   </div>
                 )}
-                {chunk.errorMessage && <div className={styles.chunkError}>{chunk.errorMessage}</div>}
+                {unit.errorMessage && <div className={styles.chunkError}>{unit.errorMessage}</div>}
               </motion.div>
             ))}
           </div>

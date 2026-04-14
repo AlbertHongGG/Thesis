@@ -4,7 +4,7 @@ import pg from 'pg';
 import { loadDotEnv } from './load-env.mjs';
 
 const REQUIRED_ENV_NAMES = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE', 'SUPABASE_DB_URL'];
-const REQUIRED_TABLES = ['knowledge_bases', 'knowledge_profiles', 'rag_documents', 'rag_document_chunks'];
+const REQUIRED_TABLES = ['knowledge_bases', 'knowledge_profiles', 'rag_sources', 'rag_units'];
 
 loadDotEnv();
 
@@ -45,15 +45,15 @@ async function testHttpApi() {
     },
   });
 
-  const { error } = await client.from('rag_documents').select('id').limit(1);
+  const { error } = await client.from('rag_sources').select('id').limit(1);
 
   if (!error) {
-    printLine('OK', 'HTTP API', '可透過 service role 讀取 rag_documents');
+    printLine('OK', 'HTTP API', '可透過 service role 讀取 rag_sources');
     return { apiReachable: true, schemaReady: true };
   }
 
   if (error.code === 'PGRST205') {
-    printLine('WARN', 'HTTP API', 'API 可連通，但 rag_documents 尚未建立');
+    printLine('WARN', 'HTTP API', 'API 可連通，但 rag_sources 尚未建立');
     return { apiReachable: true, schemaReady: false };
   }
 
@@ -80,23 +80,23 @@ async function testDatabase() {
     const functionResult = await client.query(
       `select oid::regprocedure::text as signature
        from pg_proc
-       where proname = 'match_rag_chunks'
-         and oid::regprocedure::text = 'match_rag_chunks(vector,uuid,double precision,integer,text[])'`,
+       where proname = 'match_rag_units'
+         and oid::regprocedure::text = 'match_rag_units(vector,uuid,double precision,integer,text[])'`,
     );
 
     const existingTables = new Set(result.rows.map(row => row.table_name));
     const missingTables = REQUIRED_TABLES.filter(tableName => !existingTables.has(tableName));
 
     if (missingTables.length === 0) {
-      printLine('OK', '資料表', 'knowledge_bases、knowledge_profiles、rag_documents 與 rag_document_chunks 都存在');
+      printLine('OK', '資料表', 'knowledge_bases、knowledge_profiles、rag_sources 與 rag_units 都存在');
     } else {
       printLine('WARN', '資料表', `缺少：${missingTables.join(', ')}`);
     }
 
     if ((functionResult.rowCount ?? 0) >= 1) {
-      printLine('OK', '向量搜尋函式', 'KB-aware match_rag_chunks 已存在');
+      printLine('OK', '向量搜尋函式', 'KB-aware match_rag_units 已存在');
     } else {
-      printLine('WARN', '向量搜尋函式', '缺少 KB-aware match_rag_chunks');
+      printLine('WARN', '向量搜尋函式', '缺少 KB-aware match_rag_units');
     }
 
     if (missingTables.length === 0 && (functionResult.rowCount ?? 0) >= 1) {

@@ -152,11 +152,11 @@ function GraphWorkspace() {
           <h4 className={styles.legendTitle}>Graph Legend</h4>
           <div className={styles.legendItem}>
             <span className={`${styles.legendDot} ${styles.legendDotDoc}`}></span>
-            Document Source
+            Knowledge Source
           </div>
           <div className={styles.legendItem}>
             <span className={`${styles.legendDot} ${styles.legendDotChunk}`}></span>
-            Knowledge Chunk
+            Knowledge Unit
           </div>
           <div className={styles.legendItem}>
             <span className={`${styles.legendLine} ${styles.legendLineParent}`}></span>

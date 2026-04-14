@@ -8,12 +8,17 @@ import styles from './RagQueryPanel.module.css';
 interface SearchResult {
   id: string;
   knowledgeBaseId: string;
-  documentId: string;
-  filename: string;
+  sourceId: string;
+  title: string;
+  canonicalPath: string;
   sourceType: 'document' | 'image';
+  unitType: string;
   content: string;
+  preview: string;
   summary: string;
-  keywords: string[];
+  terms: string[];
+  entities: string[];
+  relationHints: string[];
   similarity: number;
 }
 
@@ -202,8 +207,9 @@ export function RagQueryPanel({ knowledgeBaseId, knowledgeBaseName }: RagQueryPa
                           </div>
                           <div className={styles.cardBody}>
                             <div className={styles.cardTitle}>{result.summary || '未命名片段'}</div>
-                            <div className={styles.cardSnippet}>{result.filename} · {result.sourceType}</div>
-                            <div className={styles.cardSnippet}>{result.content}</div>
+                            <div className={styles.cardSnippet}>{result.canonicalPath} · {result.sourceType} · {result.unitType}</div>
+                            <div className={styles.cardSnippet}>{result.preview || result.content}</div>
+                            {result.terms.length > 0 && <div className={styles.cardSnippet}>terms: {result.terms.join('、')}</div>}
                           </div>
                         </motion.div>
                       ))}

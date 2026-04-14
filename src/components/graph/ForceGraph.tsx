@@ -4,17 +4,21 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
+const ForceGraphCanvas = ForceGraph2D as unknown as React.ComponentType<any>;
 
 export interface GraphNode {
   id: string;
   name: string;
+  fullName?: string;
   group: string;
   val: number;
-  type: 'document' | 'chunk';
+  type: 'source' | 'unit' | 'folder';
   summary?: string;
   content?: string;
-  keywords?: string[];
+  terms?: string[];
+  entities?: string[];
   sourceType?: string;
+  unitType?: string;
   x?: number;
   y?: number;
   vx?: number;
@@ -41,7 +45,7 @@ interface ForceGraphProps {
 }
 
 export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selectedNodeId }) => {
-  const fgRef = useRef<any>();
+  const fgRef = useRef<any>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,10 +69,6 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
       onNodeClick(node);
       
       if (fgRef.current) {
-        // Aim at node from outside it
-        const distance = 100;
-        const distRatio = 1 + distance / Math.hypot(node.x || 0, node.y || 0, 1);
-        
         fgRef.current.centerAt(node.x, node.y, 600);
         fgRef.current.zoom(2.5, 600);
       }
@@ -78,7 +78,7 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
 
   const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const isSelected = selectedNodeId === node.id;
-    const isDoc = node.type === 'document';
+    const isDoc = node.type === 'source';
     const isFolder = node.type === 'folder';
     
     // Size logic
@@ -90,7 +90,7 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
     // using direct hex since we are in canvas
     const folderColor = '#64748b'; // slate-500
     const docColor = '#3b82f6'; // blue-500
-    const chunkColor = '#8baef9'; // lighter blue
+    const unitColor = '#8baef9'; // lighter blue
     const selectedColor = '#f59e0b'; // Amber for highlight
     
     ctx.beginPath();
@@ -101,14 +101,14 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
       ctx.shadowColor = selectedColor;
       ctx.shadowBlur = 10 * globalScale;
     } else {
-      ctx.fillStyle = isFolder ? folderColor : (isDoc ? docColor : chunkColor);
+      ctx.fillStyle = isFolder ? folderColor : (isDoc ? docColor : unitColor);
       ctx.shadowBlur = 0;
     }
     
     ctx.fill();
     ctx.shadowBlur = 0; // Reset shadow
     
-    // Text labels for documents and folders only. Do not draw text for chunk nodes.
+    // Text labels for sources and folders only. Do not draw text for unit nodes.
     if (isDoc || isFolder) {
       const label = node.name || '';
       // Dynamically scale font size.
@@ -137,23 +137,22 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-      <ForceGraph2D
+      <ForceGraphCanvas
         ref={fgRef}
         width={dimensions.width}
         height={dimensions.height}
         graphData={data}
-        nodeColor={(node: any) => node.type === 'folder' ? '#64748b' : (node.type === 'document' ? '#3b82f6' : '#8baef9')}
+        nodeColor={(node: any) => node.type === 'folder' ? '#64748b' : (node.type === 'source' ? '#3b82f6' : '#8baef9')}
         nodeRelSize={6}
         nodeCanvasObject={paintNode}
         
         // Links config
         linkColor={(link: any) => {
-          if (link.type === 'hierarchy') return '#cbd5e1'; // solid gray for folders
           if (link.type === 'child') return 'rgba(148, 163, 184, 0.4)';
           return 'rgba(59, 130, 246, 0.2)'; // related
         }}
-        linkWidth={(link: any) => link.type === 'hierarchy' ? 2 : (link.type === 'child' ? 1.5 : 0.8)}
-        linkLineDash={(link: any) => link.type === 'related' ? [2, 2] : undefined}
+        linkWidth={(link: any) => link.type === 'child' ? 1.5 : 0.8}
+        linkLineDash={(link: any) => link.type === 'related' ? [2, 2] : null}
         
         // Particles for relation links
         linkDirectionalParticles={(link: any) => link.type === 'related' ? 2 : 0}

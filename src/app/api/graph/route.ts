@@ -25,21 +25,21 @@ export async function GET(req: Request) {
     }
 
     // Fetch documents
-    const { data: documents, error: docError } = await supabaseAdmin
-      .from('rag_documents')
-      .select('id, filename, summary, source_type')
+    const { data: sources, error: sourceError } = await supabaseAdmin
+      .from('rag_sources')
+      .select('id, title, canonical_path, source_type, meta')
       .eq('knowledge_base_id', kbId);
 
-    if (docError) throw docError;
+    if (sourceError) throw sourceError;
 
-    // Fetch chunks with status ready including embeddings
-    const { data: chunks, error: chunkError } = await supabaseAdmin
-      .from('rag_document_chunks')
-      .select('id, document_id, content, keywords, summary, related_chunks, embedding')
+    // Fetch units with status ready including embeddings
+    const { data: units, error: unitError } = await supabaseAdmin
+      .from('rag_units')
+      .select('id, source_id, unit_type, content, related_units, embedding, meta')
       .eq('knowledge_base_id', kbId)
       .eq('status', 'ready');
 
-    if (chunkError) throw chunkError;
+    if (unitError) throw unitError;
 
     const nodes: any[] = [];
     const links: any[] = [];
@@ -47,8 +47,8 @@ export async function GET(req: Request) {
     // Document and Folder nodes
     const folders = new Set<string>();
 
-    for (const doc of documents || []) {
-      const parts = doc.filename.split('/');
+    for (const source of sources || []) {
+      const parts = (source.canonical_path || source.title).split('/');
       let currentPath = '';
 
       // Build folder hierarchy if the file has path information
@@ -80,49 +80,58 @@ export async function GET(req: Request) {
         // Link the final folder to the document
         links.push({
           source: `folder:${currentPath}`,
-          target: doc.id,
+          target: source.id,
           type: 'hierarchy',
         });
       }
 
+      const sourceMeta = source.meta && typeof source.meta === 'object' ? source.meta : {};
+
       nodes.push({
-        id: doc.id,
-        name: doc.filename, // Display the full path for disambiguation
-        summary: doc.summary || '',
-        group: doc.id,
+        id: source.id,
+        name: source.title,
+        fullName: source.canonical_path,
+        summary: typeof sourceMeta.summary === 'string' ? sourceMeta.summary : '',
+        terms: Array.isArray(sourceMeta.terms) ? sourceMeta.terms : [],
+        entities: Array.isArray(sourceMeta.entities) ? sourceMeta.entities : [],
+        group: source.id,
         val: 8,
-        type: 'document',
-        sourceType: doc.source_type,
+        type: 'source',
+        sourceType: source.source_type,
       });
     }
 
-    // Chunk nodes and links
-    for (const chunk of chunks || []) {
+    // Unit nodes and links
+    for (const unit of units || []) {
+      const unitMeta = unit.meta && typeof unit.meta === 'object' ? unit.meta : {};
       nodes.push({
-        id: chunk.id,
-        name: chunk.summary || chunk.content.substring(0, 30) + '...',
-        content: chunk.content,
-        keywords: chunk.keywords || [],
-        group: chunk.document_id,
+        id: unit.id,
+        name: typeof unitMeta.summary === 'string' ? unitMeta.summary : unit.content.substring(0, 30) + '...',
+        summary: typeof unitMeta.summary === 'string' ? unitMeta.summary : '',
+        content: unit.content,
+        terms: Array.isArray(unitMeta.terms) ? unitMeta.terms : [],
+        entities: Array.isArray(unitMeta.entities) ? unitMeta.entities : [],
+        unitType: unit.unit_type,
+        group: unit.source_id,
         val: 3,
-        type: 'chunk',
+        type: 'unit',
       });
 
-      // Link chunk to its parent document
+      // Link unit to its parent source
       links.push({
-        source: chunk.document_id,
-        target: chunk.id,
+        source: unit.source_id,
+        target: unit.id,
         type: 'child',
         label: 'contains',
       });
 
-      // Link chunk to related chunks (internal to the document, computed at ingest)
-      const related = chunk.related_chunks || [];
+      // Link unit to related units (computed at ingest)
+      const related = unit.related_units || [];
       for (const rel of related) {
-        if (rel.chunkId && rel.score) {
+        if (rel.unitId && rel.score) {
           links.push({
-            source: chunk.id,
-            target: rel.chunkId,
+            source: unit.id,
+            target: rel.unitId,
             type: 'related',
             score: rel.score,
           });
@@ -131,31 +140,31 @@ export async function GET(req: Request) {
     }
 
     // Parse embeddings for dynamic cross-document relations
-    const chunksWithEmbeddings = (chunks || []).map(chunk => {
+    const unitsWithEmbeddings = (units || []).map(unit => {
       let parsed = null;
-      if (chunk.embedding) {
+      if (unit.embedding) {
         try {
-          parsed = typeof chunk.embedding === 'string' ? JSON.parse(chunk.embedding) : chunk.embedding;
+          parsed = typeof unit.embedding === 'string' ? JSON.parse(unit.embedding) : unit.embedding;
         } catch (e) {
            // ignore
         }
       }
-      return { ...chunk, parsedEmbedding: parsed };
+      return { ...unit, parsedEmbedding: parsed };
     });
 
     const MIN_CROSS_RELATION_SCORE = 0.35; // slightly strictly threshold across docs
     const MAX_CROSS_LINKS = 2; // Prevent excessive graph density
 
     // Compute cross-document Links
-    for (let i = 0; i < chunksWithEmbeddings.length; i++) {
-      const source = chunksWithEmbeddings[i];
+    for (let i = 0; i < unitsWithEmbeddings.length; i++) {
+      const source = unitsWithEmbeddings[i];
       if (!source.parsedEmbedding) continue;
 
       const candidates = [];
-      for (let j = 0; j < chunksWithEmbeddings.length; j++) {
-        const target = chunksWithEmbeddings[j];
-        // Only evaluate chunks that belong to DIFFERENT documents
-        if (source.document_id !== target.document_id && target.parsedEmbedding) {
+      for (let j = 0; j < unitsWithEmbeddings.length; j++) {
+        const target = unitsWithEmbeddings[j];
+        // Only evaluate units that belong to DIFFERENT sources
+        if (source.source_id !== target.source_id && target.parsedEmbedding) {
           const score = cosineSimilarity(source.parsedEmbedding, target.parsedEmbedding);
           if (score >= MIN_CROSS_RELATION_SCORE) {
              candidates.push({ targetId: target.id, score });
@@ -197,7 +206,7 @@ export async function DELETE(req: Request) {
     }
 
     if (deleteAll) {
-      const { error } = await supabaseAdmin.from('rag_documents').delete().eq('knowledge_base_id', kbId);
+      const { error } = await supabaseAdmin.from('rag_sources').delete().eq('knowledge_base_id', kbId);
       if (error) throw error;
       return NextResponse.json({ success: true, message: 'All documents deleted.' });
     }
@@ -206,16 +215,16 @@ export async function DELETE(req: Request) {
       // Use like operator to delete anything under that logical folder path
       // Note: The % wildcard ensures anything matching folderPath/ gets captured
       const { error } = await supabaseAdmin
-        .from('rag_documents')
+        .from('rag_sources')
         .delete()
         .eq('knowledge_base_id', kbId)
-        .like('filename', `${folderPath}/%`);
+        .like('canonical_path', `${folderPath}/%`);
       if (error) throw error;
       return NextResponse.json({ success: true, message: `Folder ${folderPath} deleted.` });
     }
 
     if (documentId) {
-      const { error } = await supabaseAdmin.from('rag_documents').delete().eq('id', documentId);
+      const { error } = await supabaseAdmin.from('rag_sources').delete().eq('id', documentId);
       if (error) throw error;
       return NextResponse.json({ success: true, message: 'Document deleted.' });
     }
