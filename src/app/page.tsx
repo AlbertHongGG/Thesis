@@ -13,6 +13,7 @@ import {
   FolderClock,
   Image as ImageIcon,
   LoaderCircle,
+  Network,
   Play,
   RotateCcw,
   Settings,
@@ -60,6 +61,7 @@ import type {
 } from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
 import styles from './page.module.css';
+import { useRouter } from 'next/navigation';
 
 type PersistencePhase = 'checking' | 'prompt' | 'ready';
 
@@ -230,6 +232,7 @@ const ProcessDurationValue = React.memo(({ entry }: { entry: FileProcessEntry })
 ProcessDurationValue.displayName = 'ProcessDurationValue';
 
 export default function DataWorkbench() {
+  const router = useRouter();
   const [files, setFiles] = useState<ExtendedFile[]>([]);
   const [processMode, setProcessMode] = useState<'idle' | 'playing' | 'paused'>('idle');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -1064,6 +1067,18 @@ export default function DataWorkbench() {
         <nav className={styles.navMenu}>
           <Button variant="secondary" onClick={() => setIsKnowledgeBaseModalOpen(true)}>
             <Database size={16} /> Knowledge Base
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              if (activeKnowledgeBaseId) {
+                router.push(`/graph?kbId=${encodeURIComponent(activeKnowledgeBaseId)}`);
+              } else {
+                alert('Please select a Knowledge Base first.');
+              }
+            }}
+          >
+            <Network size={16} /> Visualize Graph
           </Button>
           <Button variant="ghost"><FileText size={16} /> Writing Desk</Button>
           <Button variant="ghost"><Settings size={16} /> Settings</Button>

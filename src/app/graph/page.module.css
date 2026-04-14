@@ -1,0 +1,101 @@
+
+
+.graphContainer {
+  flex: 1;
+  position: relative;
+}
+
+.loadingOverlay, .errorOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-header);
+}
+
+.errorOverlay {
+  color: #ef4444; /* Error red */
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--accent-primary);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.legend {
+  position: absolute;
+  bottom: var(--space-6);
+  left: var(--space-6);
+  z-index: var(--z-header);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  padding: var(--space-4);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.legendTitle {
+  margin: 0 0 var(--space-2) 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legendDotDoc {
+  background-color: var(--accent-primary);
+}
+
+.legendDotChunk {
+  background-color: var(--accent-secondary);
+  width: 8px;
+  height: 8px;
+}
+
+.legendLine {
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.legendLineParent {
+  background-color: rgba(148, 163, 184, 0.4);
+}
+
+.legendLineRelated {
+  background-color: rgba(59, 130, 246, 0.4);
+  border-bottom: 2px dashed rgba(59, 130, 246, 0.8);
+  height: 0;
+}
