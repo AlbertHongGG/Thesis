@@ -79,16 +79,18 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
   const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const isSelected = selectedNodeId === node.id;
     const isDoc = node.type === 'document';
+    const isFolder = node.type === 'folder';
     
     // Size logic
-    let size = isDoc ? 8 : 4;
+    let size = isFolder ? 12 : (isDoc ? 8 : 4);
     // Boost size if zoomed out, shrink if zoomed in, to keep them visible but not overwhelming
     size = Math.max(1.5, size / Math.pow(globalScale, 0.5));
     
     // Colors based on css variables 
     // using direct hex since we are in canvas
-    const docColor = '#3b82f6'; // var(--accent-primary)
-    const chunkColor = '#8baef9'; // var(--accent-secondary)
+    const folderColor = '#64748b'; // slate-500
+    const docColor = '#3b82f6'; // blue-500
+    const chunkColor = '#8baef9'; // lighter blue
     const selectedColor = '#f59e0b'; // Amber for highlight
     
     ctx.beginPath();
@@ -99,19 +101,19 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
       ctx.shadowColor = selectedColor;
       ctx.shadowBlur = 10 * globalScale;
     } else {
-      ctx.fillStyle = isDoc ? docColor : chunkColor;
+      ctx.fillStyle = isFolder ? folderColor : (isDoc ? docColor : chunkColor);
       ctx.shadowBlur = 0;
     }
     
     ctx.fill();
     ctx.shadowBlur = 0; // Reset shadow
     
-    // Text labels for documents only. Do not draw text for chunk nodes.
-    if (isDoc) {
+    // Text labels for documents and folders only. Do not draw text for chunk nodes.
+    if (isDoc || isFolder) {
       const label = node.name || '';
       // Dynamically scale font size.
-      const fontSize = Math.max(10 / globalScale, 4);
-      ctx.font = `${fontSize}px Inter, sans-serif`;
+      const fontSize = Math.max((isFolder ? 12 : 10) / globalScale, 4);
+      ctx.font = `${isFolder ? 'bold ' : ''}${fontSize}px Inter, sans-serif`;
       const textWidth = ctx.measureText(label).width;
       const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); 
 
@@ -128,7 +130,7 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = isSelected ? '#f59e0b' : '#334155';
+      ctx.fillStyle = isSelected ? '#f59e0b' : (isFolder ? '#475569' : '#334155');
       ctx.fillText(label, node.x, node.y + size + fontSize * 0.5);
     }
   }, [selectedNodeId]);
@@ -140,13 +142,17 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
         width={dimensions.width}
         height={dimensions.height}
         graphData={data}
-        nodeColor={(node: any) => node.type === 'document' ? '#3b82f6' : '#8baef9'}
+        nodeColor={(node: any) => node.type === 'folder' ? '#64748b' : (node.type === 'document' ? '#3b82f6' : '#8baef9')}
         nodeRelSize={6}
         nodeCanvasObject={paintNode}
         
         // Links config
-        linkColor={(link: any) => link.type === 'child' ? 'rgba(148, 163, 184, 0.4)' : 'rgba(59, 130, 246, 0.2)'}
-        linkWidth={(link: any) => link.type === 'child' ? 1.5 : 0.8}
+        linkColor={(link: any) => {
+          if (link.type === 'hierarchy') return '#cbd5e1'; // solid gray for folders
+          if (link.type === 'child') return 'rgba(148, 163, 184, 0.4)';
+          return 'rgba(59, 130, 246, 0.2)'; // related
+        }}
+        linkWidth={(link: any) => link.type === 'hierarchy' ? 2 : (link.type === 'child' ? 1.5 : 0.8)}
         linkLineDash={(link: any) => link.type === 'related' ? [2, 2] : undefined}
         
         // Particles for relation links

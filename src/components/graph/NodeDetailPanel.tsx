@@ -2,16 +2,17 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, FileText, AlignLeft, Hash } from 'lucide-react';
+import { X, FileText, AlignLeft, Hash, Trash2 } from 'lucide-react';
 import type { GraphNode } from './ForceGraph';
 import styles from './NodeDetailPanel.module.css';
 
 interface NodeDetailPanelProps {
   node: GraphNode | null;
   onClose: () => void;
+  onDelete?: (node: GraphNode) => void;
 }
 
-export const NodeDetailPanel: React.FC<NodeDetailPanelProps> = ({ node, onClose }) => {
+export const NodeDetailPanel: React.FC<NodeDetailPanelProps> = ({ node, onClose, onDelete }) => {
   return (
     <AnimatePresence>
       {node && (
@@ -28,11 +29,27 @@ export const NodeDetailPanel: React.FC<NodeDetailPanelProps> = ({ node, onClose 
                 <span className={`${styles.badge} ${node.type === 'chunk' ? styles.badgeChunk : ''}`}>
                   {node.type === 'document' ? 'Document' : 'Knowledge Chunk'}
                 </span>
-                <h3 className={styles.title}>{node.name}</h3>
+                <h3 className={styles.title}>{node.fullName || node.name}</h3>
               </div>
-              <button className={styles.closeButton} onClick={onClose} aria-label="Close panel">
-                <X size={20} />
-              </button>
+              <div className={styles.actionsGroup}>
+                {onDelete && node.type !== 'chunk' && (
+                  <button 
+                    className={`${styles.iconButton} ${styles.dangerButton}`} 
+                    onClick={() => {
+                        if (confirm(`Are you sure you want to delete this ${node.type}?`)) {
+                            onDelete(node);
+                        }
+                    }} 
+                    aria-label="Delete node"
+                    title={`Delete ${node.type}`}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+                <button className={styles.iconButton} onClick={onClose} aria-label="Close panel">
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             <div className={styles.content}>

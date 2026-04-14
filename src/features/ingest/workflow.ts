@@ -32,6 +32,7 @@ type EnrichedChunk = PersistableDocumentChunk;
 
 type IngestWorkflowInput = {
   file: File;
+  filePath?: string;
   previewKind: PreviewKind;
   knowledgeBase: KnowledgeBaseRecord;
 };
@@ -112,7 +113,8 @@ export class IngestWorkflow {
   }
 
   async run(input: IngestWorkflowInput, emit: IngestEventHandler): Promise<IngestResult> {
-    if (isImageFile(input.file.name)) {
+    const filename = input.filePath || input.file.name;
+    if (isImageFile(filename)) {
       return this.processImage(input, emit);
     }
 
@@ -240,6 +242,7 @@ export class IngestWorkflow {
 
   private async processImage(input: IngestWorkflowInput, emit: IngestEventHandler): Promise<ImageIngestResult> {
     const startedAt = this.now();
+    const filename = input.filePath || input.file.name;
 
     this.emitStep(emit, `讀取圖片檔案內容，目標知識庫：${input.knowledgeBase.name}。`);
     const textBuffer = await input.file.arrayBuffer();
@@ -248,8 +251,8 @@ export class IngestWorkflow {
     const imageDataUrl = `data:${mimeType};base64,${base64}`;
 
     this.emitStep(emit, '先建立圖片的初步理解與檢索線索。');
-    const hints = await this.imageAnalysisService.buildRetrievalHints(imageDataUrl, input.file.name);
-    const retrievalQuery = buildImageRetrievalQuery(input.file.name, hints);
+    const hints = await this.imageAnalysisService.buildRetrievalHints(imageDataUrl, filename);
+    const retrievalQuery = buildImageRetrievalQuery(filename, hints);
 
     this.emitStep(emit, retrievalQuery ? '依照圖片線索到知識庫檢索相關片段。' : '本次未能建立有效檢索線索，將以知識庫摘要或純圖片理解作為 fallback。');
     const [profileContext, retrievedChunks] = await Promise.all([
@@ -308,7 +311,7 @@ export class IngestWorkflow {
       try {
         await this.options.repository.saveImage({
           knowledgeBaseId: input.knowledgeBase.id,
-          fileName: input.file.name,
+          fileName: filename,
           previewKind: input.previewKind,
           result,
           description,
@@ -330,6 +333,7 @@ export class IngestWorkflow {
   private async processDocument(input: IngestWorkflowInput, emit: IngestEventHandler): Promise<DocumentIngestResult> {
     const startedAt = this.now();
     const documentId = this.createId();
+    const filename = input.filePath || input.file.name;
     const profileContext = await this.loadProfileContext(input.knowledgeBase);
     const contextApplied = profileContext.text.trim().length > 0;
 
@@ -338,7 +342,7 @@ export class IngestWorkflow {
 
     let parsedText = '';
     try {
-      parsedText = await parseDocument(buffer, input.file.name);
+      parsedText = await parseDocument(buffer, filename);
     } catch (error) {
       throw new Error(`Parser failed: ${getErrorMessage(error)}`);
     }
@@ -350,7 +354,7 @@ export class IngestWorkflow {
 
     this.emitStep(emit, contextApplied ? '已載入既有知識庫摘要，將作為本次文件分析脈絡。' : '知識庫尚未形成穩定摘要，先以文件自身脈絡建立新知識。');
     const documentOverview = await this.overviewService.summarize(
-      input.file.name,
+      filename,
       chunks,
       parsedTextPreview,
       profileContext.text,
@@ -428,7 +432,7 @@ export class IngestWorkflow {
     }));
 
     const summary = await this.summaryService.summarize(
-      input.file.name,
+      filename,
       chunksWithRelations.map(chunk => this.stripChunkEmbedding(chunk)),
       profileContext.text,
       documentOverview,
@@ -457,7 +461,7 @@ export class IngestWorkflow {
       try {
         await this.options.repository.saveDocument({
           knowledgeBaseId: input.knowledgeBase.id,
-          fileName: input.file.name,
+          fileName: filename,
           previewKind: input.previewKind,
           result,
           chunks: chunksWithRelations,

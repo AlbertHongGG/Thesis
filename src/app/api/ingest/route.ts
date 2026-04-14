@@ -57,6 +57,8 @@ export async function POST(req: Request) {
     }
 
     const knowledgeBaseId = typeof knowledgeBaseValue === 'string' ? knowledgeBaseValue : '';
+    const filePathValue = formData.get('filePath');
+    const filePath = typeof filePathValue === 'string' ? filePathValue : undefined;
     const previewKind = getPreviewKind(file.name);
     const repository = createRepository();
     const knowledgeBase = repository
@@ -79,6 +81,7 @@ export async function POST(req: Request) {
           const result = await workflow.run(
             {
               file,
+              filePath,
               previewKind,
               knowledgeBase,
             },

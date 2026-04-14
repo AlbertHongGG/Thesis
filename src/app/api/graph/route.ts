@@ -44,11 +44,50 @@ export async function GET(req: Request) {
     const nodes: any[] = [];
     const links: any[] = [];
 
-    // Document nodes
+    // Document and Folder nodes
+    const folders = new Set<string>();
+
     for (const doc of documents || []) {
+      const parts = doc.filename.split('/');
+      let currentPath = '';
+
+      // Build folder hierarchy if the file has path information
+      if (parts.length > 1) {
+        for (let i = 0; i < parts.length - 1; i++) {
+          const prevPath = currentPath;
+          currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
+          
+          if (!folders.has(currentPath)) {
+            folders.add(currentPath);
+            nodes.push({
+              id: `folder:${currentPath}`,
+              name: parts[i], 
+              group: 'folder',
+              val: 12,
+              type: 'folder',
+            });
+            
+            if (prevPath) {
+               links.push({
+                 source: `folder:${prevPath}`,
+                 target: `folder:${currentPath}`,
+                 type: 'hierarchy',
+               });
+            }
+          }
+        }
+        
+        // Link the final folder to the document
+        links.push({
+          source: `folder:${currentPath}`,
+          target: doc.id,
+          type: 'hierarchy',
+        });
+      }
+
       nodes.push({
         id: doc.id,
-        name: doc.filename,
+        name: doc.filename, // Display the full path for disambiguation
         summary: doc.summary || '',
         group: doc.id,
         val: 8,
@@ -139,6 +178,49 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ nodes, links });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const kbId = url.searchParams.get('kbId');
+    const documentId = url.searchParams.get('documentId');
+    const folderPath = url.searchParams.get('folderPath');
+    const deleteAll = url.searchParams.get('deleteAll') === 'true';
+
+    if (!kbId) {
+      return NextResponse.json({ error: 'kbId is required' }, { status: 400 });
+    }
+
+    if (deleteAll) {
+      const { error } = await supabaseAdmin.from('rag_documents').delete().eq('knowledge_base_id', kbId);
+      if (error) throw error;
+      return NextResponse.json({ success: true, message: 'All documents deleted.' });
+    }
+
+    if (folderPath) {
+      // Use like operator to delete anything under that logical folder path
+      // Note: The % wildcard ensures anything matching folderPath/ gets captured
+      const { error } = await supabaseAdmin
+        .from('rag_documents')
+        .delete()
+        .eq('knowledge_base_id', kbId)
+        .like('filename', `${folderPath}/%`);
+      if (error) throw error;
+      return NextResponse.json({ success: true, message: `Folder ${folderPath} deleted.` });
+    }
+
+    if (documentId) {
+      const { error } = await supabaseAdmin.from('rag_documents').delete().eq('id', documentId);
+      if (error) throw error;
+      return NextResponse.json({ success: true, message: 'Document deleted.' });
+    }
+
+    return NextResponse.json({ error: 'No valid deletion target provided.' }, { status: 400 });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({ error: message }, { status: 500 });

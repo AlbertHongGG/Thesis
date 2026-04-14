@@ -21,6 +21,7 @@ import {
   Sparkles,
   Square,
   Trash2,
+  Eraser,
 } from 'lucide-react';
 import { DropZone, ExtendedFile } from '@/components/ui/DropZone';
 import { FilePreviewModal } from '@/components/ui/FilePreviewModal';
@@ -488,6 +489,26 @@ export default function DataWorkbench() {
     }
   }, [activeKnowledgeBase, activeKnowledgeBaseId, refreshKnowledgeBases]);
 
+  const handleClearKnowledgeBaseData = useCallback(async () => {
+    if (!activeKnowledgeBaseId) return;
+    if (!window.confirm('Are you absolutely sure you want to clear ALL document and vector data inside this Knowledge Base? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      setKnowledgeBaseError(null);
+      setMaintenanceMessage('Clearing KB data...');
+      const res = await fetch(`/api/graph?kbId=${activeKnowledgeBaseId}&deleteAll=true`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to clear KB data');
+      
+      setMaintenanceMessage('KB data successfully cleared.');
+      void refreshKnowledgeBases(activeKnowledgeBaseId);
+    } catch (err: any) {
+      setKnowledgeBaseError(err.message);
+      setMaintenanceMessage(null);
+    }
+  }, [activeKnowledgeBaseId, refreshKnowledgeBases]);
+
   useEffect(() => {
     let ignore = false;
 
@@ -860,6 +881,7 @@ export default function DataWorkbench() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('knowledgeBaseId', activeKnowledgeBaseId);
+      formData.append('filePath', fullPath);
 
       const res = await fetch('/api/ingest', { method: 'POST', body: formData });
       await processStreamResponse(res, fullPath);
@@ -1199,6 +1221,14 @@ export default function DataWorkbench() {
                       disabled={!activeKnowledgeBaseId || maintenanceState !== null}
                     >
                       {maintenanceState?.action === 'reindex' ? <LoaderCircle size={14} className={styles.spinningIcon} /> : <Box size={14} />} Reindex KB
+                    </Button>
+                    <Button 
+                      variant="secondary" 
+                      onClick={() => void handleClearKnowledgeBaseData()} 
+                      disabled={!activeKnowledgeBaseId}
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <Eraser size={14} /> Clear Data
                     </Button>
                     <Button variant="ghost" onClick={() => void deleteActiveKnowledgeBase()} disabled={knowledgeBases.length <= 1 || !activeKnowledgeBaseId}>
                       <Trash2 size={14} /> Delete KB

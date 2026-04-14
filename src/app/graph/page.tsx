@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { LoaderCircle, AlertCircle, ArrowLeft, Sparkles, Cpu, Image as ImageIcon, Box, Database, Network, FileText, Settings } from 'lucide-react';
+import { LoaderCircle, AlertCircle, ArrowLeft, Sparkles, Cpu, Image as ImageIcon, Box, Database, Network, FileText, Settings, Trash2 } from 'lucide-react';
 import { ForceGraph, GraphData, GraphNode } from '@/components/graph/ForceGraph';
 import { NodeDetailPanel } from '@/components/graph/NodeDetailPanel';
 import { Button } from '@/components/ui/Button';
@@ -49,7 +49,51 @@ function GraphWorkspace() {
     };
 
     fetchData();
+    
+    // Assign fetchData to window object to trigger reload after delete
+    // OR alternatively, handle deletion directly here
+    (window as any).__refreshGraphData = fetchData;
+    
   }, [kbId]);
+
+  const handleDeleteNode = async (node: GraphNode) => {
+    try {
+      let params = new URLSearchParams({ kbId: kbId! });
+      if (node.type === 'folder') {
+        const folderPath = node.id.replace('folder:', '');
+        params.append('folderPath', folderPath);
+      } else {
+        params.append('documentId', node.id);
+      }
+
+      const res = await fetch(`/api/graph?${params.toString()}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete node data');
+      
+      setSelectedNode(null);
+      if ((window as any).__refreshGraphData) {
+        (window as any).__refreshGraphData();
+      }
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!confirm('Are you absolutely sure you want to delete ALL vector embeddings and documents? This cannot be undone.')) {
+        return;
+    }
+    try {
+      const res = await fetch(`/api/graph?kbId=${kbId}&deleteAll=true`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to clear graph data');
+      
+      setSelectedNode(null);
+      if ((window as any).__refreshGraphData) {
+        (window as any).__refreshGraphData();
+      }
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
   return (
     <div className={mainStyles.layoutContainer}>
@@ -67,6 +111,9 @@ function GraphWorkspace() {
         </div>
 
         <nav className={mainStyles.navMenu}>
+          <Button variant="ghost" onClick={handleDeleteAll} className="text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors">
+            <Trash2 size={16} /> Delete All Data
+          </Button>
           <Button variant="ghost" onClick={() => router.push('/')}>
             <Database size={16} /> Knowledge Base
           </Button>
@@ -128,6 +175,7 @@ function GraphWorkspace() {
       <NodeDetailPanel 
         node={selectedNode} 
         onClose={() => setSelectedNode(null)} 
+        onDelete={handleDeleteNode}
       />
     </div>
   );
