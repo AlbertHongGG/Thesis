@@ -116,11 +116,11 @@ const ProcessDurationValue = React.memo(({ entry }: { entry: FileProcessEntry })
 ProcessDurationValue.displayName = 'ProcessDurationValue';
 
 function renderPersistenceBadge(entry: FileProcessEntry) {
-  if (!entry.result) {
+  if (!entry.result || typeof entry.result.dbWritten !== 'boolean') {
     return null;
   }
 
-  const committed = entry.result.dbWritten !== false;
+  const committed = entry.result.dbWritten;
 
   return (
     <span
