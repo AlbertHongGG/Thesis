@@ -1,5 +1,5 @@
-import type { AIProvider } from '@/application/ports/external';
-import type { KnowledgeUnitRepository } from '@/application/ports/repositories';
+import type { AIProvider } from '@/modules/shared/server/ports/external';
+import type { KnowledgeUnitRepository } from '@/modules/shared/server/ports/repositories';
 
 export class SearchApplicationService {
   constructor(

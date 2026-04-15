@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { KnowledgeBaseMaintenanceAction } from '@/domain/operations/types';
-import { assertDatabaseWriteEnabled, createServerApp } from '@/composition/server/createServerApp';
+import { assertDatabaseWriteEnabled, createServerApp } from '@/modules/shared/server/createServerApp';
 
 export const runtime = 'nodejs';
 

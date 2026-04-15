@@ -11,6 +11,7 @@ import {
   saveSessionSnapshot,
   syncSessionFiles,
 } from '@/lib/storage/sessionStore';
+import { cloneIngestResult, cloneIngestUnit } from '@/modules/workspace/client/ingestSnapshot';
 import { getDisplayPath } from '@/lib/workbench/formatting';
 import {
   buildInitialWorkbenchTree,
@@ -25,7 +26,6 @@ import {
 import type {
   FileProcessEntry,
   IngestResult,
-  IngestUnit,
   ProcessStepEntry,
   WorkbenchDropPosition,
   WorkbenchFileRecord,
@@ -147,46 +147,8 @@ async function readIngestError(response: Response) {
   return text.trim() || `HTTP ${response.status}`;
 }
 
-function cloneUnit(unit: IngestUnit): IngestUnit {
-  return {
-    ...unit,
-    meta: {
-      ...unit.meta,
-      terms: [...unit.meta.terms],
-      entities: [...unit.meta.entities],
-      relationHints: unit.meta.relationHints.map(relation => ({ ...relation })),
-    },
-    relatedUnits: unit.relatedUnits.map(relation => ({ ...relation })),
-  };
-}
-
-function cloneKnowledgeContext(trace?: IngestResult['knowledgeContext']) {
-  if (!trace) {
-    return undefined;
-  }
-
-  return {
-    ...trace,
-    usedSources: trace.usedSources.map(source => ({ ...source })),
-  };
-}
-
 function serializeResult(result?: IngestResult) {
-  if (!result) {
-    return undefined;
-  }
-
-  return {
-    ...result,
-    meta: {
-      ...result.meta,
-      terms: [...result.meta.terms],
-      entities: [...result.meta.entities],
-      structure: result.meta.structure ? { ...result.meta.structure } : undefined,
-    },
-    knowledgeContext: cloneKnowledgeContext(result.knowledgeContext),
-    units: result.units.map(cloneUnit),
-  } satisfies IngestResult;
+  return cloneIngestResult(result);
 }
 
 function serializeSteps(steps: ProcessStepEntry[]) {
@@ -462,9 +424,9 @@ function mergeUnitResult(fileId: string, fullPath: string, event: Extract<Ingest
     const existingUnitIndex = nextUnits.findIndex(unit => unit.id === event.unit.id);
 
     if (existingUnitIndex === -1) {
-      nextUnits.push(cloneUnit(event.unit));
+      nextUnits.push(cloneIngestUnit(event.unit));
     } else {
-      nextUnits[existingUnitIndex] = cloneUnit(event.unit);
+      nextUnits[existingUnitIndex] = cloneIngestUnit(event.unit);
     }
 
     nextUnits.sort((left, right) => left.sequence - right.sequence);

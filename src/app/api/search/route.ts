@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServerApp } from '@/composition/server/createServerApp';
+import { createServerApp } from '@/modules/shared/server/createServerApp';
 
 export const runtime = 'nodejs';
 

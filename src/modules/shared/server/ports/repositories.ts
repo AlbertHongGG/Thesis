@@ -27,8 +27,15 @@ export interface KnowledgeProfileRepository {
   listSourceMaterials(knowledgeBaseId: string, limit?: number): Promise<KnowledgeSourceMaterial[]>;
 }
 
+export interface KnowledgeGraphMutationRepository {
+  replaceSourceGraph(input: {
+    source: KnowledgeSourceRecord;
+    units: KnowledgeUnitRecord[];
+    relations: KnowledgeUnitRelationRecord[];
+  }): Promise<void>;
+}
+
 export interface KnowledgeSourceRepository {
-  saveGraph(input: ReplaceKnowledgeSourceGraphInput): Promise<void>;
   listByKnowledgeBase(knowledgeBaseId: string): Promise<KnowledgeSourceRecord[]>;
   getStats(knowledgeBaseId: string): Promise<KnowledgeBaseStats>;
   repathMany(input: {
@@ -51,11 +58,6 @@ export interface KnowledgeUnitRepository {
 }
 
 export interface KnowledgeRelationRepository {
-  replaceForSource(input: {
-    knowledgeBaseId: string;
-    sourceId: string;
-    relations: KnowledgeUnitRelationRecord[];
-  }): Promise<void>;
   listByKnowledgeBase(knowledgeBaseId: string): Promise<KnowledgeUnitRelationRecord[]>;
 }
 

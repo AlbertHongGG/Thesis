@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { KnowledgeRelationRepository, KnowledgeSourceRepository, KnowledgeUnitRepository } from '@/application/ports/repositories';
+import type { KnowledgeRelationRepository, KnowledgeSourceRepository, KnowledgeUnitRepository } from '@/modules/shared/server/ports/repositories';
 import type { KnowledgeSourceRecord, KnowledgeUnitRecord, KnowledgeUnitRelationRecord } from '@/domain/knowledge/types';
 import { GraphApplicationService } from './GraphApplicationService';
 
@@ -61,6 +61,7 @@ describe('GraphApplicationService', () => {
       saveGraph: vi.fn(),
       listByKnowledgeBase: vi.fn<KnowledgeSourceRepository['listByKnowledgeBase']>(),
       getStats: vi.fn(),
+      repathMany: vi.fn(),
       deleteById: vi.fn(),
       deleteByPathPrefix: vi.fn(),
       deleteByKnowledgeBase: vi.fn(),
@@ -141,6 +142,7 @@ describe('GraphApplicationService', () => {
       saveGraph: vi.fn(),
       listByKnowledgeBase: vi.fn(),
       getStats: vi.fn(),
+      repathMany: vi.fn(),
       deleteById: vi.fn().mockResolvedValue(undefined),
       deleteByPathPrefix: vi.fn().mockResolvedValue(undefined),
       deleteByKnowledgeBase: vi.fn().mockResolvedValue(undefined),

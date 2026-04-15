@@ -1,15 +1,15 @@
 import { buildUnitRelations } from '@/features/ingest/relations';
 import type {
   KnowledgeBaseRepository,
+  KnowledgeGraphMutationRepository,
   KnowledgeOperationRepository,
-  KnowledgeRelationRepository,
   KnowledgeSourceRepository,
   KnowledgeUnitRepository,
-} from '@/application/ports/repositories';
-import type { AIProvider } from '@/application/ports/external';
+} from '@/modules/shared/server/ports/repositories';
+import type { AIProvider } from '@/modules/shared/server/ports/external';
 import type { KnowledgeBaseRecord, KnowledgeUnitRelationRecord } from '@/domain/knowledge/types';
 import { NotFoundError } from '@/domain/knowledge/errors';
-import { KnowledgeProfileRefreshService } from './KnowledgeProfileRefreshService';
+import { KnowledgeProfileRefreshService } from '@/modules/knowledge/server/KnowledgeProfileRefreshService';
 
 function buildUnitEmbeddingText(source: { summary: string; structure?: { label: string } }, unit: {
   content: string;
@@ -32,7 +32,7 @@ export class KnowledgeBaseApplicationService {
     private readonly knowledgeBaseRepository: KnowledgeBaseRepository,
     private readonly sourceRepository: KnowledgeSourceRepository,
     private readonly unitRepository: KnowledgeUnitRepository,
-    private readonly relationRepository: KnowledgeRelationRepository,
+    private readonly graphRepository: KnowledgeGraphMutationRepository,
     private readonly operationRepository: KnowledgeOperationRepository,
     private readonly aiProvider: AIProvider,
     private readonly profileRefreshService: KnowledgeProfileRefreshService,
@@ -182,13 +182,9 @@ export class KnowledgeBaseApplicationService {
           })),
         );
 
-        await this.sourceRepository.saveGraph({
+        await this.graphRepository.replaceSourceGraph({
           source,
           units: unitsWithRelations,
-        });
-        await this.relationRepository.replaceForSource({
-          knowledgeBaseId,
-          sourceId,
           relations,
         });
       }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import { ToastProvider } from "@/components/ui/Toast";
+import { KnowledgeBaseWorkspaceProvider } from '@/modules/shared/client/KnowledgeBaseWorkspaceProvider';
 import "./globals.css";
 
 const interSans = Inter({
@@ -26,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${interSans.variable} ${outfitDisplay.variable}`}>
       <body suppressHydrationWarning>
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          <KnowledgeBaseWorkspaceProvider>{children}</KnowledgeBaseWorkspaceProvider>
+        </ToastProvider>
       </body>
     </html>
   );

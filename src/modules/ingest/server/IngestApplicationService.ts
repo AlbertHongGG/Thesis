@@ -4,14 +4,13 @@ import { normalizeEntities, normalizeRelationHints, normalizeStructure, normaliz
 import { buildUnitRelations } from '@/features/ingest/relations';
 import { buildParsedPreview, buildPreview } from '@/features/ingest/text';
 import type { TextChunk } from '@/lib/rag/chunker';
-import type { AIProvider, DocumentParser, TextChunker } from '@/application/ports/external';
+import type { AIProvider, DocumentParser, TextChunker } from '@/modules/shared/server/ports/external';
 import type {
+  KnowledgeGraphMutationRepository,
   KnowledgeOperationRepository,
   KnowledgeProfileRepository,
-  KnowledgeRelationRepository,
-  KnowledgeSourceRepository,
   KnowledgeUnitRepository,
-} from '@/application/ports/repositories';
+} from '@/modules/shared/server/ports/repositories';
 import type {
   KnowledgeBaseRecord,
   KnowledgeContextTrace,
@@ -24,8 +23,8 @@ import type {
   PreviewKind,
 } from '@/domain/knowledge/types';
 import { uniqueStrings } from '@/domain/knowledge/defaults';
-import { buildKnowledgeSourceReferences, renderKnowledgeContext } from '@/application/support/knowledgeContext';
-import { KnowledgeProfileRefreshService } from './KnowledgeProfileRefreshService';
+import { buildKnowledgeSourceReferences, renderKnowledgeContext } from '@/modules/knowledge/server/knowledgeContext';
+import { KnowledgeProfileRefreshService } from '@/modules/knowledge/server/KnowledgeProfileRefreshService';
 
 const METADATA_VERSION = 1;
 
@@ -161,10 +160,9 @@ export class IngestApplicationService {
     private readonly promptCatalog: IngestPrompts,
     private readonly parser: DocumentParser,
     private readonly chunker: TextChunker,
-    private readonly sourceRepository: KnowledgeSourceRepository,
+    private readonly graphRepository: KnowledgeGraphMutationRepository,
     private readonly profileRepository: KnowledgeProfileRepository,
     private readonly unitRepository: KnowledgeUnitRepository,
-    private readonly relationRepository: KnowledgeRelationRepository,
     private readonly operationRepository: KnowledgeOperationRepository,
     private readonly profileRefreshService: KnowledgeProfileRefreshService,
   ) {}
@@ -263,15 +261,18 @@ export class IngestApplicationService {
         profileVersion: profile?.version,
         profileSummary: profile?.summary,
         usedUnitCount: relatedUnits.length,
-        usedSources: buildKnowledgeSourceReferences({ profile: profile ? {
-          knowledgeBaseId: profile.knowledgeBaseId,
-          summary: profile.summary,
-          focusAreas: profile.focusAreas,
-          keyTerms: profile.keyTerms,
-          sourceCount: profile.sourceCount,
-          unitCount: profile.unitCount,
-          version: profile.version,
-        } : null, units: relatedUnits }),
+        usedSources: buildKnowledgeSourceReferences({
+          profile: profile ? {
+            knowledgeBaseId: profile.knowledgeBaseId,
+            summary: profile.summary,
+            focusAreas: profile.focusAreas,
+            keyTerms: profile.keyTerms,
+            sourceCount: profile.sourceCount,
+            unitCount: profile.unitCount,
+            version: profile.version,
+          } : null,
+          units: relatedUnits,
+        }),
         fallbackTriggered: !profile || text.trim().length === 0,
       },
     };
@@ -683,11 +684,6 @@ export class IngestApplicationService {
 
     try {
       input.reporter.step('準備將來源與 units 寫入知識庫。');
-      await this.sourceRepository.saveGraph({
-        source: input.source,
-        units: input.units,
-      });
-
       const relations: KnowledgeUnitRelationRecord[] = input.units.flatMap(unit =>
         unit.relations.map(relation => ({
           sourceUnitId: unit.id,
@@ -699,9 +695,9 @@ export class IngestApplicationService {
         })),
       );
 
-      await this.relationRepository.replaceForSource({
-        knowledgeBaseId: input.knowledgeBase.id,
-        sourceId: input.source.id,
+      await this.graphRepository.replaceSourceGraph({
+        source: input.source,
+        units: input.units,
         relations,
       });
 

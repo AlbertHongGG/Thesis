@@ -1,4 +1,4 @@
-import type { IngestModuleConfig } from '@/application/ports/external';
+import type { IngestModuleConfig } from '@/modules/shared/server/ports/external';
 import { createIngestPrompts } from '@/features/ingest/prompts';
 
 export function createIngestModuleConfig(): IngestModuleConfig {

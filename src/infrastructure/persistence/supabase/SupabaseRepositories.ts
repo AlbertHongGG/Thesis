@@ -11,7 +11,6 @@ import type {
   KnowledgeUnitRecord,
   KnowledgeUnitRelationRecord,
   PersistKnowledgeProfileInput,
-  ReplaceKnowledgeSourceGraphInput,
   SearchKnowledgeUnitsInput,
 } from '@/domain/knowledge/types';
 import type {
@@ -21,7 +20,7 @@ import type {
   KnowledgeRelationRepository,
   KnowledgeSourceRepository,
   KnowledgeUnitRepository,
-} from '@/application/ports/repositories';
+} from '@/modules/shared/server/ports/repositories';
 import type { KnowledgeOperationRecord } from '@/domain/operations/types';
 import {
   DEFAULT_KNOWLEDGE_BASE_NAME,
@@ -149,8 +148,6 @@ type SearchMatchRow = {
   entities: unknown;
   relation_hints: unknown;
 };
-
-type UnitIdRow = { id: string };
 
 const KNOWLEDGE_RELATION_KINDS = new Set<KnowledgeUnitRelationRecord['kind']>([
   'depends-on',
@@ -515,72 +512,6 @@ export class SupabaseKnowledgeProfileRepository implements KnowledgeProfileRepos
 export class SupabaseKnowledgeSourceRepository implements KnowledgeSourceRepository {
   constructor(private readonly client: SupabaseClient) {}
 
-  async saveGraph(input: ReplaceKnowledgeSourceGraphInput): Promise<void> {
-    const { source, units } = input;
-
-    const sourceResponse = await this.client.from('knowledge_sources').upsert({
-      id: source.id,
-      knowledge_base_id: source.knowledgeBaseId,
-      canonical_path: source.canonicalPath,
-      title: source.title,
-      source_type: source.sourceType,
-      preview_kind: source.previewKind,
-      raw_preview: source.rawPreview ?? null,
-      summary: source.metadata.summary,
-      terms: source.metadata.terms,
-      entities: source.metadata.entities,
-      structure: source.metadata.structure ?? null,
-      total_unit_count: source.totalUnitCount,
-      total_char_count: source.totalCharCount,
-      processing_duration_ms: source.processingDurationMs ?? null,
-      ingest_status: source.ingestStatus,
-      prompt_variant: source.promptVariant,
-      metadata_version: source.metadata.version,
-    });
-
-    if (sourceResponse.error) {
-      throw sourceResponse.error;
-    }
-
-    const deleteUnitsResponse = await this.client.from('knowledge_units').delete().eq('source_id', source.id);
-    if (deleteUnitsResponse.error) {
-      throw deleteUnitsResponse.error;
-    }
-
-    if (units.length === 0) {
-      return;
-    }
-
-    const unitResponse = await this.client.from('knowledge_units').upsert(
-      units.map(unit => ({
-        id: unit.id,
-        knowledge_base_id: unit.knowledgeBaseId,
-        source_id: unit.sourceId,
-        unit_type: unit.unitType,
-        sequence: unit.sequence,
-        content: unit.content,
-        preview: unit.preview,
-        summary: unit.metadata.summary,
-        terms: unit.metadata.terms,
-        entities: unit.metadata.entities,
-        relation_hints: unit.metadata.relationHints,
-        status: unit.status,
-        error_message: unit.errorMessage ?? null,
-        embedding: unit.embedding ? normalizeEmbedding(unit.embedding) : null,
-        embedding_dimensions: unit.embedding?.length ?? null,
-        word_count: unit.wordCount,
-        char_count: unit.charCount,
-        start_offset: unit.startOffset,
-        end_offset: unit.endOffset,
-        metadata_version: unit.metadata.version,
-      })),
-    );
-
-    if (unitResponse.error) {
-      throw unitResponse.error;
-    }
-  }
-
   async listByKnowledgeBase(knowledgeBaseId: string): Promise<KnowledgeSourceRecord[]> {
     const { data, error } = await this.client
       .from('knowledge_sources')
@@ -735,53 +666,6 @@ export class SupabaseKnowledgeUnitRepository implements KnowledgeUnitRepository 
 
 export class SupabaseKnowledgeRelationRepository implements KnowledgeRelationRepository {
   constructor(private readonly client: SupabaseClient) {}
-
-  async replaceForSource(input: {
-    knowledgeBaseId: string;
-    sourceId: string;
-    relations: KnowledgeUnitRelationRecord[];
-  }): Promise<void> {
-    const { data: sourceUnits, error: unitError } = await this.client
-      .from('knowledge_units')
-      .select('id')
-      .eq('source_id', input.sourceId);
-
-    if (unitError) {
-      throw unitError;
-    }
-
-    const unitIds = (sourceUnits ?? []).map((row: unknown) => (row as UnitIdRow).id);
-
-    if (unitIds.length > 0) {
-      const deleteResponse = await this.client
-        .from('knowledge_unit_relations')
-        .delete()
-        .in('source_unit_id', unitIds);
-
-      if (deleteResponse.error) {
-        throw deleteResponse.error;
-      }
-    }
-
-    if (input.relations.length === 0) {
-      return;
-    }
-
-    const insertResponse = await this.client.from('knowledge_unit_relations').upsert(
-      input.relations.map(relation => ({
-        source_unit_id: relation.sourceUnitId,
-        target_unit_id: relation.targetUnitId,
-        knowledge_base_id: relation.knowledgeBaseId,
-        relation_kind: relation.kind,
-        relation_label: relation.label,
-        score: relation.score,
-      })),
-    );
-
-    if (insertResponse.error) {
-      throw insertResponse.error;
-    }
-  }
 
   async listByKnowledgeBase(knowledgeBaseId: string): Promise<KnowledgeUnitRelationRecord[]> {
     const { data, error } = await this.client

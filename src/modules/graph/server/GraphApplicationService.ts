@@ -1,4 +1,4 @@
-import type { KnowledgeRelationRepository, KnowledgeSourceRepository, KnowledgeUnitRepository } from '@/application/ports/repositories';
+import type { KnowledgeRelationRepository, KnowledgeSourceRepository, KnowledgeUnitRepository } from '@/modules/shared/server/ports/repositories';
 import type { KnowledgeGraphProjection, KnowledgeUnitRecord } from '@/domain/knowledge/types';
 
 function cosineSimilarity(left: number[], right: number[]) {

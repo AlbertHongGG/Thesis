@@ -4,6 +4,7 @@ import { createIngestAiProvider } from '@/infrastructure/ai/IngestAiProvider';
 import { SemanticTextChunker } from '@/infrastructure/chunking/SemanticTextChunker';
 import { DocumentContentParser } from '@/infrastructure/parsing/DocumentContentParser';
 import { createIngestModuleConfig } from '@/infrastructure/prompts/IngestPromptCatalog';
+import { PostgresKnowledgeGraphMutationRepository } from '@/modules/knowledge/server/persistence/postgres/PostgresKnowledgeGraphMutationRepository';
 import {
   SupabaseKnowledgeBaseRepository,
   SupabaseKnowledgeOperationRepository,
@@ -12,12 +13,12 @@ import {
   SupabaseKnowledgeSourceRepository,
   SupabaseKnowledgeUnitRepository,
 } from '@/infrastructure/persistence/supabase/SupabaseRepositories';
-import { GraphApplicationService } from '@/application/services/GraphApplicationService';
-import { IngestApplicationService } from '@/application/services/IngestApplicationService';
-import { KnowledgeBaseApplicationService } from '@/application/services/KnowledgeBaseApplicationService';
-import { KnowledgeProfileRefreshService } from '@/application/services/KnowledgeProfileRefreshService';
-import { ProfileSummarizationService } from '@/application/services/ProfileSummarizationService';
-import { SearchApplicationService } from '@/application/services/SearchApplicationService';
+import { GraphApplicationService } from '@/modules/graph/server/GraphApplicationService';
+import { IngestApplicationService } from '@/modules/ingest/server/IngestApplicationService';
+import { KnowledgeBaseApplicationService } from '@/modules/knowledge-base/server/KnowledgeBaseApplicationService';
+import { KnowledgeProfileRefreshService } from '@/modules/knowledge/server/KnowledgeProfileRefreshService';
+import { ProfileSummarizationService } from '@/modules/knowledge/server/ProfileSummarizationService';
+import { SearchApplicationService } from '@/modules/search/server/SearchApplicationService';
 
 function assertDatabaseConfigured(env: NodeJS.ProcessEnv = process.env) {
   if (!(env.SUPABASE_URL ?? '').trim() || !(env.SUPABASE_SERVICE_ROLE ?? '').trim()) {
@@ -42,6 +43,7 @@ export function createServerApp(env: NodeJS.ProcessEnv = process.env) {
   const relationRepository = new SupabaseKnowledgeRelationRepository(supabaseAdmin);
   const operationRepository = new SupabaseKnowledgeOperationRepository(supabaseAdmin);
   const profileRepository = new SupabaseKnowledgeProfileRepository(supabaseAdmin);
+  const graphRepository = new PostgresKnowledgeGraphMutationRepository(env);
   const profileSummarizationService = new ProfileSummarizationService(aiProvider, moduleConfig.prompts.knowledgeProfile);
   const profileRefreshService = new KnowledgeProfileRefreshService(profileRepository, sourceRepository, profileSummarizationService);
 
@@ -50,7 +52,7 @@ export function createServerApp(env: NodeJS.ProcessEnv = process.env) {
       knowledgeBaseRepository,
       sourceRepository,
       unitRepository,
-      relationRepository,
+      graphRepository,
       operationRepository,
       aiProvider,
       profileRefreshService,
@@ -60,10 +62,9 @@ export function createServerApp(env: NodeJS.ProcessEnv = process.env) {
       moduleConfig.prompts,
       new DocumentContentParser(),
       new SemanticTextChunker(),
-      sourceRepository,
+      graphRepository,
       profileRepository,
       unitRepository,
-      relationRepository,
       operationRepository,
       profileRefreshService,
     ),

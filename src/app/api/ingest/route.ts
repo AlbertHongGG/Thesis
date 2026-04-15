@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { encodeStreamEvent } from '@/features/ingest/contracts';
 import { getPreviewKind } from '@/lib/workbench/filePreview';
-import { createServerApp, assertDatabaseWriteEnabled } from '@/composition/server/createServerApp';
-import { toIngestResultDto, toIngestUnitProgressDto } from '@/composition/server/dtoMappers';
+import { createServerApp, assertDatabaseWriteEnabled } from '@/modules/shared/server/createServerApp';
+import { toIngestResultDto, toIngestUnitProgressDto } from '@/modules/shared/server/dtoMappers';
 
 export const runtime = 'nodejs';
 

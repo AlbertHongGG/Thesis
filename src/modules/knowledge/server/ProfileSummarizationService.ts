@@ -1,4 +1,4 @@
-import type { AIProvider } from '@/application/ports/external';
+import type { AIProvider } from '@/modules/shared/server/ports/external';
 import type { KnowledgeProfilePromptBundle } from '@/features/ingest/prompts';
 import { buildPreview } from '@/features/ingest/text';
 import { uniqueStrings } from '@/domain/knowledge/defaults';

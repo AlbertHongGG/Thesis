@@ -5,10 +5,10 @@ import type {
   KnowledgeRelationRepository,
   KnowledgeSourceRepository,
   KnowledgeUnitRepository,
-} from '@/application/ports/repositories';
-import type { AIProvider } from '@/application/ports/external';
+} from '@/modules/shared/server/ports/repositories';
+import type { AIProvider } from '@/modules/shared/server/ports/external';
 import { KnowledgeBaseApplicationService } from './KnowledgeBaseApplicationService';
-import { KnowledgeProfileRefreshService } from './KnowledgeProfileRefreshService';
+import { KnowledgeProfileRefreshService } from '@/modules/knowledge/server/KnowledgeProfileRefreshService';
 
 function createKnowledgeBaseRepository(): KnowledgeBaseRepository {
   return {
@@ -50,9 +50,8 @@ describe('KnowledgeBaseApplicationService', () => {
   } satisfies KnowledgeOperationRepository;
   const aiProvider = {
     createEmbedding: vi.fn(),
-    summarizeKnowledgeBase: vi.fn(),
-    ingestSource: vi.fn(),
-    answerQuery: vi.fn(),
+    generateText: vi.fn(),
+    analyzeImage: vi.fn(),
   } satisfies AIProvider;
   const profileRefreshService = {
     refresh: vi.fn(),

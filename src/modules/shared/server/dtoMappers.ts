@@ -1,6 +1,6 @@
 import type { IngestResult, IngestUnit, PreviewKind } from '@/features/ingest/contracts';
 import type { KnowledgeBaseRecord, KnowledgeSourceRecord, KnowledgeUnitRecord } from '@/domain/knowledge/types';
-import type { IngestExecutionResult } from '@/application/services/IngestApplicationService';
+import type { IngestExecutionResult } from '@/modules/ingest/server/IngestApplicationService';
 
 function toIngestUnitDto(unit: KnowledgeUnitRecord): IngestUnit {
   return {

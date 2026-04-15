@@ -3,13 +3,18 @@
 目前版本已切換到新的分層架構，不再以 page-level orchestration 或 monolithic ingest workflow 為核心。主要責任分佈如下：
 
 - `src/domain/`: 知識庫、知識單位、關聯、操作紀錄等核心模型
-- `src/application/`: ports 與 use-case services
-- `src/infrastructure/`: AI、parser、chunker、Supabase adapters
-- `src/composition/server/`: server-side composition root，供 App Router route handlers 使用
+- `src/modules/shared/server/`: server composition root、shared contracts、PostgreSQL transaction utilities
+- `src/modules/ingest/server/`: ingest orchestration 與 stream DTO mapping
+- `src/modules/knowledge/server/`: knowledge context、profile refresh、transactional graph persistence
+- `src/modules/knowledge-base/server/`: knowledge base lifecycle 與 maintenance use cases
+- `src/modules/graph/server/`: graph projection 與刪除邏輯
+- `src/modules/search/server/`: semantic search orchestration
+- `src/infrastructure/`: AI、parser、chunker、Supabase read-side adapters
+- `src/modules/shared/client/` 與 `src/modules/workspace/ui/`: shared KB workspace state、app shell、workbench / graph screens
 - `src/lib/client/`: 前端對 API 的唯一存取入口
 - `src/lib/workbench/ingestQueue.ts`: 可跨頁面存活的 ingest queue runtime
 
-`src/app/api/*` 現在只保留 controller 職責，真正的流程協調都在 application services 內完成。
+`src/app/api/*` 現在只保留 controller 職責，真正的流程協調都在 `src/modules/*/server` 內完成。
 
 ## Getting Started
 
@@ -65,7 +70,7 @@ provider 專屬設定：
 
 ## Prompt 調整
 
-Prompt 定義仍位於 `src/features/ingest/prompts/`，但現在由 `src/infrastructure/prompts/IngestPromptCatalog.ts` 組裝後注入 application services。調整 prompt 時，不需要修改 route 或 runtime。
+Prompt 定義仍位於 `src/features/ingest/prompts/`，但現在由 `src/infrastructure/prompts/IngestPromptCatalog.ts` 組裝後注入 `src/modules/ingest/server/`。調整 prompt 時，不需要修改 route 或 runtime。
 
 ## Supabase Schema
 
@@ -95,7 +100,8 @@ Prompt 定義仍位於 `src/features/ingest/prompts/`，但現在由 `src/infras
 
 目前已加入針對新架構核心服務的測試：
 
-- `GraphApplicationService`
-- `ProfileSummarizationService`
+- `src/modules/graph/server/GraphApplicationService.test.ts`
+- `src/modules/knowledge/server/ProfileSummarizationService.test.ts`
+- `src/modules/knowledge-base/server/KnowledgeBaseApplicationService.test.ts`
 
-後續新增 use case 時，優先補 application service tests，而不是回到 page/component 層做流程堆疊測試。
+後續新增 use case 時，優先補 `src/modules/*/server` 測試，而不是回到 page/component 層做流程堆疊測試。

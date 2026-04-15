@@ -1,5 +1,5 @@
 import type { KnowledgeBaseRecord } from '@/domain/knowledge/types';
-import type { KnowledgeProfileRepository, KnowledgeSourceRepository } from '@/application/ports/repositories';
+import type { KnowledgeProfileRepository, KnowledgeSourceRepository } from '@/modules/shared/server/ports/repositories';
 import { ProfileSummarizationService } from './ProfileSummarizationService';
 
 export class KnowledgeProfileRefreshService {

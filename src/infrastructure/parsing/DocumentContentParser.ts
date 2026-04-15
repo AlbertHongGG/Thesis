@@ -1,4 +1,4 @@
-import type { DocumentParser } from '@/application/ports/external';
+import type { DocumentParser } from '@/modules/shared/server/ports/external';
 import { parseDocument } from '@/lib/rag/parser';
 
 export class DocumentContentParser implements DocumentParser {

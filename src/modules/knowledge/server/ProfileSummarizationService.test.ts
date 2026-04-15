@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { AIProvider } from '@/application/ports/external';
+import type { AIProvider } from '@/modules/shared/server/ports/external';
 import type { KnowledgeProfilePromptBundle } from '@/features/ingest/prompts';
 import { ProfileSummarizationService } from './ProfileSummarizationService';
 

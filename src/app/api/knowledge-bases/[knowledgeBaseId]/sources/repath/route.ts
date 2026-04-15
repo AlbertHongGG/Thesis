@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { assertDatabaseWriteEnabled, createServerApp } from '@/composition/server/createServerApp';
+import { assertDatabaseWriteEnabled, createServerApp } from '@/modules/shared/server/createServerApp';
 
 export const runtime = 'nodejs';
 

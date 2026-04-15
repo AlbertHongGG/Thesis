@@ -1,0 +1,136 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(18rem, 24rem) minmax(20rem, 1fr);
+  gap: 1rem;
+  min-height: 0;
+}
+
+.panel {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--bg-secondary);
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.fieldStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.statsRow,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.createRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.actionRow {
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 0.95rem;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.actionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.actionTitle {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.actionHint {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.empty {
+  border: 1px dashed var(--border-color);
+  border-radius: 14px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  padding: 1rem;
+  line-height: 1.7;
+}
+
+.actions {
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .createRow {
+    grid-template-columns: 1fr;
+  }
+
+  .actionRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

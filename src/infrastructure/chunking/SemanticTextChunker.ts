@@ -1,4 +1,4 @@
-import type { TextChunker } from '@/application/ports/external';
+import type { TextChunker } from '@/modules/shared/server/ports/external';
 import { chunkText } from '@/lib/rag/chunker';
 
 export class SemanticTextChunker implements TextChunker {

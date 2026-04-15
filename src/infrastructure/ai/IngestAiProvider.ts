@@ -1,5 +1,5 @@
 import { AIRuntimeConfigurationError, createAiRuntimeFromConfig, resolveAIRuntimeConfig } from '@/ai';
-import type { AIProvider } from '@/application/ports/external';
+import type { AIProvider } from '@/modules/shared/server/ports/external';
 
 function assertConfiguredModel(model: string | undefined, envName: string) {
   if (!model) {
