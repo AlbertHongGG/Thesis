@@ -1,10 +1,15 @@
-import { INGEST_CONTRACT_VERSION, type IngestResult } from '@/features/ingest/contracts';
+import type { IngestResult } from '@/features/ingest/contracts';
+import type {
+  WorkbenchSourceSyncStatus,
+  WorkbenchTreeState,
+} from '@/lib/workbench/types';
 
 const DB_NAME = 'thesis-rag-workbench';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const SESSION_STORE = 'session';
 const FILE_STORE = 'files';
 const ACTIVE_SESSION_KEY = 'active';
+const SESSION_SCHEMA_VERSION = 1;
 
 export type PersistedProcessStepEntry = {
   id: number;
@@ -17,6 +22,7 @@ export type PersistedProcessStepEntry = {
 export type PersistedIngestResult = IngestResult;
 
 export type PersistedFileProcessEntry = {
+  fileId: string;
   path: string;
   displayPath: string;
   status: 'idle' | 'processing' | 'completed' | 'error';
@@ -31,17 +37,25 @@ export type PersistedSessionSnapshot = {
   key: string;
   schemaVersion: number;
   activeKnowledgeBaseId: string | null;
-  fileOrder: string[];
+  tree: WorkbenchTreeState;
+  currentFileId: string | null;
   processEntries: Record<string, PersistedFileProcessEntry>;
   savedAt: number;
 };
 
 export type PersistedFileRecord = {
-  path: string;
+  id: string;
   name: string;
   type: string;
   size: number;
   lastModified: number;
+  originalPath: string;
+  workbenchPath: string;
+  sourceSyncStatus: WorkbenchSourceSyncStatus;
+  sourceSyncError?: string;
+  syncedCanonicalPath?: string;
+  sourceId?: string;
+  knowledgeBaseId?: string;
   blob: Blob;
 };
 
@@ -58,13 +72,16 @@ function openDatabase(): Promise<IDBDatabase> {
     request.onupgradeneeded = () => {
       const db = request.result;
 
-      if (!db.objectStoreNames.contains(SESSION_STORE)) {
-        db.createObjectStore(SESSION_STORE, { keyPath: 'key' });
+      if (db.objectStoreNames.contains(SESSION_STORE)) {
+        db.deleteObjectStore(SESSION_STORE);
       }
 
-      if (!db.objectStoreNames.contains(FILE_STORE)) {
-        db.createObjectStore(FILE_STORE, { keyPath: 'path' });
+      if (db.objectStoreNames.contains(FILE_STORE)) {
+        db.deleteObjectStore(FILE_STORE);
       }
+
+      db.createObjectStore(SESSION_STORE, { keyPath: 'key' });
+      db.createObjectStore(FILE_STORE, { keyPath: 'id' });
     };
     request.onsuccess = () => resolve(request.result);
   });
@@ -102,13 +119,14 @@ export async function loadRestorableSession(): Promise<RestorableSession | null>
       snapshotTransaction.objectStore(SESSION_STORE).get(ACTIVE_SESSION_KEY),
     ) as PersistedSessionSnapshot | undefined;
 
-    if (!snapshot || snapshot.schemaVersion !== INGEST_CONTRACT_VERSION || snapshot.fileOrder.length === 0) {
+    if (!snapshot || snapshot.schemaVersion !== SESSION_SCHEMA_VERSION || snapshot.tree.rootNodeIds.length === 0) {
       return null;
     }
 
     const fileTransaction = db.transaction(FILE_STORE, 'readonly');
     const fileStore = fileTransaction.objectStore(FILE_STORE);
-    const fileRequests = snapshot.fileOrder.map(path => wrapRequest(fileStore.get(path)) as Promise<PersistedFileRecord | undefined>);
+    const requestedFileIds = Object.keys(snapshot.processEntries);
+    const fileRequests = requestedFileIds.map(fileId => wrapRequest(fileStore.get(fileId)) as Promise<PersistedFileRecord | undefined>);
     const files = await Promise.all(
       fileRequests.map(async request => {
         const record = await request;
@@ -135,7 +153,7 @@ export async function saveSessionSnapshot(snapshot: Omit<PersistedSessionSnapsho
     transaction.objectStore(SESSION_STORE).put({
       ...snapshot,
       key: ACTIVE_SESSION_KEY,
-      schemaVersion: INGEST_CONTRACT_VERSION,
+      schemaVersion: SESSION_SCHEMA_VERSION,
       savedAt: Date.now(),
     });
 
@@ -147,7 +165,7 @@ export async function syncSessionFiles(records: PersistedFileRecord[]): Promise<
   return withDatabase(async db => {
     const keyTransaction = db.transaction(FILE_STORE, 'readonly');
     const existingKeys = await wrapRequest(keyTransaction.objectStore(FILE_STORE).getAllKeys()) as string[];
-    const nextKeys = new Set(records.map(record => record.path));
+    const nextKeys = new Set(records.map(record => record.id));
 
     const writeTransaction = db.transaction(FILE_STORE, 'readwrite');
     const store = writeTransaction.objectStore(FILE_STORE);

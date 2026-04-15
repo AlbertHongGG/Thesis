@@ -50,6 +50,31 @@ export class KnowledgeBaseApplicationService {
     await this.knowledgeBaseRepository.delete(knowledgeBaseId);
   }
 
+  async repathSources(input: {
+    knowledgeBaseId: string;
+    items: Array<{
+      sourceId: string;
+      canonicalPath: string;
+    }>;
+  }) {
+    if (input.items.length === 0) {
+      return { updatedSourceCount: 0 };
+    }
+
+    await this.getKnowledgeBaseOrThrow(input.knowledgeBaseId);
+    await this.sourceRepository.repathMany({
+      knowledgeBaseId: input.knowledgeBaseId,
+      items: input.items.map(item => ({
+        ...item,
+        title: item.canonicalPath.split('/').pop() || item.canonicalPath,
+      })),
+    });
+
+    return {
+      updatedSourceCount: input.items.length,
+    };
+  }
+
   async rebuildProfile(knowledgeBaseId: string) {
     const knowledgeBase = await this.getKnowledgeBaseOrThrow(knowledgeBaseId);
     const operation = await this.operationRepository.start({

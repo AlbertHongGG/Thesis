@@ -623,6 +623,30 @@ export class SupabaseKnowledgeSourceRepository implements KnowledgeSourceReposit
     };
   }
 
+  async repathMany(input: {
+    knowledgeBaseId: string;
+    items: Array<{
+      sourceId: string;
+      canonicalPath: string;
+      title: string;
+    }>;
+  }): Promise<void> {
+    for (const item of input.items) {
+      const { error } = await this.client
+        .from('knowledge_sources')
+        .update({
+          canonical_path: item.canonicalPath,
+          title: item.title,
+        })
+        .eq('knowledge_base_id', input.knowledgeBaseId)
+        .eq('id', item.sourceId);
+
+      if (error) {
+        throw error;
+      }
+    }
+  }
+
   async deleteById(sourceId: string): Promise<void> {
     const { error } = await this.client.from('knowledge_sources').delete().eq('id', sourceId);
 

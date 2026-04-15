@@ -31,6 +31,14 @@ export interface KnowledgeSourceRepository {
   saveGraph(input: ReplaceKnowledgeSourceGraphInput): Promise<void>;
   listByKnowledgeBase(knowledgeBaseId: string): Promise<KnowledgeSourceRecord[]>;
   getStats(knowledgeBaseId: string): Promise<KnowledgeBaseStats>;
+  repathMany(input: {
+    knowledgeBaseId: string;
+    items: Array<{
+      sourceId: string;
+      canonicalPath: string;
+      title: string;
+    }>;
+  }): Promise<void>;
   deleteById(sourceId: string): Promise<void>;
   deleteByPathPrefix(knowledgeBaseId: string, pathPrefix: string): Promise<void>;
   deleteByKnowledgeBase(knowledgeBaseId: string): Promise<void>;

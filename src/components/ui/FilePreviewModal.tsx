@@ -5,11 +5,10 @@ import { AlertCircle, CheckCircle2, Clock3, Eye, FileText, Image as ImageIcon, L
 import Image from 'next/image';
 import { Modal } from '@/components/ui/Modal';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { ExtendedFile } from '@/components/ui/DropZone';
 import { ProcessTimeline } from '@/components/ui/ProcessTimeline';
 import { formatDuration, formatFileSize, getStatusLabel } from '@/lib/workbench/formatting';
 import { getPreviewKind, trimPreviewText } from '@/lib/workbench/filePreview';
-import type { FileProcessEntry } from '@/lib/workbench/types';
+import type { FileProcessEntry, WorkbenchFileRecord } from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
 import styles from './FilePreviewModal.module.css';
 
@@ -21,7 +20,7 @@ type PreviewState =
 
 interface FilePreviewModalProps {
   isOpen: boolean;
-  file: ExtendedFile | null;
+  file: WorkbenchFileRecord | null;
   entry: FileProcessEntry | null;
   onClose: () => void;
 }
@@ -49,7 +48,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
       return null;
     }
 
-    return URL.createObjectURL(file);
+    return URL.createObjectURL(file.file);
   }, [file, isOpen, previewKind]);
 
   useEffect(() => {
@@ -73,7 +72,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
       if (previewKind === 'text') {
         setPreviewState({ status: 'loading' });
         try {
-          const rawText = await file.text();
+          const rawText = await file.file.text();
           const { text } = trimPreviewText(rawText);
           if (!revoked) {
             setPreviewState({ status: 'ready', kind: 'text', content: text, metaLabel: '原始檔案內容' });
@@ -137,7 +136,7 @@ export const FilePreviewModal = ({ isOpen, file, entry, onClose }: FilePreviewMo
           {previewKind === 'image' ? <ImageIcon size={20} className={styles.titleIcon} /> : <FileText size={20} className={styles.titleIcon} />}
           <h2 className={styles.titleText}>{file.name}</h2>
         </div>
-        <div className={styles.pathText}>{file.path || file.name}</div>
+        <div className={styles.pathText}>{file.workbenchPath}</div>
       </div>
       {entry && (
         <div className={styles.titleStats}>

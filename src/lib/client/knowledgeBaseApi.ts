@@ -62,3 +62,22 @@ export async function runKnowledgeBaseMaintenance(
 
   return response.result;
 }
+
+export async function repathKnowledgeSources(
+  knowledgeBaseId: string,
+  items: Array<{
+    sourceId: string;
+    canonicalPath: string;
+  }>,
+) {
+  const response = await requestJson<{ updatedSourceCount: number }>(
+    `/api/knowledge-bases/${encodeURIComponent(knowledgeBaseId)}/sources/repath`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    },
+  );
+
+  return response.updatedSourceCount;
+}

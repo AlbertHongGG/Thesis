@@ -54,7 +54,7 @@ import {
   runKnowledgeBaseMaintenance as runKnowledgeBaseMaintenanceRequest,
 } from '@/lib/client/knowledgeBaseApi';
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
-import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
+import { getOrderedFileIds } from '@/lib/workbench/treeState';
 import { useWorkbenchQueueState, workbenchQueue } from '@/lib/workbench/ingestQueue';
 import type {
   FileProcessEntry,
@@ -62,6 +62,7 @@ import type {
   IngestUnit,
   IngestResult,
   ProcessStepEntry,
+  WorkbenchFileRecord,
 } from '@/lib/workbench/types';
 import { useLiveNow } from '@/lib/workbench/useLiveNow';
 import styles from './page.module.css';
@@ -85,14 +86,29 @@ const FALLBACK_KNOWLEDGE_BASE: KnowledgeBaseRecord = {
 };
 
 
-function rebuildExtendedFile(record: PersistedFileRecord): ExtendedFile {
+function rebuildWorkbenchFile(record: PersistedFileRecord): WorkbenchFileRecord {
   const file = new File([record.blob], record.name, {
     type: record.type,
     lastModified: record.lastModified,
   }) as ExtendedFile;
 
-  file.path = record.path;
-  return file;
+  file.path = record.workbenchPath;
+
+  return {
+    id: record.id,
+    file,
+    name: record.name,
+    type: record.type,
+    size: record.size,
+    lastModified: record.lastModified,
+    originalPath: record.originalPath,
+    workbenchPath: record.workbenchPath,
+    sourceSyncStatus: record.sourceSyncStatus,
+    sourceSyncError: record.sourceSyncError,
+    syncedCanonicalPath: record.syncedCanonicalPath,
+    sourceId: record.sourceId,
+    knowledgeBaseId: record.knowledgeBaseId,
+  };
 }
 
 function cloneUnit(unit: IngestUnit): IngestUnit {
@@ -147,34 +163,23 @@ function normalizeRestoredEntry(entry: PersistedFileProcessEntry): FileProcessEn
     completedAt: step.completedAt ?? restoredAt,
   }));
 
-  if (entry.status === 'processing') {
-    normalizedSteps.push({
-      id: normalizedSteps.length + 1,
-      message: '上次執行中斷，等待重新執行。',
-      status: 'error',
-      startedAt: restoredAt,
-      completedAt: restoredAt,
-    });
-  }
-
   return {
+    fileId: entry.fileId,
     path: entry.path,
     displayPath: entry.displayPath,
-    status: entry.status === 'processing' ? 'error' : entry.status,
+    status: entry.status,
     steps: normalizedSteps,
     startedAt: entry.startedAt,
     completedAt: entry.completedAt,
     result: normalizeRestoredResult(entry.result),
-    errorMessage: entry.status === 'processing'
-      ? '上次執行中斷，可直接 Resume 繼續。'
-      : entry.errorMessage,
+    errorMessage: entry.errorMessage,
   };
 }
 
 function countRunnablePaths(snapshot: PersistedSessionSnapshot) {
-  return snapshot.fileOrder.filter(path => {
-    const entry = snapshot.processEntries[path];
-    return (entry?.status ?? 'idle') !== 'completed';
+  return Object.values(snapshot.processEntries).filter(entry => {
+    const status = entry?.status ?? 'idle';
+    return status === 'idle' || status === 'processing';
   }).length;
 }
 
@@ -192,10 +197,10 @@ ProcessDurationValue.displayName = 'ProcessDurationValue';
 
 export default function DataWorkbench() {
   const router = useRouter();
-  const { files, processEntries, processMode, currentIndex, activeKnowledgeBaseId } = useWorkbenchQueueState();
-  const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
-  const [selectedPreviewPath, setSelectedPreviewPath] = useState<string | null>(null);
-  const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
+  const { files, tree, processEntries, processMode, currentFileId, activeKnowledgeBaseId } = useWorkbenchQueueState();
+  const [highlightedFileId, setHighlightedFileId] = useState<string | null>(null);
+  const [selectedPreviewFileId, setSelectedPreviewFileId] = useState<string | null>(null);
+  const [expandedEntryIds, setExpandedEntryIds] = useState<Record<string, boolean>>({});
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseRecord[]>([]);
   const [newKnowledgeBaseName, setNewKnowledgeBaseName] = useState('');
   const [isCreatingKnowledgeBase, setIsCreatingKnowledgeBase] = useState(false);
@@ -210,48 +215,74 @@ export default function DataWorkbench() {
     [activeKnowledgeBaseId, knowledgeBases],
   );
 
+  const fileMap = useMemo(() => new Map(files.map(file => [file.id, file])), [files]);
+
   const sortedFiles = useMemo(() => {
-    const docs = files.filter(file => !IMAGE_FILE_PATTERN.test(file.name));
-    const imgs = files.filter(file => IMAGE_FILE_PATTERN.test(file.name));
-    return [...docs, ...imgs];
-  }, [files]);
+    return getOrderedFileIds(tree)
+      .map(fileId => fileMap.get(fileId) ?? null)
+      .filter((file): file is WorkbenchFileRecord => file !== null);
+  }, [fileMap, tree]);
+
+  const highlightedPath = useMemo(() => {
+    if (!highlightedFileId) {
+      return null;
+    }
+
+    return fileMap.get(highlightedFileId)?.workbenchPath ?? null;
+  }, [fileMap, highlightedFileId]);
 
   const selectedPreviewFile = useMemo(
-    () => sortedFiles.find(file => (file.path || file.name) === selectedPreviewPath) ?? null,
-    [selectedPreviewPath, sortedFiles],
+    () => (selectedPreviewFileId ? fileMap.get(selectedPreviewFileId) ?? null : null),
+    [fileMap, selectedPreviewFileId],
   );
 
-  const buildInitialEntry = useCallback((fullPath: string): FileProcessEntry => ({
-    path: fullPath,
-    displayPath: getDisplayPath(fullPath),
+  const buildInitialEntry = useCallback((file: WorkbenchFileRecord): FileProcessEntry => ({
+    fileId: file.id,
+    path: file.workbenchPath,
+    displayPath: getDisplayPath(file.workbenchPath),
     status: 'idle',
     steps: [],
   }), []);
 
   const selectedPreviewEntry = useMemo(() => {
-    if (!selectedPreviewPath) return null;
-    return processEntries[selectedPreviewPath] ?? buildInitialEntry(selectedPreviewPath);
-  }, [buildInitialEntry, processEntries, selectedPreviewPath]);
+    if (!selectedPreviewFile) {
+      return null;
+    }
 
-  const allPaths = useMemo(
-    () => sortedFiles.map(file => file.path || file.name),
+    return processEntries[selectedPreviewFile.id] ?? buildInitialEntry(selectedPreviewFile);
+  }, [buildInitialEntry, processEntries, selectedPreviewFile]);
+
+  const allFileIds = useMemo(
+    () => sortedFiles.map(file => file.id),
     [sortedFiles],
   );
 
-  const resumablePaths = useMemo(
-    () => allPaths.filter(path => (processEntries[path]?.status ?? 'idle') !== 'completed'),
-    [allPaths, processEntries],
+  const currentQueueIndex = useMemo(() => {
+    if (!currentFileId) {
+      return sortedFiles.length;
+    }
+
+    const index = allFileIds.indexOf(currentFileId);
+    return index === -1 ? sortedFiles.length : index;
+  }, [allFileIds, currentFileId, sortedFiles.length]);
+
+  const resumableFileIds = useMemo(
+    () => allFileIds.filter(fileId => {
+      const status = processEntries[fileId]?.status ?? 'idle';
+      return status === 'idle' || status === 'processing';
+    }),
+    [allFileIds, processEntries],
   );
 
   const fileStatuses = useMemo(() => {
     const nextStatuses: Record<string, FileProcessStatus | undefined> = {};
 
-    for (const path of allPaths) {
-      nextStatuses[path] = processEntries[path]?.status;
+    for (const fileId of allFileIds) {
+      nextStatuses[fileId] = processEntries[fileId]?.status;
     }
 
     return nextStatuses;
-  }, [allPaths, processEntries]);
+  }, [allFileIds, processEntries]);
 
   const refreshKnowledgeBases = useCallback(async (preferredKnowledgeBaseId?: string | null) => {
     try {
@@ -429,15 +460,26 @@ export default function DataWorkbench() {
   }, [refreshKnowledgeBases]);
 
   useEffect(() => {
-    if (!selectedPreviewPath) return;
-
-    const previewStillExists = sortedFiles.some(file => (file.path || file.name) === selectedPreviewPath);
-    if (!previewStillExists) {
-      setSelectedPreviewPath(null);
+    if (!selectedPreviewFileId) {
+      return;
     }
-  }, [selectedPreviewPath, sortedFiles]);
 
-  const handleDelete = async (path: string) => {
+    if (!fileMap.has(selectedPreviewFileId)) {
+      setSelectedPreviewFileId(null);
+    }
+  }, [fileMap, selectedPreviewFileId]);
+
+  useEffect(() => {
+    if (!highlightedFileId) {
+      return;
+    }
+
+    if (!fileMap.has(highlightedFileId)) {
+      setHighlightedFileId(null);
+    }
+  }, [fileMap, highlightedFileId]);
+
+  const handleDelete = async (nodeId: string) => {
     if (persistencePhase === 'prompt' && canUseSessionPersistence()) {
       await clearStoredSession().catch(error => {
         console.error('Failed to clear stored session before delete:', error);
@@ -446,19 +488,36 @@ export default function DataWorkbench() {
       setPersistencePhase('ready');
     }
 
-    workbenchQueue.deleteByPath(path);
-    setExpandedPaths(prev => {
-      const nextExpanded = { ...prev };
-      for (const key of Object.keys(nextExpanded)) {
-        if (key.startsWith(path)) {
-          delete nextExpanded[key];
-        }
-      }
-      return nextExpanded;
-    });
-    if (highlightedPath?.startsWith(path)) setHighlightedPath(null);
-    if (selectedPreviewPath?.startsWith(path)) setSelectedPreviewPath(null);
+    const removedFileIds = workbenchQueue.deleteNode(nodeId);
+    if (removedFileIds.length === 0) {
+      return;
+    }
+
+    const removedSet = new Set(removedFileIds);
+    setExpandedEntryIds(prev => Object.fromEntries(
+      Object.entries(prev).filter(([fileId]) => !removedSet.has(fileId)),
+    ));
+
+    if (highlightedFileId && removedSet.has(highlightedFileId)) {
+      setHighlightedFileId(null);
+    }
+
+    if (selectedPreviewFileId && removedSet.has(selectedPreviewFileId)) {
+      setSelectedPreviewFileId(null);
+    }
   };
+
+  const handleMoveNode = useCallback(async (input: {
+    sourceNodeId: string;
+    targetNodeId: string | null;
+    position: 'before' | 'after' | 'inside';
+  }) => {
+    try {
+      await workbenchQueue.moveNode(input);
+    } catch (error) {
+      toast(error instanceof Error ? error.message : String(error), 'error');
+    }
+  }, [toast]);
 
   const handleDrop = async (newFiles: ExtendedFile[]) => {
     if (persistencePhase === 'prompt' && canUseSessionPersistence()) {
@@ -479,15 +538,18 @@ export default function DataWorkbench() {
   const handlePause = () => workbenchQueue.pauseProcessing();
 
   const handleNext = async () => {
-    if (currentIndex >= sortedFiles.length) return;
+    if (!currentFileId) {
+      return;
+    }
+
     await workbenchQueue.processNext();
   };
 
   const handleClear = async () => {
     await workbenchQueue.clear();
-    setExpandedPaths({});
-    setHighlightedPath(null);
-    setSelectedPreviewPath(null);
+    setExpandedEntryIds({});
+    setHighlightedFileId(null);
+    setSelectedPreviewFileId(null);
     setRestorePrompt(null);
     setPersistencePhase('ready');
   };
@@ -495,31 +557,21 @@ export default function DataWorkbench() {
   const handleRestoreSession = () => {
     if (!restorePrompt) return;
 
-    const restoredFiles = restorePrompt.files.map(rebuildExtendedFile);
-    const restoredEntries: Record<string, FileProcessEntry> = {};
+    const restoredFiles = restorePrompt.files.map(rebuildWorkbenchFile);
+    const restoredEntries = Object.fromEntries(
+      Object.entries(restorePrompt.snapshot.processEntries).map(([fileId, entry]) => [fileId, normalizeRestoredEntry(entry)]),
+    );
 
-    for (const path of restorePrompt.snapshot.fileOrder) {
-      const entry = restorePrompt.snapshot.processEntries[path];
-      if (entry) {
-        restoredEntries[path] = normalizeRestoredEntry(entry);
-      } else {
-        restoredEntries[path] = buildInitialEntry(path);
-      }
-    }
-
-    setExpandedPaths({});
-    const restoredNextRunnableIndex = restorePrompt.snapshot.fileOrder.findIndex(path => {
-      const entry = restoredEntries[path];
-      return (entry?.status ?? 'idle') !== 'completed';
-    });
+    setExpandedEntryIds({});
     workbenchQueue.restoreSession({
       files: restoredFiles,
+      tree: restorePrompt.snapshot.tree,
       processEntries: restoredEntries,
-      currentIndex: restoredNextRunnableIndex === -1 ? restorePrompt.snapshot.fileOrder.length : restoredNextRunnableIndex,
+      currentFileId: restorePrompt.snapshot.currentFileId,
       activeKnowledgeBaseId: restorePrompt.snapshot.activeKnowledgeBaseId ?? null,
     });
-    setHighlightedPath(null);
-    setSelectedPreviewPath(null);
+    setHighlightedFileId(null);
+    setSelectedPreviewFileId(null);
     if (restorePrompt.snapshot.activeKnowledgeBaseId) {
       void refreshKnowledgeBases(restorePrompt.snapshot.activeKnowledgeBaseId);
     }
@@ -531,21 +583,20 @@ export default function DataWorkbench() {
     await handleClear();
   };
 
-  const toggleExpanded = (fullPath: string) => {
-    setExpandedPaths(prev => ({
+  const toggleExpanded = (fileId: string) => {
+    setExpandedEntryIds(prev => ({
       ...prev,
-      [fullPath]: !prev[fullPath],
+      [fileId]: !prev[fileId],
     }));
-    setHighlightedPath(fullPath);
+    setHighlightedFileId(fileId);
   };
 
-  const handleSelectPreview = useCallback((fullPath: string) => {
-    setSelectedPreviewPath(fullPath);
+  const handleSelectPreview = useCallback((fileId: string) => {
+    setSelectedPreviewFileId(fileId);
   }, []);
 
   const orderedEntries = sortedFiles.map(file => {
-    const fullPath = file.path || file.name;
-    return processEntries[fullPath] ?? buildInitialEntry(fullPath);
+    return processEntries[file.id] ?? buildInitialEntry(file);
   });
 
   return (
@@ -598,12 +649,15 @@ export default function DataWorkbench() {
                     <Button variant="ghost" onClick={() => void handleClear()} style={{ padding: '4px 8px', fontSize: '0.8rem', height: 'auto' }}>Clear</Button>
                   </div>
                   <FileTree
+                    tree={tree}
                     files={files}
-                    onDelete={path => void handleDelete(path)}
+                    onDelete={nodeId => void handleDelete(nodeId)}
+                    onMove={handleMoveNode}
                     highlightedPath={highlightedPath}
-                    selectedPath={selectedPreviewPath}
+                    selectedFileId={selectedPreviewFileId}
                     statuses={fileStatuses}
-                    onSelectFile={node => handleSelectPreview(node.path)}
+                    onSelectFile={handleSelectPreview}
+                    isStructureLocked={workbenchQueue.isStructureLocked()}
                   />
                 </div>
               </div>
@@ -633,7 +687,7 @@ export default function DataWorkbench() {
                   {processMode === 'playing' ? (
                     <Button variant="secondary" onClick={handlePause}><Square size={14} /> Stop</Button>
                   ) : (
-                    <Button variant="primary" onClick={handlePlay} disabled={!activeKnowledgeBaseId}><Play size={14} /> {currentIndex > 0 && currentIndex < sortedFiles.length ? 'Resume' : 'Start Auto'}</Button>
+                    <Button variant="primary" onClick={handlePlay} disabled={!activeKnowledgeBaseId}><Play size={14} /> {currentQueueIndex > 0 && currentQueueIndex < sortedFiles.length ? 'Resume' : 'Start Auto'}</Button>
                   )}
                   <Button variant="secondary" onClick={() => void handleNext()} disabled={processMode === 'playing' || !activeKnowledgeBaseId}><SkipForward size={14} /> Next Step</Button>
                 </div>
@@ -738,7 +792,7 @@ export default function DataWorkbench() {
 
             {persistencePhase === 'ready' && sortedFiles.length > 0 && (
               <div className={styles.persistenceSummary}>
-                目前已保存 {sortedFiles.length} 個檔案的執行紀錄，其中 {resumablePaths.length} 個仍可接續處理。Active KB：{activeKnowledgeBase?.name || '未指定'}。
+                目前已保存 {sortedFiles.length} 個檔案的執行紀錄，其中 {resumableFileIds.length} 個仍可接續處理。Active KB：{activeKnowledgeBase?.name || '未指定'}。
               </div>
             )}
 
@@ -764,11 +818,11 @@ export default function DataWorkbench() {
                     style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
                   >
                     {orderedEntries.map(entry => {
-                  const isExpanded = !!expandedPaths[entry.path];
+                  const isExpanded = !!expandedEntryIds[entry.fileId];
 
                   return (
-                    <section key={entry.path} className={`${styles.processCard} ${styles[`processCard${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] || ''}`}>
-                      <button type="button" className={styles.processCardHeader} onClick={() => toggleExpanded(entry.path)}>
+                    <section key={entry.fileId} className={`${styles.processCard} ${styles[`processCard${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] || ''}`}>
+                      <button type="button" className={styles.processCardHeader} onClick={() => toggleExpanded(entry.fileId)}>
                         <div className={styles.processCardHeaderLeft}>
                           <ChevronRight size={18} className={`${styles.processChevron} ${isExpanded ? styles.processChevronExpanded : ''}`} />
                           <div className={styles.processCardTitleGroup}>
@@ -815,7 +869,7 @@ export default function DataWorkbench() {
         isOpen={!!selectedPreviewFile && !!selectedPreviewEntry}
         file={selectedPreviewFile}
         entry={selectedPreviewEntry}
-        onClose={() => setSelectedPreviewPath(null)}
+        onClose={() => setSelectedPreviewFileId(null)}
       />
 
       <RagQueryPanel knowledgeBaseId={activeKnowledgeBaseId} knowledgeBaseName={activeKnowledgeBase?.name} />
