@@ -79,18 +79,42 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight,
-        });
+    const element = containerRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    const updateDimensions = () => {
+      const width = element.clientWidth;
+      const height = element.clientHeight;
+
+      if (width === 0 || height === 0) {
+        return;
       }
+
+      setDimensions(prev => {
+        if (prev.width === width && prev.height === height) {
+          return prev;
+        }
+
+        return { width, height };
+      });
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    updateDimensions();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(() => {
+        updateDimensions();
+      });
+
+      observer.observe(element);
+      return () => observer.disconnect();
+    }
+
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   const handleNodeClick = useCallback(
@@ -198,7 +222,7 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
         warmupTicks={200}
         cooldownTicks={100}
         
-        backgroundColor="#f8fafc" // var(--bg-primary)
+        backgroundColor="rgba(0, 0, 0, 0)"
       />
     </div>
   );

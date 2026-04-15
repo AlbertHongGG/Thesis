@@ -19,6 +19,14 @@ function toVectorLiteral(embedding?: number[]) {
   return `[${normalizeEmbedding(embedding).join(',')}]`;
 }
 
+function toJsonbLiteral(value: unknown) {
+  if (value == null) {
+    return null;
+  }
+
+  return JSON.stringify(value);
+}
+
 async function upsertSource(client: PoolClient, source: KnowledgeSourceRecord) {
   await client.query(
     `
@@ -42,7 +50,7 @@ async function upsertSource(client: PoolClient, source: KnowledgeSourceRecord) {
         metadata_version
       )
       values (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, $16, $17
       )
       on conflict (id) do update set
         knowledge_base_id = excluded.knowledge_base_id,
@@ -73,7 +81,7 @@ async function upsertSource(client: PoolClient, source: KnowledgeSourceRecord) {
       source.metadata.summary,
       source.metadata.terms,
       source.metadata.entities,
-      source.metadata.structure ?? null,
+      toJsonbLiteral(source.metadata.structure),
       source.totalUnitCount,
       source.totalCharCount,
       source.processingDurationMs ?? null,
@@ -113,7 +121,7 @@ async function replaceUnits(client: PoolClient, source: KnowledgeSourceRecord, u
           metadata_version
         )
         values (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::extensions.vector, $15, $16, $17, $18, $19, $20
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14::extensions.vector, $15, $16, $17, $18, $19, $20
         )
         on conflict (id) do update set
           knowledge_base_id = excluded.knowledge_base_id,
@@ -147,7 +155,7 @@ async function replaceUnits(client: PoolClient, source: KnowledgeSourceRecord, u
         unit.metadata.summary,
         unit.metadata.terms,
         unit.metadata.entities,
-        unit.metadata.relationHints,
+        toJsonbLiteral(unit.metadata.relationHints),
         unit.status,
         unit.errorMessage ?? null,
         toVectorLiteral(unit.embedding),

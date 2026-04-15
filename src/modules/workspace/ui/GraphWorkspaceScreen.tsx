@@ -123,44 +123,46 @@ export function GraphWorkspaceScreen() {
         )}
 
         {!loading && !error && hasGraphData && data && (
-          <ForceGraph
-            data={data}
-            onNodeClick={setSelectedNode}
-            selectedNodeId={selectedNode?.id}
-          />
+          <div className={styles.graphCanvasLayer}>
+            <ForceGraph
+              data={data}
+              onNodeClick={setSelectedNode}
+              selectedNodeId={selectedNode?.id}
+            />
+          </div>
+        )}
+
+        {!loading && !error && hasGraphData && (
+          <div className={styles.legend}>
+            <h4 className={styles.legendTitle}>Graph Legend</h4>
+            <div className={styles.legendItem}>
+              <span className={`${styles.legendDot} ${styles.legendDotDoc}`}></span>
+              Knowledge Source
+            </div>
+            <div className={styles.legendItem}>
+              <span className={`${styles.legendDot} ${styles.legendDotChunk}`}></span>
+              Knowledge Unit
+            </div>
+            <div className={styles.legendItem}>
+              <span className={`${styles.legendLine} ${styles.legendLineParent}`}></span>
+              Parent Relation
+            </div>
+            <div className={styles.legendItem}>
+              <span className={`${styles.legendLine} ${styles.legendLineRelated}`}></span>
+              Semantic Link
+            </div>
+            <div className={styles.legendActions}>
+              <Button
+                variant="secondary"
+                onClick={handleDeleteAll}
+                className={styles.clearDataButton}
+              >
+                <Trash2 size={14} /> Clear Active KB Data
+              </Button>
+            </div>
+          </div>
         )}
       </div>
-
-      {!loading && !error && hasGraphData && (
-        <div className={styles.legend}>
-          <h4 className={styles.legendTitle}>Graph Legend</h4>
-          <div className={styles.legendItem}>
-            <span className={`${styles.legendDot} ${styles.legendDotDoc}`}></span>
-            Knowledge Source
-          </div>
-          <div className={styles.legendItem}>
-            <span className={`${styles.legendDot} ${styles.legendDotChunk}`}></span>
-            Knowledge Unit
-          </div>
-          <div className={styles.legendItem}>
-            <span className={`${styles.legendLine} ${styles.legendLineParent}`}></span>
-            Parent Relation
-          </div>
-          <div className={styles.legendItem}>
-            <span className={`${styles.legendLine} ${styles.legendLineRelated}`}></span>
-            Semantic Link
-          </div>
-          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'center' }}>
-            <Button
-              variant="secondary"
-              onClick={handleDeleteAll}
-              style={{ width: '100%', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#ef4444', background: 'transparent' }}
-            >
-              <Trash2 size={14} /> Clear Active KB Data
-            </Button>
-          </div>
-        </div>
-      )}
 
       <NodeDetailPanel
         node={selectedNode}
