@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, LoaderCircle, Trash2 } from 'lucide-react';
+import { AlertCircle, LoaderCircle, Network, Trash2 } from 'lucide-react';
 import { ForceGraph, type GraphData, type GraphNode } from '@/components/graph/ForceGraph';
 import { NodeDetailPanel } from '@/components/graph/NodeDetailPanel';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +17,7 @@ export function GraphWorkspaceScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  const hasGraphData = Boolean(data && data.nodes.length > 0);
 
   const loadGraph = useCallback(async () => {
     if (!activeKnowledgeBaseId) {
@@ -105,7 +106,23 @@ export function GraphWorkspaceScreen() {
           </div>
         )}
 
-        {!loading && !error && data && (
+        {!loading && !error && !hasGraphData && (
+          <div className={styles.emptyCanvasOverlay}>
+            <div className={styles.emptyCanvasPanel}>
+              <div className={styles.emptyCanvasBadge}>
+                <Network size={15} /> Graph Canvas
+              </div>
+              <h2 className={styles.emptyCanvasTitle}>Canvas ready</h2>
+              <p className={styles.emptyCanvasText}>
+                {activeKnowledgeBase
+                  ? `${activeKnowledgeBase.name} 目前還沒有可視化節點。完成資料匯入後，來源與關聯會出現在這個畫布上。`
+                  : 'Select an active knowledge base to start building the graph canvas.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && hasGraphData && data && (
           <ForceGraph
             data={data}
             onNodeClick={setSelectedNode}
@@ -114,7 +131,7 @@ export function GraphWorkspaceScreen() {
         )}
       </div>
 
-      {!loading && !error && data && (
+      {!loading && !error && hasGraphData && (
         <div className={styles.legend}>
           <h4 className={styles.legendTitle}>Graph Legend</h4>
           <div className={styles.legendItem}>

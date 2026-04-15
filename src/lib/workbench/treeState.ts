@@ -8,6 +8,7 @@ import type {
   WorkbenchTreeNode,
   WorkbenchTreeState,
 } from './types';
+import { compareWorkbenchFileNames } from './filePriority';
 
 function createId(prefix: string) {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -18,7 +19,7 @@ function createId(prefix: string) {
 }
 
 function compareNodeNames(left: string, right: string) {
-  return left.localeCompare(right);
+  return compareWorkbenchFileNames(left, right);
 }
 
 function compareNodes(left: WorkbenchTreeNode, right: WorkbenchTreeNode) {

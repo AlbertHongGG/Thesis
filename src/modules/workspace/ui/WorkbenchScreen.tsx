@@ -436,7 +436,7 @@ export function WorkbenchScreen() {
           )}
         </AnimatePresence>
 
-        <motion.main layout className={styles.mainPanel} style={{ flex: 1, overflow: 'auto', background: 'var(--bg-primary)' }}>
+        <motion.main layout layoutScroll className={styles.mainPanel} style={{ flex: 1, overflow: 'auto', background: 'var(--bg-primary)' }}>
           <div className={styles.workingArea}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
               <div>
@@ -508,8 +508,13 @@ export function WorkbenchScreen() {
                       const isExpanded = !!expandedEntryIds[entry.fileId];
 
                       return (
-                        <section key={entry.fileId} className={`${styles.processCard} ${styles[`processCard${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] || ''}`}>
-                          <button type="button" className={styles.processCardHeader} onClick={() => {
+                        <motion.section
+                          key={entry.fileId}
+                          layout
+                          transition={{ layout: { duration: 0.24, ease: [0.25, 0.1, 0.25, 1] } }}
+                          className={`${styles.processCard} ${styles[`processCard${entry.status.charAt(0).toUpperCase()}${entry.status.slice(1)}`] || ''}`}
+                        >
+                          <button type="button" className={styles.processCardHeader} aria-expanded={isExpanded} onClick={() => {
                             setExpandedEntryIds(prev => ({
                               ...prev,
                               [entry.fileId]: !prev[entry.fileId],
@@ -543,12 +548,26 @@ export function WorkbenchScreen() {
                             </div>
                           </button>
 
-                          {isExpanded && (
-                            <div className={styles.processCardBody}>
-                              <ProcessTimeline entry={entry} showStructuredOutput />
-                            </div>
-                          )}
-                        </section>
+                          <AnimatePresence initial={false}>
+                            {isExpanded ? (
+                              <motion.div
+                                key={`${entry.fileId}-body`}
+                                className={styles.processCardBodyMotion}
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{
+                                  height: { duration: 0.24, ease: [0.25, 0.1, 0.25, 1] },
+                                  opacity: { duration: 0.18, ease: 'easeOut' },
+                                }}
+                              >
+                                <div className={styles.processCardBody}>
+                                  <ProcessTimeline entry={entry} showStructuredOutput />
+                                </div>
+                              </motion.div>
+                            ) : null}
+                          </AnimatePresence>
+                        </motion.section>
                       );
                     })}
                   </motion.div>

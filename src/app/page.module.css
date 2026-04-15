@@ -188,6 +188,7 @@
   border-radius: 12px;
   background: var(--bg-primary);
   overflow: hidden;
+  will-change: transform, height;
 }
 
 .processCardIdle {
@@ -316,6 +317,10 @@
 .processCardBody {
   border-top: 1px solid var(--border-color);
   padding: 0.9rem 1.1rem 1rem;
+}
+
+.processCardBodyMotion {
+  overflow: hidden;
 }
 
 .processStepList {

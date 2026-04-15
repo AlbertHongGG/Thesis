@@ -109,6 +109,15 @@ export function KnowledgeBaseManagementScreen() {
       <section className={styles.panel}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.panelTitle}>Knowledge Base</h2>
+          <Button
+            variant="ghost"
+            className={styles.deleteButton}
+            onClick={() => void handleDeleteKnowledgeBase()}
+            isLoading={isDeleting}
+            disabled={!canDeleteActiveKnowledgeBase}
+          >
+            <Trash2 size={16} /> Delete current
+          </Button>
         </div>
 
         <div className={styles.fieldStack}>
@@ -149,12 +158,6 @@ export function KnowledgeBaseManagementScreen() {
             </div>
           </div>
         </div>
-
-        <div className={styles.actions}>
-          <Button variant="ghost" onClick={() => void handleDeleteKnowledgeBase()} isLoading={isDeleting} disabled={!canDeleteActiveKnowledgeBase}>
-            <Trash2 size={16} /> Delete current
-          </Button>
-        </div>
       </section>
 
       <section className={styles.panel}>
@@ -165,26 +168,32 @@ export function KnowledgeBaseManagementScreen() {
         {!activeKnowledgeBase ? (
           <div className={styles.empty}>Select a knowledge base first.</div>
         ) : (
-          <div className={styles.actionList}>
-            <div className={styles.actionRow}>
-              <div className={styles.actionBody}>
-                <div className={styles.actionTitle}>Rebuild Profile</div>
-                <div className={styles.actionHint}>Refresh summary and key terms.</div>
-              </div>
-              <Button variant="secondary" onClick={() => void handleRunMaintenance('rebuild-profile')} isLoading={maintenanceState === 'rebuild-profile'}>
-                <RotateCcw size={16} /> Rebuild
-              </Button>
+          <div className={styles.maintenanceStack}>
+            <div className={styles.maintenanceTarget}>
+              <span className={styles.label}>Target</span>
+              <span className={styles.targetName}>{activeKnowledgeBase.name}</span>
             </div>
 
-            <div className={styles.actionRow}>
-              <div className={styles.actionBody}>
-                <div className={styles.actionTitle}>Reindex</div>
-                <div className={styles.actionHint}>Recreate embeddings and relation links.</div>
-              </div>
-              <Button variant="secondary" onClick={() => void handleRunMaintenance('reindex')} isLoading={maintenanceState === 'reindex'}>
+            <div className={styles.maintenanceActions}>
+              <Button
+                variant="secondary"
+                className={styles.compactButton}
+                onClick={() => void handleRunMaintenance('rebuild-profile')}
+                isLoading={maintenanceState === 'rebuild-profile'}
+              >
+                <RotateCcw size={16} /> Rebuild profile
+              </Button>
+              <Button
+                variant="secondary"
+                className={styles.compactButton}
+                onClick={() => void handleRunMaintenance('reindex')}
+                isLoading={maintenanceState === 'reindex'}
+              >
                 <Box size={16} /> Reindex
               </Button>
             </div>
+
+            <div className={styles.maintenanceHint}>Run these only when you need to refresh derived profile or embedding state.</div>
           </div>
         )}
       </section>

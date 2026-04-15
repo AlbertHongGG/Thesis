@@ -3,6 +3,7 @@
   grid-template-columns: minmax(18rem, 24rem) minmax(20rem, 1fr);
   gap: 1rem;
   min-height: 0;
+  align-items: start;
 }
 
 .panel {
@@ -49,7 +50,7 @@
 }
 
 .statsRow,
-.actions {
+.maintenanceActions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -71,37 +72,35 @@
   gap: 0.75rem;
 }
 
-.actionList {
+.maintenanceStack {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
-.actionRow {
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 0.95rem;
-  background: var(--bg-primary);
+.maintenanceTarget {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.65rem;
+  flex-wrap: wrap;
 }
 
-.actionBody {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.actionTitle {
+.targetName {
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.actionHint {
+.compactButton {
+  min-height: 42px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}
+
+.maintenanceHint {
   color: var(--text-secondary);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
+  line-height: 1.6;
 }
 
 .empty {
@@ -113,9 +112,17 @@
   line-height: 1.7;
 }
 
-.actions {
-  justify-content: flex-end;
-  margin-top: auto;
+.deleteButton {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  border-radius: 10px;
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
 }
 
 @media (max-width: 960px) {
@@ -129,8 +136,13 @@
     grid-template-columns: 1fr;
   }
 
-  .actionRow {
-    flex-direction: column;
+  .sectionHeader {
     align-items: stretch;
+    flex-direction: column;
+  }
+
+  .deleteButton,
+  .compactButton {
+    width: 100%;
   }
 }

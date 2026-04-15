@@ -38,4 +38,20 @@ describe('orderFilesByTree', () => {
       'root/zeta.md',
     ]);
   });
+
+  it('prioritizes document and data files before images within the same level', () => {
+    const files: TestFile[] = [
+      { name: 'diagram.png', path: 'root/diagram.png' },
+      { name: 'context.json', path: 'root/context.json' },
+      { name: 'notes.md', path: 'root/notes.md' },
+      { name: 'photo.jpeg', path: 'root/photo.jpeg' },
+    ];
+
+    expect(orderFilesByTree(files).map(file => file.path)).toEqual([
+      'root/context.json',
+      'root/notes.md',
+      'root/diagram.png',
+      'root/photo.jpeg',
+    ]);
+  });
 });

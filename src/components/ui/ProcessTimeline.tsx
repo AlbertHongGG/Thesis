@@ -40,7 +40,7 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
 
   return (
     <div className={styles.outputGroup}>
-      <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+      <motion.section className={styles.outputCard} initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <div className={styles.outputHeader}>
           <div className={styles.outputTitle}>
             {result.sourceType === 'image' ? <ImageIcon size={16} className={styles.headerIcon} /> : <FileText size={16} className={styles.headerIcon} />}
@@ -72,7 +72,7 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
       </motion.section>
 
       {result.knowledgeContext && (
-        <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+        <motion.section className={styles.outputCard} initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
               <Database size={16} className={styles.headerIcon} />
@@ -111,7 +111,7 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
       )}
 
       {result.units.length > 0 && (
-        <motion.section className={styles.outputCard} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.section className={styles.outputCard} initial={false} animate={{ opacity: 1, y: 0 }}>
           <div className={styles.outputHeader}>
             <div className={styles.outputTitle}>
               <Rows3 size={16} className={styles.headerIcon} />
@@ -122,7 +122,8 @@ const StructuredOutput = React.memo(({ entry }: { entry: FileProcessEntry }) => 
           <div className={styles.chunkList}>
             {result.units.map((unit, idx) => (
               <motion.div key={`${entry.path}-unit-${unit.sequence}`} className={styles.chunkItem}
-                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(idx * 0.05, 0.5) }}>
+                initial={false}
+                animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(idx * 0.05, 0.5) }}>
                 <div className={styles.chunkLabel}>
                   Unit {unit.sequence + 1}
                   <span className={styles.charCountBadge}>{unit.charCount} chars</span>
@@ -203,7 +204,7 @@ export const ProcessTimeline = ({
         <div className={styles.empty}>{emptyMessage}</div>
       ) : (
         <div className={styles.stepList}>
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {entry.steps.map((step, idx) => {
               const isRunning = step.status === 'running';
 
@@ -211,7 +212,7 @@ export const ProcessTimeline = ({
                 <motion.div 
                   key={`${entry.path}-${step.id}`} 
                   className={`${styles.stepItem} ${isRunning ? styles.stepItemRunning : ''}`}
-                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  initial={false}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ type: 'spring', damping: 25, stiffness: 400, delay: Math.min(0.04 * idx, 0.2) }}
                   layout

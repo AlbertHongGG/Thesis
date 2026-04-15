@@ -1,3 +1,5 @@
+import { compareWorkbenchFileNames } from './filePriority';
+
 export type FilePathLike = {
   name: string;
   path?: string;
@@ -12,7 +14,7 @@ export type FileOrderingNode<TFile extends FilePathLike = FilePathLike> = {
 };
 
 function compareNodeNames(left: string, right: string) {
-  return left.localeCompare(right);
+  return compareWorkbenchFileNames(left, right);
 }
 
 export function compareFileOrderingNodes<TFile extends FilePathLike>(

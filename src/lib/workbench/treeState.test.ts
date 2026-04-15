@@ -43,6 +43,25 @@ describe('treeState', () => {
     ]);
   });
 
+  it('orders document and json files before images in the same folder', () => {
+    const files = [
+      createFile('資料/input.png'),
+      createFile('資料/context.json'),
+      createFile('資料/spec.md'),
+      createFile('資料/preview.jpg'),
+    ];
+
+    const tree = buildInitialWorkbenchTree(files);
+    const orderedNames = getOrderedFileIds(tree).map(fileId => files.find(file => file.id === fileId)?.workbenchPath);
+
+    expect(orderedNames).toEqual([
+      '資料/context.json',
+      '資料/spec.md',
+      '資料/input.png',
+      '資料/preview.jpg',
+    ]);
+  });
+
   it('moves a completed file into another folder and marks it for path sync', () => {
     const files = [
       createFile('文件資料/紀錄.md'),
