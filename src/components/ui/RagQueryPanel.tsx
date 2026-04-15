@@ -3,24 +3,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, FileText, DatabaseZap, Search, X, LoaderCircle } from 'lucide-react';
+import type { KnowledgeUnitMatch } from '@/domain/knowledge/types';
+import { searchKnowledgeBase } from '@/lib/client/searchApi';
 import styles from './RagQueryPanel.module.css';
-
-interface SearchResult {
-  id: string;
-  knowledgeBaseId: string;
-  sourceId: string;
-  title: string;
-  canonicalPath: string;
-  sourceType: 'document' | 'image';
-  unitType: string;
-  content: string;
-  preview: string;
-  summary: string;
-  terms: string[];
-  entities: string[];
-  relationHints: string[];
-  similarity: number;
-}
 
 interface RagQueryPanelProps {
   knowledgeBaseId: string | null;
@@ -32,7 +17,7 @@ export function RagQueryPanel({ knowledgeBaseId, knowledgeBaseName }: RagQueryPa
   const [query, setQuery] = useState('');
   const [isQuerying, setIsQuerying] = useState(false);
   const [hasResults, setHasResults] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<KnowledgeUnitMatch[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -67,24 +52,15 @@ export function RagQueryPanel({ knowledgeBaseId, knowledgeBaseName }: RagQueryPa
         throw new Error('請先選擇知識庫。');
       }
 
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim(), knowledgeBaseId, limit: 5 }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-
-      setResults(data.results || []);
+      setResults(await searchKnowledgeBase({
+        query: query.trim(),
+        knowledgeBaseId,
+        limit: 5,
+      }));
       setHasResults(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Search failed:', err);
-      setErrorMsg(err.message || 'An error occurred while searching.');
+      setErrorMsg(err instanceof Error ? err.message : 'An error occurred while searching.');
       setHasResults(true);
     } finally {
       setIsQuerying(false);

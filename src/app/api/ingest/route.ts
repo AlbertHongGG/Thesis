@@ -1,16 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createAiRuntimeFromConfig } from '@/ai';
-import { loadIngestFeatureConfig } from '@/features/ingest/config';
 import { encodeStreamEvent } from '@/features/ingest/contracts';
-import { SupabaseIngestRepository } from '@/features/ingest/SupabaseIngestRepository';
-import {
-  DEFAULT_KNOWLEDGE_BASE_NAME,
-  DEFAULT_KNOWLEDGE_BASE_SLUG,
-  type KnowledgeBaseRecord,
-} from '@/features/ingest/knowledge';
-import { IngestWorkflow } from '@/features/ingest/workflow';
-import { supabaseAdmin } from '@/lib/supabase';
 import { getPreviewKind } from '@/lib/workbench/filePreview';
+import { createServerApp, assertDatabaseWriteEnabled } from '@/composition/server/createServerApp';
+import { toIngestResultDto, toIngestUnitProgressDto } from '@/composition/server/dtoMappers';
 
 export const runtime = 'nodejs';
 
@@ -22,32 +14,10 @@ function getErrorMessage(error: unknown) {
   return String(error);
 }
 
-function createRepository() {
-  const dbWriteEnabled = process.env.ENABLE_DB_WRITE === 'true';
-  const dbConfigured = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE);
-
-  if (!dbWriteEnabled || !dbConfigured) {
-    return undefined;
-  }
-
-  return new SupabaseIngestRepository(supabaseAdmin);
-}
-
-function createFallbackKnowledgeBase(id?: string): KnowledgeBaseRecord {
-  return {
-    id: id || '00000000-0000-0000-0000-000000000001',
-    slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
-    name: DEFAULT_KNOWLEDGE_BASE_NAME,
-    status: 'active',
-    sourceCount: 0,
-    unitCount: 0,
-    profileVersion: 0,
-  };
-}
-
 export async function POST(req: Request) {
   try {
-    const featureConfig = loadIngestFeatureConfig();
+    assertDatabaseWriteEnabled();
+    const app = createServerApp();
     const formData = await req.formData();
     const file = formData.get('file');
     const knowledgeBaseValue = formData.get('knowledgeBaseId');
@@ -60,15 +30,7 @@ export async function POST(req: Request) {
     const filePathValue = formData.get('filePath');
     const filePath = typeof filePathValue === 'string' ? filePathValue : undefined;
     const previewKind = getPreviewKind(file.name);
-    const repository = createRepository();
-    const knowledgeBase = repository
-      ? await repository.ensureKnowledgeBase({ id: knowledgeBaseId || undefined })
-      : createFallbackKnowledgeBase(knowledgeBaseId || undefined);
-    const workflow = new IngestWorkflow({
-      runtime: createAiRuntimeFromConfig(featureConfig.runtime),
-      prompts: featureConfig.prompts,
-      repository,
-    });
+    const knowledgeBase = await app.knowledgeBaseService.ensureKnowledgeBase({ id: knowledgeBaseId || undefined });
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream<Uint8Array>({
@@ -78,17 +40,24 @@ export async function POST(req: Request) {
         };
 
         try {
-          const result = await workflow.run(
+          const result = await app.ingestService.ingest(
             {
               file,
               filePath,
               previewKind,
               knowledgeBase,
             },
-            send,
+            {
+              step(message) {
+                send({ type: 'step', message });
+              },
+              unit(payload) {
+                send(toIngestUnitProgressDto(payload));
+              },
+            },
           );
 
-          send({ type: 'result', result });
+          send({ type: 'result', result: toIngestResultDto(result) });
         } catch (error) {
           send({ type: 'error', error: getErrorMessage(error) });
         } finally {

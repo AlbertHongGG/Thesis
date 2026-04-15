@@ -1,19 +1,21 @@
 # Thesis Editor
 
-這個工作區現在採用和 `Transitor` 相同的 AI 邊界設計：
+目前版本已切換到新的分層架構，不再以 page-level orchestration 或 monolithic ingest workflow 為核心。主要責任分佈如下：
 
-- `src/ai/runtime/` 只負責 AI runtime、provider 選擇與 env 解析
-- `src/features/ingest/` 只負責 ingest 功能流程
-- `src/features/ingest/prompts/` 是獨立 prompt 定義
-- `src/app/api/ingest/route.ts` 是 thin controller，只負責接 request 與串流結果
+- `src/domain/`: 知識庫、知識單位、關聯、操作紀錄等核心模型
+- `src/application/`: ports 與 use-case services
+- `src/infrastructure/`: AI、parser、chunker、Supabase adapters
+- `src/composition/server/`: server-side composition root，供 App Router route handlers 使用
+- `src/lib/client/`: 前端對 API 的唯一存取入口
+- `src/lib/workbench/ingestQueue.ts`: 可跨頁面存活的 ingest queue runtime
 
-功能邏輯不再理解 provider 細節，runtime 也不再把 provider/model metadata 外洩到前端 DTO、session persistence 或 Supabase 核心資料表。
+`src/app/api/*` 現在只保留 controller 職責，真正的流程協調都在 application services 內完成。
 
 ## Getting Started
 
-1. 準備 env
+1. 準備環境變數
 
-	將 `.env.example` 的內容複製到 `.env`，再依照你要用的 provider/model 調整。
+   依照你的 provider / model 設定 `.env`。
 
 2. 安裝依賴
 
@@ -27,11 +29,12 @@ npm install
 npm run dev
 ```
 
-4. 驗證建置與 lint
+4. 驗證專案
 
 ```bash
 npm run build
 npm run lint
+npm run test
 ```
 
 ## AI Runtime Env
@@ -45,7 +48,7 @@ npm run lint
 - `AI_EMBEDDING_MODEL`: 全域 embedding 模型
 - `AI_RUNTIME_TIMEOUT_MS`: 全域 timeout
 
-ingest 功能覆寫：
+ingest 模組覆寫：
 
 - `INGEST_AI_PROVIDER`
 - `INGEST_AI_MODEL`
@@ -62,24 +65,37 @@ provider 專屬設定：
 
 ## Prompt 調整
 
-ingest prompt 已經從 workflow 拆開，位於：
-
-- `src/features/ingest/prompts/chunk-analysis.ts`
-- `src/features/ingest/prompts/document-summary.ts`
-- `src/features/ingest/prompts/image-analysis.ts`
-
-如果要調整 prompt，不需要修改 runtime 或 route；直接調整這三個 prompt 檔案檔頭的 prompt 常數即可。
+Prompt 定義仍位於 `src/features/ingest/prompts/`，但現在由 `src/infrastructure/prompts/IngestPromptCatalog.ts` 組裝後注入 application services。調整 prompt 時，不需要修改 route 或 runtime。
 
 ## Supabase Schema
 
-`npm run setup:supabase` 會一次套用：
+`npm run setup:supabase` 會套用：
 
 - `supabase/rag_schema.sql`
 - `supabase/add_vector_search.sql`
+
+雖然檔名仍保留 `rag_schema.sql`，內容已經切換到新的正規化 schema：
+
+- `knowledge_bases`
+- `knowledge_profiles`
+- `knowledge_sources`
+- `knowledge_units`
+- `knowledge_unit_relations`
+- `knowledge_operations`
+- `match_knowledge_units(...)`
 
 `npm run test:supabase` 會檢查：
 
 - Supabase HTTP API 是否可用
 - PostgreSQL 是否可連線
-- `knowledge_bases`、`knowledge_profiles`、`rag_documents`、`rag_document_chunks` 是否存在
-- `match_rag_chunks` RPC 是否存在
+- 上述 `knowledge_*` 資料表是否存在
+- `match_knowledge_units(vector, uuid, double precision, integer, text[])` 是否存在
+
+## Testing
+
+目前已加入針對新架構核心服務的測試：
+
+- `GraphApplicationService`
+- `ProfileSummarizationService`
+
+後續新增 use case 時，優先補 application service tests，而不是回到 page/component 層做流程堆疊測試。

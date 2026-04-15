@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { LoaderCircle, AlertCircle, ArrowLeft, Sparkles, Cpu, Image as ImageIcon, Box, Database, Network, FileText, Settings, Trash2 } from 'lucide-react';
+import { LoaderCircle, AlertCircle, Sparkles, Database, Network, FileText, Settings, Trash2 } from 'lucide-react';
 import { ForceGraph, GraphData, GraphNode } from '@/components/graph/ForceGraph';
 import { NodeDetailPanel } from '@/components/graph/NodeDetailPanel';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
+import { deleteKnowledgeGraphTarget, fetchKnowledgeGraph } from '@/lib/client/graphApi';
 import styles from './page.module.css';
 import mainStyles from '../page.module.css';
 
@@ -21,63 +22,52 @@ function GraphWorkspace() {
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
 
-  useEffect(() => {
+  const loadGraph = useCallback(async () => {
     if (!kbId) {
+      setData(null);
       setError('No Knowledge Base ID provided.');
       setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/graph?kbId=${encodeURIComponent(kbId)}`);
-        if (!res.ok) {
-          throw new Error('Failed to fetch graph data: ' + res.statusText);
-        }
-        const json = await res.json();
-        
-        if (json.error) {
-          throw new Error(json.error);
-        }
-
-        // Post process to ensure unique nodes or filter orphans if desired
-        setData({ nodes: json.nodes, links: json.links });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-    
-    // Assign fetchData to window object to trigger reload after delete
-    // OR alternatively, handle deletion directly here
-    (window as any).__refreshGraphData = fetchData;
-    
+    try {
+      setLoading(true);
+      setError(null);
+      setData(await fetchKnowledgeGraph(kbId) as GraphData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
   }, [kbId]);
+
+  useEffect(() => {
+    void loadGraph();
+  }, [loadGraph]);
 
   const handleDeleteNode = async (node: GraphNode) => {
     try {
-      let params = new URLSearchParams({ kbId: kbId! });
-      if (node.type === 'folder') {
-        const folderPath = node.id.replace('folder:', '');
-        params.append('folderPath', folderPath);
-      } else {
-        params.append('documentId', node.id);
+      if (!kbId) {
+        throw new Error('No Knowledge Base ID provided.');
       }
 
-      const res = await fetch(`/api/graph?${params.toString()}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete node data');
+      if (node.type === 'folder') {
+        await deleteKnowledgeGraphTarget({
+          knowledgeBaseId: kbId,
+          folderPath: node.id.replace('folder:', ''),
+        });
+      } else {
+        await deleteKnowledgeGraphTarget({
+          knowledgeBaseId: kbId,
+          documentId: node.id,
+        });
+      }
       
       setSelectedNode(null);
       toast('Deleted node successfully.', 'success');
-      if ((window as any).__refreshGraphData) {
-        (window as any).__refreshGraphData();
-      }
-    } catch (err: any) {
-      toast(err.message, 'error');
+      await loadGraph();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : String(err), 'error');
     }
   };
 
@@ -87,16 +77,17 @@ function GraphWorkspace() {
     }
     toast('Clearing all data...', 'info');
     try {
-      const res = await fetch(`/api/graph?kbId=${kbId}&deleteAll=true`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to clear graph data');
+      if (!kbId) {
+        throw new Error('No Knowledge Base ID provided.');
+      }
+
+      await deleteKnowledgeGraphTarget({ knowledgeBaseId: kbId, deleteAll: true });
       
       setSelectedNode(null);
       toast('All data successfully cleared.', 'success');
-      if ((window as any).__refreshGraphData) {
-        (window as any).__refreshGraphData();
-      }
-    } catch (err: any) {
-      toast(err.message, 'error');
+      await loadGraph();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : String(err), 'error');
     }
   };
 

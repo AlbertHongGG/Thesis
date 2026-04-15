@@ -4,7 +4,14 @@ import pg from 'pg';
 import { loadDotEnv } from './load-env.mjs';
 
 const REQUIRED_ENV_NAMES = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE', 'SUPABASE_DB_URL'];
-const REQUIRED_TABLES = ['knowledge_bases', 'knowledge_profiles', 'rag_sources', 'rag_units'];
+const REQUIRED_TABLES = [
+  'knowledge_bases',
+  'knowledge_profiles',
+  'knowledge_sources',
+  'knowledge_units',
+  'knowledge_unit_relations',
+  'knowledge_operations',
+];
 
 loadDotEnv();
 
@@ -37,6 +44,13 @@ function buildPgClient() {
   });
 }
 
+function attachClientErrorHandler(client, label) {
+  client.on('error', error => {
+    const message = error instanceof Error ? error.message : String(error);
+    printLine('WARN', label, message);
+  });
+}
+
 async function testHttpApi() {
   const client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE, {
     auth: {
@@ -45,15 +59,15 @@ async function testHttpApi() {
     },
   });
 
-  const { error } = await client.from('rag_sources').select('id').limit(1);
+  const { error } = await client.from('knowledge_sources').select('id').limit(1);
 
   if (!error) {
-    printLine('OK', 'HTTP API', '可透過 service role 讀取 rag_sources');
+    printLine('OK', 'HTTP API', '可透過 service role 讀取 knowledge_sources');
     return { apiReachable: true, schemaReady: true };
   }
 
   if (error.code === 'PGRST205') {
-    printLine('WARN', 'HTTP API', 'API 可連通，但 rag_sources 尚未建立');
+    printLine('WARN', 'HTTP API', 'API 可連通，但 knowledge_sources 尚未建立');
     return { apiReachable: true, schemaReady: false };
   }
 
@@ -63,6 +77,7 @@ async function testHttpApi() {
 
 async function testDatabase() {
   const client = buildPgClient();
+  attachClientErrorHandler(client, '資料庫事件');
 
   try {
     await client.connect();
@@ -80,23 +95,23 @@ async function testDatabase() {
     const functionResult = await client.query(
       `select oid::regprocedure::text as signature
        from pg_proc
-       where proname = 'match_rag_units'
-         and oid::regprocedure::text = 'match_rag_units(vector,uuid,double precision,integer,text[])'`,
+       where proname = 'match_knowledge_units'
+         and oid::regprocedure::text = 'match_knowledge_units(vector,uuid,double precision,integer,text[])'`,
     );
 
     const existingTables = new Set(result.rows.map(row => row.table_name));
     const missingTables = REQUIRED_TABLES.filter(tableName => !existingTables.has(tableName));
 
     if (missingTables.length === 0) {
-      printLine('OK', '資料表', 'knowledge_bases、knowledge_profiles、rag_sources 與 rag_units 都存在');
+      printLine('OK', '資料表', 'knowledge_bases、knowledge_profiles、knowledge_sources、knowledge_units、knowledge_unit_relations、knowledge_operations 都存在');
     } else {
       printLine('WARN', '資料表', `缺少：${missingTables.join(', ')}`);
     }
 
     if ((functionResult.rowCount ?? 0) >= 1) {
-      printLine('OK', '向量搜尋函式', 'KB-aware match_rag_units 已存在');
+      printLine('OK', '向量搜尋函式', 'KB-aware match_knowledge_units 已存在');
     } else {
-      printLine('WARN', '向量搜尋函式', '缺少 KB-aware match_rag_units');
+      printLine('WARN', '向量搜尋函式', '缺少 KB-aware match_knowledge_units');
     }
 
     if (missingTables.length === 0 && (functionResult.rowCount ?? 0) >= 1) {

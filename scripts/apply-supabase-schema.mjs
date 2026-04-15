@@ -23,6 +23,13 @@ function buildClient() {
   });
 }
 
+function attachClientErrorHandler(client, label) {
+  client.on('error', error => {
+    const message = error instanceof Error ? error.message : String(error);
+    printLine('WARN', label, message);
+  });
+}
+
 async function main() {
   const dbUrl = process.env.SUPABASE_DB_URL ?? '';
   if (!dbUrl.trim()) {
@@ -34,14 +41,15 @@ async function main() {
   const schemaSql = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
   const vectorSql = fs.readFileSync(VECTOR_SQL_FILE_PATH, 'utf8');
   const client = buildClient();
+  attachClientErrorHandler(client, '資料庫事件');
 
   try {
     await client.connect();
     printLine('OK', '資料庫連線', '已成功連線到目標資料庫');
     await client.query(schemaSql);
-    printLine('OK', 'Schema 套用', 'rag_schema.sql 已成功執行');
+    printLine('OK', 'Schema 套用', 'rag_schema.sql 已成功執行，新 knowledge_* schema 已建立');
     await client.query(vectorSql);
-    printLine('OK', '向量搜尋初始化', 'add_vector_search.sql 已成功執行');
+    printLine('OK', '向量搜尋初始化', 'add_vector_search.sql 已成功執行，match_knowledge_units 已建立');
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     printLine('FAIL', 'Schema 套用', message);

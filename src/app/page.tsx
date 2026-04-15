@@ -9,11 +9,9 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock3,
-  Cpu,
   Database,
   FileText,
   FolderClock,
-  Image as ImageIcon,
   LoaderCircle,
   Network,
   Play,
@@ -23,7 +21,6 @@ import {
   Sparkles,
   Square,
   Trash2,
-  Eraser,
 } from 'lucide-react';
 import { DropZone, ExtendedFile } from '@/components/ui/DropZone';
 import { FilePreviewModal } from '@/components/ui/FilePreviewModal';
@@ -44,11 +41,18 @@ import {
   type PersistedSessionSnapshot,
 } from '@/lib/storage/sessionStore';
 import {
+  DEFAULT_KNOWLEDGE_BASE_ID,
   DEFAULT_KNOWLEDGE_BASE_NAME,
   DEFAULT_KNOWLEDGE_BASE_SLUG,
-  type KnowledgeBaseMaintenanceAction,
-  type KnowledgeBaseRecord,
-} from '@/features/ingest/knowledge';
+} from '@/domain/knowledge/defaults';
+import type { KnowledgeBaseRecord } from '@/domain/knowledge/types';
+import type { KnowledgeBaseMaintenanceAction } from '@/domain/operations/types';
+import {
+  createKnowledgeBase as createKnowledgeBaseRequest,
+  deleteKnowledgeBase as deleteKnowledgeBaseRequest,
+  listKnowledgeBases,
+  runKnowledgeBaseMaintenance as runKnowledgeBaseMaintenanceRequest,
+} from '@/lib/client/knowledgeBaseApi';
 import { formatDuration, formatSavedAt, getDisplayPath, getStatusLabel } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
 import { useWorkbenchQueueState, workbenchQueue } from '@/lib/workbench/ingestQueue';
@@ -70,9 +74,8 @@ interface RestorePromptState {
   files: PersistedFileRecord[];
 }
 
-const FALLBACK_KNOWLEDGE_BASE_ID = '00000000-0000-0000-0000-000000000001';
 const FALLBACK_KNOWLEDGE_BASE: KnowledgeBaseRecord = {
-  id: FALLBACK_KNOWLEDGE_BASE_ID,
+  id: DEFAULT_KNOWLEDGE_BASE_ID,
   slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
   name: DEFAULT_KNOWLEDGE_BASE_NAME,
   status: 'active',
@@ -252,33 +255,15 @@ export default function DataWorkbench() {
 
   const refreshKnowledgeBases = useCallback(async (preferredKnowledgeBaseId?: string | null) => {
     try {
-      const response = await fetch('/api/knowledge-bases');
-
-      if (!response.ok) {
-        throw new Error(`Knowledge base request failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      let nextKnowledgeBases = (data.knowledgeBases ?? []) as KnowledgeBaseRecord[];
+      let nextKnowledgeBases = await listKnowledgeBases();
 
       if (nextKnowledgeBases.length === 0) {
-        const createResponse = await fetch('/api/knowledge-bases', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: FALLBACK_KNOWLEDGE_BASE_ID,
-            slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
-            name: DEFAULT_KNOWLEDGE_BASE_NAME,
-            description: 'Default knowledge base for thesis research ingestion.',
-          }),
-        });
-
-        if (!createResponse.ok) {
-          throw new Error(`Failed to create default knowledge base: ${createResponse.status}`);
-        }
-
-        const created = await createResponse.json();
-        nextKnowledgeBases = [created.knowledgeBase as KnowledgeBaseRecord];
+        nextKnowledgeBases = [await createKnowledgeBaseRequest({
+          id: DEFAULT_KNOWLEDGE_BASE_ID,
+          slug: DEFAULT_KNOWLEDGE_BASE_SLUG,
+          name: DEFAULT_KNOWLEDGE_BASE_NAME,
+          description: 'Default knowledge base for thesis research ingestion.',
+        })];
       }
 
       setKnowledgeBases(nextKnowledgeBases);
@@ -293,7 +278,7 @@ export default function DataWorkbench() {
       console.error('Failed to load knowledge bases:', error);
       toast(error instanceof Error ? error.message : String(error), 'error');
       setKnowledgeBases([FALLBACK_KNOWLEDGE_BASE]);
-      workbenchQueue.setActiveKnowledgeBaseId(preferredKnowledgeBaseId ?? FALLBACK_KNOWLEDGE_BASE_ID);
+      workbenchQueue.setActiveKnowledgeBaseId(preferredKnowledgeBaseId ?? DEFAULT_KNOWLEDGE_BASE_ID);
     }
   }, [toast]);
 
@@ -307,18 +292,7 @@ export default function DataWorkbench() {
     setIsCreatingKnowledgeBase(true);
 
     try {
-      const response = await fetch('/api/knowledge-bases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: trimmedName }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create knowledge base: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const created = data.knowledgeBase as KnowledgeBaseRecord;
+      const created = await createKnowledgeBaseRequest({ name: trimmedName });
 
       setKnowledgeBases(prev => {
         const next = [...prev.filter(knowledgeBase => knowledgeBase.id !== created.id), created];
@@ -352,13 +326,7 @@ export default function DataWorkbench() {
     }
 
     try {
-      const response = await fetch(`/api/knowledge-bases?id=${encodeURIComponent(activeKnowledgeBaseId)}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete knowledge base: ${response.status}`);
-      }
+      await deleteKnowledgeBaseRequest(activeKnowledgeBaseId);
 
       if (processMode !== 'idle') {
         workbenchQueue.stopProcessing();
@@ -388,23 +356,7 @@ export default function DataWorkbench() {
     toast(action === 'reindex' ? 'Reindexing KB...' : 'Rebuilding profile...', 'info');
 
     try {
-      const response = await fetch(`/api/knowledge-bases/${encodeURIComponent(activeKnowledgeBaseId)}/maintenance`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Maintenance request failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const result = data.result as {
-        action: KnowledgeBaseMaintenanceAction;
-        sourceCount: number;
-        unitCount: number;
-        profileVersion?: number;
-      };
+      const result = await runKnowledgeBaseMaintenanceRequest(activeKnowledgeBaseId, action);
 
       toast(
         action === 'reindex'

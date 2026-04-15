@@ -1,8 +1,9 @@
 create extension if not exists vector schema extensions;
 
 drop function if exists public.match_rag_units(vector, uuid, float, int, text[]);
+drop function if exists public.match_knowledge_units(vector, uuid, float, int, text[]);
 
-create or replace function public.match_rag_units (
+create or replace function public.match_knowledge_units (
   query_embedding vector,
   kb_id uuid,
   match_threshold float,
@@ -20,9 +21,9 @@ returns table (
   content text,
   preview text,
   summary text,
-  terms jsonb,
-  entities jsonb,
-  relation_hints jsonb,
+  terms text[],
+  entities text[],
+  relation_hints text[],
   similarity float
 )
 language sql stable
@@ -37,25 +38,30 @@ as $$
     units.unit_type,
     units.content,
     units.preview,
-    coalesce(units.meta->>'summary', ''),
-    coalesce(units.meta->'terms', '[]'::jsonb),
-    coalesce(units.meta->'entities', '[]'::jsonb),
+    units.summary,
+    units.terms,
+    units.entities,
     coalesce(
-      (
-        select jsonb_agg(item->>'label')
-        from jsonb_array_elements(coalesce(units.meta->'relationHints', '[]'::jsonb)) item
+      array(
+        select item->>'label'
+        from jsonb_array_elements(coalesce(units.relation_hints, '[]'::jsonb)) item
+        where coalesce(item->>'label', '') <> ''
       ),
-      '[]'::jsonb
+      array[]::text[]
     ),
     1 - (units.embedding operator(extensions.<=>) query_embedding) as similarity
-  from public.rag_units units
-  join public.rag_sources sources on sources.id = units.source_id
+  from public.knowledge_units units
+  join public.knowledge_sources sources on sources.id = units.source_id
   where units.knowledge_base_id = kb_id
     and sources.knowledge_base_id = kb_id
     and units.embedding is not null
     and units.status = 'ready'
     and sources.ingest_status = 'ready'
-    and (source_types is null or sources.source_type = any(source_types))
+    and (
+      source_types is null
+      or array_length(source_types, 1) is null
+      or sources.source_type = any(source_types)
+    )
     and 1 - (units.embedding operator(extensions.<=>) query_embedding) > match_threshold
   order by units.embedding operator(extensions.<=>) query_embedding
   limit match_count;

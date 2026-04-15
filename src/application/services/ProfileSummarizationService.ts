@@ -1,7 +1,7 @@
-import type { AIRuntime } from '@/ai';
-import { buildPreview } from '../text';
-import type { KnowledgeProfilePromptBundle } from '../prompts';
-import { uniqueStrings } from '../knowledge';
+import type { AIProvider } from '@/application/ports/external';
+import type { KnowledgeProfilePromptBundle } from '@/features/ingest/prompts';
+import { buildPreview } from '@/features/ingest/text';
+import { uniqueStrings } from '@/domain/knowledge/defaults';
 
 type KnowledgeProfileSource = {
   summary: string;
@@ -9,9 +9,9 @@ type KnowledgeProfileSource = {
   terms: string[];
 };
 
-export class KnowledgeProfileService {
+export class ProfileSummarizationService {
   constructor(
-    private readonly runtime: AIRuntime,
+    private readonly aiProvider: AIProvider,
     private readonly prompt: KnowledgeProfilePromptBundle,
   ) {}
 
@@ -34,7 +34,7 @@ export class KnowledgeProfileService {
     }
 
     try {
-      const raw = await this.runtime.generateText({
+      const raw = await this.aiProvider.generateText({
         systemPrompt: this.prompt.systemPrompt,
         prompt: this.prompt.buildPrompt({
           knowledgeBaseName: input.knowledgeBaseName,

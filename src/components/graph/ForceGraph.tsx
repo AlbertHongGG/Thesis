@@ -4,7 +4,11 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
-const ForceGraphCanvas = ForceGraph2D as unknown as React.ComponentType<any>;
+
+type ForceGraphInstance = {
+  centerAt: (x?: number, y?: number, ms?: number) => void;
+  zoom: (scale: number, ms?: number) => void;
+};
 
 export interface GraphNode {
   id: string;
@@ -28,7 +32,7 @@ export interface GraphNode {
 export interface GraphLink {
   source: string | GraphNode;
   target: string | GraphNode;
-  type: 'child' | 'related';
+  type: 'child' | 'related' | 'hierarchy';
   label?: string;
   score?: number;
 }
@@ -38,6 +42,31 @@ export interface GraphData {
   links: GraphLink[];
 }
 
+type ForceGraphCanvasProps = {
+  width: number;
+  height: number;
+  graphData: GraphData;
+  nodeColor: (node: GraphNode) => string;
+  nodeRelSize: number;
+  nodeCanvasObject: (node: GraphNode, ctx: CanvasRenderingContext2D, globalScale: number) => void;
+  linkColor: (link: GraphLink) => string;
+  linkWidth: (link: GraphLink) => number;
+  linkLineDash: (link: GraphLink) => number[] | null;
+  linkDirectionalParticles: (link: GraphLink) => number;
+  linkDirectionalParticleSpeed: number;
+  linkDirectionalParticleWidth: number;
+  linkDirectionalParticleColor: () => string;
+  onNodeClick: (node: GraphNode) => void;
+  d3VelocityDecay: number;
+  warmupTicks: number;
+  cooldownTicks: number;
+  backgroundColor: string;
+};
+
+const ForceGraphCanvas = ForceGraph2D as unknown as React.ForwardRefExoticComponent<
+  ForceGraphCanvasProps & React.RefAttributes<ForceGraphInstance>
+>;
+
 interface ForceGraphProps {
   data: GraphData;
   onNodeClick: (node: GraphNode) => void;
@@ -45,7 +74,7 @@ interface ForceGraphProps {
 }
 
 export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selectedNodeId }) => {
-  const fgRef = useRef<any>(null);
+  const fgRef = useRef<ForceGraphInstance | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -76,10 +105,12 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
     [onNodeClick]
   );
 
-  const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const paintNode = useCallback((node: GraphNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const isSelected = selectedNodeId === node.id;
     const isDoc = node.type === 'source';
     const isFolder = node.type === 'folder';
+    const nodeX = node.x ?? 0;
+    const nodeY = node.y ?? 0;
     
     // Size logic
     let size = isFolder ? 12 : (isDoc ? 8 : 4);
@@ -94,7 +125,7 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
     const selectedColor = '#f59e0b'; // Amber for highlight
     
     ctx.beginPath();
-    ctx.arc(node.x, node.y, isSelected ? size * 1.5 : size, 0, 2 * Math.PI, false);
+    ctx.arc(nodeX, nodeY, isSelected ? size * 1.5 : size, 0, 2 * Math.PI, false);
     
     if (isSelected) {
       ctx.fillStyle = selectedColor;
@@ -120,8 +151,8 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
       ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
       ctx.beginPath();
       ctx.roundRect(
-        node.x - bckgDimensions[0] / 2, 
-        node.y + size + fontSize * 0.5 - bckgDimensions[1] / 2, 
+        nodeX - bckgDimensions[0] / 2, 
+        nodeY + size + fontSize * 0.5 - bckgDimensions[1] / 2, 
         bckgDimensions[0], 
         bckgDimensions[1],
         4 / globalScale
@@ -131,7 +162,7 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = isSelected ? '#f59e0b' : (isFolder ? '#475569' : '#334155');
-      ctx.fillText(label, node.x, node.y + size + fontSize * 0.5);
+      ctx.fillText(label, nodeX, nodeY + size + fontSize * 0.5);
     }
   }, [selectedNodeId]);
 
@@ -142,20 +173,20 @@ export const ForceGraph: React.FC<ForceGraphProps> = ({ data, onNodeClick, selec
         width={dimensions.width}
         height={dimensions.height}
         graphData={data}
-        nodeColor={(node: any) => node.type === 'folder' ? '#64748b' : (node.type === 'source' ? '#3b82f6' : '#8baef9')}
+        nodeColor={(node) => node.type === 'folder' ? '#64748b' : (node.type === 'source' ? '#3b82f6' : '#8baef9')}
         nodeRelSize={6}
         nodeCanvasObject={paintNode}
         
         // Links config
-        linkColor={(link: any) => {
-          if (link.type === 'child') return 'rgba(148, 163, 184, 0.4)';
+        linkColor={(link) => {
+          if (link.type === 'child' || link.type === 'hierarchy') return 'rgba(148, 163, 184, 0.4)';
           return 'rgba(59, 130, 246, 0.2)'; // related
         }}
-        linkWidth={(link: any) => link.type === 'child' ? 1.5 : 0.8}
-        linkLineDash={(link: any) => link.type === 'related' ? [2, 2] : null}
+        linkWidth={(link) => (link.type === 'child' || link.type === 'hierarchy') ? 1.5 : 0.8}
+        linkLineDash={(link) => link.type === 'related' ? [2, 2] : null}
         
         // Particles for relation links
-        linkDirectionalParticles={(link: any) => link.type === 'related' ? 2 : 0}
+        linkDirectionalParticles={(link) => link.type === 'related' ? 2 : 0}
         linkDirectionalParticleSpeed={0.005}
         linkDirectionalParticleWidth={2}
         linkDirectionalParticleColor={() => '#3b82f6'}

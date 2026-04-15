@@ -1,15 +1,19 @@
-import type { KnowledgeContextTrace, KnowledgeSourceType } from './knowledge';
+import type {
+  KnowledgeContextTrace,
+  KnowledgeRelationKind,
+  KnowledgeSourceType,
+  PreviewKind as KnowledgePreviewKind,
+  RelationHint as KnowledgeRelationHint,
+  SourceStructure as KnowledgeSourceStructure,
+} from '@/domain/knowledge/types';
 
 export const INGEST_CONTRACT_VERSION = 5;
 
-export type PreviewKind = 'image' | 'text' | 'parsed-text' | 'unsupported';
+export type PreviewKind = KnowledgePreviewKind;
 
-export type RelationKind = 'depends-on' | 'continues' | 'compares' | 'explains' | 'references' | 'supports';
+export type RelationKind = KnowledgeRelationKind;
 
-export type RelationHint = {
-  kind: RelationKind;
-  label: string;
-};
+export type RelationHint = KnowledgeRelationHint;
 
 export type UnitRelation = {
   unitId: string;
@@ -18,10 +22,7 @@ export type UnitRelation = {
   label: string;
 };
 
-export type SourceStructure = {
-  kind: string;
-  label: string;
-};
+export type SourceStructure = KnowledgeSourceStructure;
 
 export type SourceMeta = {
   schemaVersion: number;

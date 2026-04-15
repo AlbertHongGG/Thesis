@@ -11,6 +11,7 @@ import {
 } from '@/lib/storage/sessionStore';
 import { getDisplayPath } from '@/lib/workbench/formatting';
 import { IMAGE_FILE_PATTERN } from '@/lib/workbench/filePreview';
+import { startIngestRequest } from '@/lib/client/ingestApi';
 import type {
   FileProcessEntry,
   IngestResult,
@@ -541,12 +542,11 @@ async function processCurrentFile(generation: number) {
       throw new Error('No active knowledge base selected');
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('knowledgeBaseId', snapshot.activeKnowledgeBaseId);
-    formData.append('filePath', fullPath);
-
-    const res = await fetch('/api/ingest', { method: 'POST', body: formData });
+    const res = await startIngestRequest({
+      file,
+      knowledgeBaseId: snapshot.activeKnowledgeBaseId,
+      filePath: fullPath,
+    });
     await processStreamResponse(res, fullPath, generation);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
